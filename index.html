@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#C8102E">
+<meta name="robots" content="noindex">
+<title>徐悲鸿中学 · 2026级5班 · 班级服务平台</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23C8102E'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='serif' font-weight='bold'>徐</text></svg>">
+<style>
+:root{
+  --red:#C8102E;--red-d:#9B0C24;--red-l:#E63946;
+  --ink:#1F2328;--ink2:#4B5563;--muted:#8A9099;--line:#E7E9EE;--bg:#F6F7F9;--card:#fff;
+  --sh:0 8px 24px rgba(17,24,39,.10);--r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+  background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer}
+
+/* ---------- 通用组件 ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;
+  border:1px solid transparent;border-radius:9px;font-size:14px;font-weight:600;letter-spacing:.5px;
+  transition:.15s;white-space:nowrap}
+.btn[disabled]{opacity:.6;cursor:not-allowed}
+.btn.primary{background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;box-shadow:0 6px 16px rgba(200,16,46,.28)}
+.btn.primary:hover{box-shadow:0 9px 22px rgba(200,16,46,.36)}
+.btn.ghost{background:#fff;color:var(--ink2);border-color:var(--line)}
+.btn.ghost:hover{background:#FAFAFB;color:var(--ink)}
+.btn.danger{background:#fff;color:#B42318;border-color:#F1C6C2}
+.btn.danger:hover{background:#FEF3F2}
+.btn.sm{height:30px;padding:0 11px;font-size:13px;font-weight:500;border-radius:7px}
+.btn.block{width:100%;height:46px;font-size:15px}
+
+.field{display:block;margin-bottom:14px}
+.field>span{display:block;font-size:13px;color:var(--ink2);margin-bottom:6px}
+.field>span em{font-style:normal;color:var(--red);margin-left:2px}
+.input,.textarea{width:100%;border:1px solid var(--line);border-radius:9px;background:#fff;
+  padding:0 12px;height:40px;font-size:14px;font-family:inherit;color:var(--ink);outline:none;transition:.18s}
+.textarea{height:auto;padding:10px 12px;line-height:1.65;resize:vertical;min-height:96px}
+.input:focus,.textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.12)}
+.input::placeholder,.textarea::placeholder{color:#AEB4BC}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 2px rgba(17,24,39,.06)}
+.badge{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;
+  font-size:12px;border:1px solid transparent;white-space:nowrap}
+.badge.red{color:#9B0C24;background:#FDF0F2;border-color:#F6D5DA}
+.badge.gray{color:#5B6270;background:#F3F4F6;border-color:#E5E7EB}
+.link{background:none;border:none;padding:0;font-size:13px;color:var(--red)}
+.link:hover{text-decoration:underline}
+.link.muted{color:var(--ink2)}
+.link.danger{color:#B42318}
+.link[disabled]{color:#B9BEC6;cursor:not-allowed;text-decoration:none}
+
+/* 弹窗 */
+.mask{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:rgba(17,24,39,.45);opacity:0;transition:.2s}
+.mask.show{opacity:1}
+.modal{width:100%;max-height:calc(100vh - 40px);display:flex;flex-direction:column;background:#fff;
+  border-radius:16px;box-shadow:0 24px 60px rgba(17,24,39,.18);transform:translateY(14px);transition:.22s;overflow:hidden}
+.mask.show .modal{transform:none}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid #F1F2F5}
+.modal-head h3{font-size:16px;letter-spacing:.5px}
+.modal-x{border:none;background:none;font-size:24px;line-height:1;color:#A3A9B2;padding:0 4px;border-radius:6px}
+.modal-x:hover{color:var(--ink);background:#F3F4F6}
+.modal-body{padding:18px 20px;overflow-y:auto;font-size:14px;color:var(--ink2);line-height:1.7}
+.modal-body p{margin-bottom:10px}
+.modal-body p:last-child{margin-bottom:0}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:12px 20px 16px;border-top:1px solid #F1F2F5;background:#FCFCFD}
+
+/* toast */
+.toasts{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9500;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none}
+.toast{max-width:86vw;padding:11px 18px;border-radius:10px;background:rgba(31,35,40,.94);color:#fff;font-size:13.5px;
+  box-shadow:var(--sh);opacity:0;transform:translateY(-8px);transition:.24s}
+.toast.show{opacity:1;transform:none}
+.toast.ok{background:rgba(18,112,61,.95)}
+.toast.err{background:rgba(166,22,32,.95)}
+
+.spinner{width:13px;height:13px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;
+  display:inline-block;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ---------- 登录 ---------- */
+#loginView{min-height:100vh;display:flex;flex-direction:column;
+  background:linear-gradient(180deg,var(--red) 0%,#D9233B 32%,#fff 46%)}
+.login-top{padding:26px 32px;display:flex;align-items:baseline;gap:14px}
+.login-top .school{color:#fff;font-size:24px;font-weight:700;letter-spacing:3px;text-shadow:0 2px 6px rgba(0,0,0,.15)}
+.login-top .cls{color:rgba(255,255,255,.9);font-size:15px;letter-spacing:2px}
+.login-main{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:6vh 20px 40px}
+.login-card{width:100%;max-width:390px;background:#fff;border-radius:16px;padding:36px 32px 28px;
+  box-shadow:0 14px 44px rgba(200,16,46,.20)}
+.login-card h1{text-align:center;font-size:23px;color:var(--red);letter-spacing:2px;margin-bottom:6px}
+.login-card .sub{text-align:center;font-size:13px;color:#999;margin-bottom:26px}
+.login-card .err{min-height:20px;font-size:13px;color:#B42318;text-align:center;margin:-4px 0 8px}
+.login-card .foot{margin-top:16px;text-align:center;font-size:12px;color:#b3b8c0}
+.fatal{text-align:center;padding:6px 0}
+.fatal strong{display:block;font-size:15px;color:#B42318;margin-bottom:8px}
+.fatal p{font-size:13px;line-height:1.7;color:#6b7280;margin-bottom:10px;word-break:break-word}
+
+/* ---------- 应用 ---------- */
+#appView{min-height:100vh;display:flex;flex-direction:column;animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.topbar{background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;padding:14px 0;
+  box-shadow:0 4px 16px rgba(200,16,46,.22)}
+.topbar .inner{max-width:1120px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:14px}
+.brand-mark{width:36px;height:36px;border-radius:50%;background:#fff;color:var(--red);flex:none;
+  display:flex;align-items:center;justify-content:center;font-family:"STKaiti","KaiTi",serif;font-size:20px;font-weight:700}
+.brand-text{display:flex;flex-direction:column;line-height:1.25}
+.brand-text b{font-size:17px;letter-spacing:2px}
+.brand-text small{font-size:11.5px;color:rgba(255,255,255,.8);letter-spacing:1px}
+.chip{margin-left:auto;display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px 0 8px;
+  border-radius:999px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);font-size:13px;max-width:180px}
+.chip .dot{width:20px;height:20px;border-radius:50%;background:#fff;color:var(--red);flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.chip span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-logout{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;
+  height:32px;padding:0 14px;border-radius:999px;font-size:13px}
+.btn-logout:hover{background:rgba(255,255,255,.26)}
+
+.wrap{flex:1;width:100%;max-width:1120px;margin:0 auto;padding:26px 24px 60px}
+
+/* 用户端 */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:760px;margin:6vh auto 0}
+.tile{aspect-ratio:1/1;border-radius:18px;background:linear-gradient(135deg,var(--red-l),var(--red));
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:600;letter-spacing:3px;
+  box-shadow:0 10px 30px rgba(200,16,46,.25);position:relative;transition:.18s;cursor:pointer;user-select:none;text-align:center}
+.tile:hover{filter:brightness(1.07);box-shadow:0 16px 36px rgba(200,16,46,.36)}
+.tile:active{filter:brightness(.96)}
+.tile .dot{position:absolute;top:12px;right:12px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;
+  background:#fff;color:var(--red);font-size:11.5px;font-weight:700;display:none;align-items:center;justify-content:center;letter-spacing:0}
+.tile .dot.show{display:flex}
+
+/* 管理端 */
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{height:36px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:#fff;
+  font-size:13.5px;color:var(--ink2);letter-spacing:1px}
+.tab.active{background:var(--red);border-color:var(--red);color:#fff;font-weight:600;box-shadow:0 6px 16px rgba(200,16,46,.24)}
+
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.panel-head h2{font-size:17px;letter-spacing:1px}
+.panel-head .hint{font-size:12.5px;color:var(--muted)}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}
+th{text-align:left;font-size:12.5px;font-weight:600;color:var(--muted);background:#FAFBFC;
+  border-bottom:1px solid var(--line);padding:11px 14px;white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid #F1F2F5;color:var(--ink2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{cursor:pointer;transition:background .15s}
+tbody tr:hover{background:#FCFCFD}
+tbody tr.sel{background:#FDF2F4}
+tbody tr.sel td{border-bottom-color:#F6D5DA}
+tbody tr.sel .name{color:var(--red)}
+.name{color:var(--ink);font-weight:600;display:flex;align-items:center;gap:10px}
+.avatar{width:28px;height:28px;border-radius:50%;background:#FDF0F2;color:var(--red);flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600}
+.pick{width:20px;height:20px;border-radius:50%;border:1.5px solid #D6DAE0;background:#fff;display:flex;
+  align-items:center;justify-content:center;font-size:11px;color:transparent}
+tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
+
+.toolbar{display:flex;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid #F1F2F5;flex-wrap:wrap}
+.toolbar .input{height:38px;flex:1 1 220px;min-width:160px}
+.count{font-size:12.5px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.table-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:10px 16px;border-top:1px solid #F1F2F5;font-size:12px;color:var(--muted)}
+
+.actions{position:fixed;right:28px;bottom:24px;z-index:50;display:flex;gap:10px}
+.actions .btn{height:44px;padding:0 22px;box-shadow:0 10px 24px rgba(17,24,39,.16)}
+
+.news{padding:14px}
+.news-item{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;margin-bottom:12px}
+.news-item:last-child{margin-bottom:0}
+.news-item .hd{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.news-item h4{font-size:14.5px;color:var(--ink)}
+.news-item .time{margin-left:auto;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.news-item p{font-size:13.5px;line-height:1.75;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
+.news-item .ops{margin-top:10px;display:flex;gap:14px}
+
+.empty{padding:44px 20px;text-align:center;color:var(--muted);font-size:14px}
+.empty strong{display:block;color:var(--ink2);font-size:15px;margin-bottom:6px}
+.loading{display:flex;align-items:center;justify-content:center;padding:44px;color:var(--muted);font-size:14px}
+
+/* 弹窗内容小工具 */
+.kv{display:grid;grid-template-columns:80px 1fr;gap:9px 12px;font-size:13.5px}
+.kv dt{color:var(--muted)}
+.kv dd{color:var(--ink);word-break:break-all}
+.cred{background:#F8F9FB;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:10px;
+  font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:2;color:var(--ink);word-break:break-all}
+.row{display:flex;gap:8px}
+.row .btn{flex:none;height:40px}
+
+@media(max-width:640px){
+  .topbar .inner{padding:0 14px;gap:10px}
+  .brand-text b{font-size:15px;letter-spacing:1px}
+  .brand-text small{font-size:10.5px}
+  .chip{max-width:110px;padding:0 10px 0 7px}
+  .wrap{padding:18px 14px 80px}
+  .grid{gap:14px;margin-top:3vh}
+  .tile{font-size:17px;letter-spacing:2px}
+  .actions{left:14px;right:14px;bottom:14px;gap:8px}
+  .actions .btn{flex:1;padding:0 10px;font-size:13.5px}
+  .login-card{padding:30px 22px 22px}
+  .login-top{padding:20px}
+  .login-top .school{font-size:21px}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 登录 ========== -->
+<div id="loginView">
+  <div class="login-top">
+    <span class="school">徐悲鸿中学</span>
+    <span class="cls">2026级5班</span>
+  </div>
+  <div class="login-main">
+    <div class="login-card">
+      <h1 id="loginTitle">班级服务平台</h1>
+      <div class="sub">请输入登录名和密码</div>
+      <form id="loginForm" novalidate>
+        <label class="field"><span>登录名</span>
+          <input class="input" id="username" autocomplete="off" placeholder="请输入登录名" maxlength="32">
+        </label>
+        <label class="field"><span>密码</span>
+          <input class="input" id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
+        </label>
+        <div class="err" id="loginErr"></div>
+        <button class="btn primary block" id="btnLogin" type="submit">登 录</button>
+      </form>
+      <p class="foot">账号由班级管理员统一发放</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 应用 ========== -->
+<div id="appView" hidden>
+  <header class="topbar">
+    <div class="inner">
+      <div class="brand-mark">徐</div>
+      <div class="brand-text">
+        <b>徐悲鸿中学</b>
+        <small id="brandSub">2026级5班 · 班级服务平台</small>
+      </div>
+      <span class="chip"><span class="dot" id="userDot">我</span><span id="userName">同学</span></span>
+      <button class="btn-logout" id="btnLogout" type="button">退出</button>
+    </div>
+  </header>
+
+  <!-- 用户端 -->
+  <main class="wrap" id="userPanel" hidden>
+    <div class="grid">
+      <div class="tile" data-mod="news" data-name="班级热点">班级热点<span class="dot" id="newsDot"></span></div>
+      <div class="tile" data-mod="homework" data-name="班级作业">班级作业</div>
+      <div class="tile" data-mod="cube" data-name="魔方">魔方</div>
+      <div class="tile" data-mod="push" data-name="广告推流">广告推流</div>
+    </div>
+  </main>
+
+  <!-- 全屏模块页（点方块后覆盖整个屏幕） -->
+  <section id="modView" hidden style="position:fixed;inset:0;z-index:800;background:var(--bg);display:flex;flex-direction:column">
+    <header style="flex:none;background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;padding:0 18px;height:54px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(200,16,46,.22)">
+      <button id="modBack" type="button" style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;height:32px;padding:0 14px;border-radius:999px;font-size:13.5px">‹ 返回</button>
+      <b id="modTitle" style="font-size:17px;letter-spacing:2px"></b>
+    </header>
+    <div id="modBody" style="flex:1;overflow-y:auto;padding:18px;max-width:900px;width:100%;margin:0 auto"></div>
+  </section>
+
+  <!-- 管理端 -->
+  <main class="wrap" id="adminPanel" hidden>
+    <div class="tabs">
+      <button class="tab active" data-tab="users" type="button">用户管理</button>
+      <button class="tab" data-tab="news" type="button">班级热点</button>
+      <button class="tab" data-tab="me" type="button">我的账号</button>
+    </div>
+
+    <!-- 用户管理 -->
+    <section id="tab-users">
+      <div class="panel-head">
+        <div>
+          <h2>用户管理</h2>
+          <div class="hint">点一行选中账号，右下角操作</div>
+        </div>
+        <span class="hint" id="userCount"></span>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <input class="input" id="search" type="search" placeholder="搜索用户名 / 登录名">
+          <button class="btn ghost sm" id="btnReload" type="button" style="height:38px">刷新</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th style="width:40px"></th><th>用户名</th><th>登录名</th><th style="text-align:right">最后登录</th></tr></thead>
+            <tbody id="userBody"><tr><td colspan="4"><div class="loading"><span class="spinner"></span>加载中…</div></td></tr></tbody>
+          </table>
+        </div>
+        <div class="table-foot">
+          <span>密码以 bcrypt 哈希存储，管理员也看不到明文</span>
+          <span id="pwdHint">忘记密码可点「重置密码」</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 班级热点 -->
+    <section id="tab-news" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>班级热点</h2>
+          <div class="hint">发布后，学生在「班级热点」里就能看到</div>
+        </div>
+        <button class="btn primary sm" id="btnAddNews" type="button" style="height:36px;padding:0 16px">＋ 发布公告</button>
+      </div>
+      <div class="card"><div class="news" id="newsList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- 我的账号 -->
+    <section id="tab-me" hidden>
+      <div class="panel-head"><div><h2>我的账号</h2><div class="hint">改密码、看身份</div></div></div>
+      <div class="card" style="padding:20px 18px">
+        <dl class="kv" id="meInfo"></dl>
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn primary sm" id="btnChangePwd" type="button" style="height:36px;padding:0 16px">修改密码</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="actions" id="adminActions" hidden style="display:none">
+    <button class="btn ghost" id="btnReset" type="button">重置密码</button>
+    <button class="btn primary" id="btnAdd" type="button">新增用户</button>
+    <button class="btn danger" id="btnDelete" type="button">删除用户</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+ * 徐悲鸿中学 · 2026级5班 · 班级服务平台（单文件版）
+ * 登录后按角色自动切换：管理员 → 管理端；其他人 → 用户端
+ * ============================================================ */
+(function () {
+  'use strict';
+
+  var URL = 'https://hkmxmkujzikcgrnlrxit.supabase.co';
+  var KEY = 'sb_publishable_eK9SJy7QLl9WLpcXKncHmw_U0GTsPVw';
+  var SESSION = 'xbh_session_v2';
+  var TTL = 7 * 24 * 3600 * 1000;
+
+  var db = null;
+  var S = { token: '', me: null, users: [], news: [], sel: '', kw: '' };
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function fmt(iso) {
+    if (!iso) return '从未登录';
+    var d = new Date(iso);
+    if (isNaN(d)) return '—';
+    var diff = Date.now() - d.getTime();
+    if (diff < 60000) return '刚刚';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+    if (diff < 7 * 86400000) return Math.floor(diff / 86400000) + ' 天前';
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function debounce(fn, ms) {
+    var t; return function () { var a = arguments, self = this; clearTimeout(t); t = setTimeout(function () { fn.apply(self, a); }, ms); };
+  }
+  function randPwd() {
+    var c = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789', o = '', b = new Uint32Array(8);
+    (window.crypto || {}).getRandomValues ? crypto.getRandomValues(b) : b.forEach(function (_, i) { b[i] = Math.random() * 1e9; });
+    for (var i = 0; i < 8; i++) o += c[b[i] % c.length];
+    return o;
+  }
+
+  /* ---------- 会话 ---------- */
+  function saveSession(token, profile) {
+    try { localStorage.setItem(SESSION, JSON.stringify({ token: token, profile: profile, ts: Date.now() })); } catch (e) {}
+  }
+  function loadSession() {
+    try {
+      var s = JSON.parse(localStorage.getItem(SESSION) || 'null');
+      if (!s || !s.token) return null;
+      if (Date.now() - (s.ts || 0) > TTL) { localStorage.removeItem(SESSION); return null; }
+      return s;
+    } catch (e) { return null; }
+  }
+  function clearSession() { try { localStorage.removeItem(SESSION); } catch (e) {} }
+
+  /* ---------- toast / 弹窗 ---------- */
+  function toast(msg, type) {
+    var host = $('toasts');
+    if (!host) {
+      host = document.createElement('div');
+      host.id = 'toasts'; host.className = 'toasts';
+      document.body.appendChild(host);
+    }
+    var el = document.createElement('div');
+    el.className = 'toast ' + (type || '');
+    el.textContent = msg;
+    host.appendChild(el);
+    requestAnimationFrame(function () { el.classList.add('show'); });
+    setTimeout(function () {
+      el.classList.remove('show');
+      setTimeout(function () { el.remove(); }, 240);
+    }, 2800);
+  }
+
+  var modalEl = null;
+  function closeModal() {
+    if (!modalEl) return;
+    var m = modalEl; modalEl = null;
+    m.classList.remove('show');
+    setTimeout(function () { m.remove(); }, 200);
+  }
+  function modal(title, body, foot, width) {
+    closeModal();
+    var mask = document.createElement('div');
+    mask.className = 'mask';
+    mask.innerHTML =
+      '<div class="modal" style="max-width:' + (width || 500) + 'px">' +
+        '<div class="modal-head"><h3>' + esc(title) + '</h3>' +
+          '<button class="modal-x" type="button" data-close>&times;</button></div>' +
+        '<div class="modal-body">' + body + '</div>' +
+        (foot ? '<div class="modal-foot">' + foot + '</div>' : '') +
+      '</div>';
+    document.body.appendChild(mask);
+    modalEl = mask;
+    mask.addEventListener('click', function (e) {
+      if (e.target === mask || e.target.hasAttribute('data-close')) closeModal();
+    });
+    requestAnimationFrame(function () { mask.classList.add('show'); });
+    return mask;
+  }
+  function confirmBox(title, text, hint, okText) {
+    return new Promise(function (resolve) {
+      var done = false;
+      function fin(v) { if (done) return; done = true; closeModal(); resolve(v); }
+      var m = modal(title,
+        '<p style="color:var(--ink);font-size:14.5px">' + esc(text) + '</p>' +
+        (hint ? '<p style="font-size:13px;color:var(--muted);margin-top:8px">' + esc(hint) + '</p>' : ''),
+        '<button class="btn ghost" type="button" data-no>取消</button>' +
+        '<button class="btn danger" type="button" data-yes>' + esc(okText || '确定') + '</button>');
+      m.querySelector('[data-no]').onclick = function () { fin(false); };
+      m.querySelector('[data-yes]').onclick = function () { fin(true); };
+      m.addEventListener('click', function (e) { if (e.target === m) fin(false); });
+    });
+  }
+  function busy(btn, on, txt) {
+    if (!btn) return;
+    if (on) {
+      if (!btn.__h) btn.__h = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>' + (txt || btn.__h);
+    } else {
+      btn.disabled = false;
+      if (btn.__h) btn.innerHTML = btn.__h;
+    }
+  }
+
+  /* ---------- 接口 ---------- */
+  function humanize(e) {
+    var m = (e && e.message) || '';
+    if (/PGRST202|does not exist/i.test(m)) return '数据库还没初始化，请先执行 sql/001_init.sql';
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return '连不上数据库，请检查网络';
+    if (/JWT|apikey/i.test(m)) return '密钥不正确，请检查 config';
+    return m || '操作失败';
+  }
+  function onExpired() {
+    clearSession();
+    S.token = ''; S.me = null;
+    toast('登录已过期，请重新登录', 'err');
+    showLogin();
+  }
+  function api(fn, params) {
+    if (!db) return Promise.reject(new Error('还没连上数据库'));
+    return db.rpc(fn, params || {}).then(function (res) {
+      if (res.error) throw new Error(humanize(res.error));
+      var d = res.data;
+      if (!d || d.ok === false) {
+        var msg = (d && d.error) || '操作失败';
+        if (/登录已过期|请重新登录/.test(msg)) onExpired();
+        throw new Error(msg);
+      }
+      return d;
+    }, function (e) { throw new Error(humanize(e)); });
+  }
+
+  /* ---------- 启动 ---------- */
+  function boot() {
+    if (!window.supabase) return fatal('Supabase 脚本没加载成功，检查网络后刷新');
+    try {
+      db = window.supabase.createClient(URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
+    } catch (e) { return fatal('连接创建失败：' + e.message); }
+
+    // 不自动登录：每次打开或刷新页面都要重新输入登录名和密码
+    clearSession();
+    showLogin();
+  }
+
+  function fatal(msg) {
+    $('loginView').innerHTML =
+      '<div class="login-top"><span class="school">徐悲鸿中学</span><span class="cls">2026级5班</span></div>' +
+      '<div class="login-main"><div class="login-card">' +
+        '<div class="fatal"><strong>站点暂时打不开</strong><p>' + esc(msg) + '</p>' +
+        '<p>请检查 Supabase 项目状态和 sql/001_init.sql 是否执行。</p></div>' +
+        '<button class="btn primary block" type="button" onclick="location.reload()">重新加载</button>' +
+      '</div></div>';
+  }
+
+  function showLogin() {
+    $('appView').hidden = true;
+    $('loginView').hidden = false;
+    $('adminActions').style.display = 'none';
+    setTimeout(function () { var u = $('username'); if (u) u.focus(); }, 150);
+  }
+
+  /* ---------- 登录 ---------- */
+  function doLogin() {
+    var u = $('username').value.trim();
+    var p = $('password').value;
+    var err = $('loginErr');
+    var btn = $('btnLogin');
+    err.textContent = '';
+    if (!u || !p) { err.textContent = '请输入登录名和密码'; return; }
+
+    busy(btn, true, '登 录');
+    api('api_login', { p_username: u, p_password: p }).then(function (r) {
+      busy(btn, false);
+      saveSession(r.token, r.profile);
+      S.token = r.token;
+      $('password').value = '';
+      enter(r.profile);
+    }, function (e) {
+      busy(btn, false);
+      err.textContent = e.message;
+    });
+  }
+
+  function enter(profile) {
+    S.me = profile;
+    $('loginView').hidden = true;
+    $('appView').hidden = false;
+    $('userName').textContent = profile.display_name || profile.username;
+    $('userDot').textContent = (profile.display_name || profile.username || '我').slice(0, 1);
+
+    if (profile.role === 'admin') {
+      $('brandSub').textContent = '2026级5班 · 管理端';
+      $('userPanel').hidden = true;
+      $('adminPanel').hidden = false;
+      $('adminActions').style.display = 'flex';
+      switchTab('users');
+      loadUsers();
+    } else {
+      $('brandSub').textContent = '2026级5班 · 班级服务平台';
+      $('adminPanel').hidden = true;
+      $('adminActions').style.display = 'none';
+      $('userPanel').hidden = false;
+      loadNewsBadge();
+    }
+  }
+
+  function logout() {
+    var t = S.token;
+    S.token = ''; S.me = null;
+    clearSession();
+    closeModule();
+    if (db && t) api('api_logout', { p_token: t }).catch(function () {});
+    $('appView').hidden = true;
+    $('loginView').hidden = false;
+    $('username').value = '';
+    $('password').value = '';
+    showLogin();
+  }
+
+  /* ---------- 全屏模块 ---------- */
+  var currentMod = '';
+
+  function openModule(mod, name) {
+    currentMod = mod;
+    $('modTitle').textContent = name;
+    $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    $('userPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    try { history.pushState({ mod: mod }, '', '#' + mod); } catch (e) {}
+    renderModule();
+  }
+
+  function closeModule() {
+    currentMod = '';
+    $('modView').hidden = true;
+    document.body.style.overflow = '';
+    if (!S.me) return;
+    $('userPanel').hidden = false;
+    if (location.hash) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+  }
+
+  function renderModule() {
+    var body = $('modBody');
+    if (currentMod === 'news') return renderNewsInModule(body);
+    if (currentMod === 'homework') return renderTodoInModule(body, '班级作业', '这个模块还没开放，后续会在这里发布作业、截止时间和完成情况。');
+    if (currentMod === 'cube') return renderTodoInModule(body, '魔方', '这个模块还没开放，后续会在这里放玩法说明和公式。');
+    if (currentMod === 'push') return renderTodoInModule(body, '广告推流', '这个模块还没开放。');
+  }
+
+  function renderNewsInModule(body) {
+    api('api_list_announcements', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>暂时没有公告</strong>管理员发布后会出现在这里</div>';
+        return;
+      }
+      body.innerHTML = items.map(function (n) {
+        return '<div class="news-item">' +
+          '<div class="hd">' + (n.pinned ? '<span class="badge red">置顶</span>' : '') +
+            '<h4>' + esc(n.title) + '</h4>' +
+            '<span class="time">' + fmt(n.created_at) + '</span></div>' +
+          '<p>' + esc(n.content) + '</p></div>';
+      }).join('');
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderTodoInModule(body, name, text) {
+    body.innerHTML = '<div class="empty" style="padding:60px 20px">' +
+      '<strong>「' + esc(name) + '」正在建设</strong>' + esc(text) + '</div>';
+  }
+
+  /* ---------- 用户端 ---------- */
+  function loadNewsBadge() {
+    api('api_list_announcements', { p_token: S.token }).then(function (r) {
+      S.news = r.items || [];
+      var d = $('newsDot');
+      if (S.news.length && d) {
+        d.textContent = S.news.length > 99 ? '99+' : S.news.length;
+        d.title = '共 ' + S.news.length + ' 条公告';
+        d.classList.add('show');
+      }
+    }, function () {});
+  }
+
+  /* ---------- 管理端：标签 ---------- */
+  function switchTab(name) {    ['users', 'news', 'me'].forEach(function (k) {
+      $('tab-' + k).hidden = (k !== name);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+      b.classList.toggle('active', b.dataset.tab === name);
+    });
+    $('adminActions').style.display = (name === 'users') ? 'flex' : 'none';
+    if (name === 'news') loadNews();
+    if (name === 'me') renderMe();
+  }
+
+  /* ---------- 管理端：用户 ---------- */
+  function loadUsers() {
+    $('userBody').innerHTML = '<tr><td colspan="4"><div class="loading"><span class="spinner"></span>加载中…</div></td></tr>';
+    api('api_admin_list_users', { p_token: S.token, p_search: S.kw }).then(function (r) {
+      S.users = r.users || [];
+      $('userCount').textContent = '共 ' + (r.total || 0) + ' 个账号';
+      renderUsers();
+    }, function (e) {
+      $('userBody').innerHTML = '<tr><td colspan="4"><div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div></td></tr>';
+    });
+  }
+
+  function renderUsers() {
+    var body = $('userBody');
+    if (!S.users.length) {
+      S.sel = '';
+      body.innerHTML = '<tr><td colspan="4"><div class="empty"><strong>' +
+        (S.kw ? '没有搜到匹配的账号' : '还没有账号') + '</strong>' +
+        (S.kw ? '换个关键词试试' : '点右下角「新增用户」建第一个账号') + '</div></td></tr>';
+      return;
+    }
+    body.innerHTML = S.users.map(function (u) {
+      var me = S.me && u.id === S.me.id;
+      return '<tr data-id="' + esc(u.id) + '" class="' + (u.id === S.sel ? 'sel' : '') + '">' +
+        '<td><span class="pick">✓</span></td>' +
+        '<td><span class="name"><span class="avatar">' + esc((u.display_name || u.username || '?').slice(0, 1)) + '</span>' +
+          esc(u.display_name || '未命名') +
+          (me ? ' <span class="badge gray" style="height:18px;font-size:11px">我</span>' : '') +
+          (u.status === 'disabled' ? ' <span class="badge gray" style="height:18px;font-size:11px">已停用</span>' : '') +
+        '</span></td>' +
+        '<td style="font-family:ui-monospace,Consolas,monospace;font-size:13px">' + esc(u.username) + '</td>' +
+        '<td style="text-align:right;font-size:12.5px;color:var(--muted)">' + fmt(u.last_login_at) + '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function selected() {
+    for (var i = 0; i < S.users.length; i++) if (S.users[i].id === S.sel) return S.users[i];
+    return null;
+  }
+
+  function openAdd() {
+    var pwd = randPwd();
+    var m = modal('新增用户',
+      '<label class="field"><span>用户名<em>*</em></span>' +
+        '<input class="input" id="fName" maxlength="20" placeholder="显示的名字，如：张同学" autocomplete="off"></label>' +
+      '<label class="field"><span>登录名<em>*</em></span>' +
+        '<input class="input" id="fLogin" maxlength="32" placeholder="登录用，如：zhang01" autocomplete="off">' +
+        '<span style="display:block;font-size:12px;color:var(--muted);margin-top:6px">3–32 位小写字母、数字或 _ . -，建后不可改</span></label>' +
+      '<label class="field"><span>密码<em>*</em></span>' +
+        '<div class="row"><input class="input" id="fPwd" value="' + esc(pwd) + '" autocomplete="off">' +
+        '<button class="btn ghost sm" id="fGen" type="button">随机</button></div>' +
+        '<span style="display:block;font-size:12px;color:var(--muted);margin-top:6px">至少 6 位</span></label>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="fOk" type="button">创建账号</button>', 460);
+
+    m.querySelector('#fGen').onclick = function () { m.querySelector('#fPwd').value = randPwd(); };
+    m.querySelector('#fName').focus();
+
+    m.querySelector('#fOk').onclick = function () {
+      var btn = this;
+      var name = m.querySelector('#fName').value.trim();
+      var login = m.querySelector('#fLogin').value.trim();
+      var pwd2 = m.querySelector('#fPwd').value;
+      if (!name) return toast('请填写用户名', 'err');
+      if (!/^[a-zA-Z0-9_][a-zA-Z0-9_.\-]{2,31}$/.test(login)) return toast('登录名要 3–32 位字母/数字/_ . -', 'err');
+      if (pwd2.length < 6) return toast('密码至少 6 位', 'err');
+
+      busy(btn, true, '创建中…');
+      api('api_admin_create_user', {
+        p_token: S.token, p_display_name: name, p_username: login, p_password: pwd2, p_role: 'user'
+      }).then(function (r) {
+        busy(btn, false);
+        closeModal();
+        toast('账号已创建', 'ok');
+        loadUsers();
+        showCred('账号创建成功', r.user.username, r.user.display_name, pwd2);
+      }, function (e) { busy(btn, false); toast(e.message, 'err'); });
+    };
+  }
+
+  function showCred(title, login, name, pwd) {
+    var text = '徐悲鸿中学 2026级5班 班级服务平台\n登录地址：' + location.href.split('#')[0] +
+      '\n登录名：' + login + '\n密码：' + pwd;
+    var m = modal(title,
+      '<p>把下面的信息发给本人，提醒他登录后在「我的账号」里改密码。</p>' +
+      '<div class="cred">用户名：' + esc(name || '—') + '<br>登录名：' + esc(login) + '<br>密码：' + esc(pwd) + '</div>' +
+      '<p style="font-size:12.5px;color:var(--muted);margin-top:10px">密码只存哈希，之后看不到，请现在复制走。</p>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>' +
+      '<button class="btn primary" id="cCopy" type="button">复制账号信息</button>', 460);
+    m.querySelector('#cCopy').onclick = function () {
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+        .then(function () { toast('已复制', 'ok'); }, function () { toast('复制失败，请手动选择', 'err'); });
+    };
+  }
+
+  function openReset() {
+    var u = selected();
+    if (!u) return toast('请先点一行选中账号', 'err');
+    var m = modal('重置密码',
+      '<p>为 <b style="color:var(--ink)">' + esc(u.display_name || u.username) + '</b>（' + esc(u.username) + '）设置新密码。</p>' +
+      '<label class="field" style="margin-top:12px"><span>新密码</span>' +
+        '<div class="row"><input class="input" id="rPwd" value="' + esc(randPwd()) + '">' +
+        '<button class="btn ghost sm" id="rGen" type="button">随机</button></div></label>' +
+      '<p style="font-size:12.5px;color:var(--muted)">重置后该账号在其他设备上的登录会失效。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="rOk" type="button">确认重置</button>', 440);
+
+    m.querySelector('#rGen').onclick = function () { m.querySelector('#rPwd').value = randPwd(); };
+    m.querySelector('#rOk').onclick = function () {
+      var btn = this, v = m.querySelector('#rPwd').value;
+      if (v.length < 6) return toast('密码至少 6 位', 'err');
+      busy(btn, true, '提交中…');
+      api('api_admin_reset_password', { p_token: S.token, p_id: u.id, p_new_password: v }).then(function () {
+        busy(btn, false); closeModal(); toast('密码已重置', 'ok');
+        showCred('密码已重置', u.username, u.display_name, v);
+      }, function (e) { busy(btn, false); toast(e.message, 'err'); });
+    };
+  }
+
+  function delUser() {
+    var u = selected();
+    if (!u) return toast('请先点一行选中账号', 'err');
+    if (S.me && u.id === S.me.id) return toast('不能删除自己的账号', 'err');
+    confirmBox('删除用户', '确定删除「' + (u.display_name || u.username) + '」（' + u.username + '）吗？',
+      '删除后立即失效、无法恢复。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_delete_user', { p_token: S.token, p_id: u.id }).then(function () {
+        toast('已删除', 'ok'); S.sel = ''; loadUsers();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  /* ---------- 管理端：公告 ---------- */
+  function loadNews() {
+    $('newsList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_list_announcements', { p_token: S.token }).then(function (r) {
+      S.news = r.items || [];
+      renderNews();
+    }, function (e) {
+      $('newsList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderNews() {
+    var box = $('newsList');
+    if (!S.news.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有公告</strong>点右上角「发布公告」，学生端就能看到</div>';
+      return;
+    }
+    box.innerHTML = S.news.map(function (n) {
+      return '<div class="news-item" data-id="' + esc(n.id) + '">' +
+        '<div class="hd">' + (n.pinned ? '<span class="badge red">置顶</span>' : '') +
+          '<h4>' + esc(n.title) + '</h4><span class="time">' + fmt(n.created_at) + '</span></div>' +
+        '<p>' + esc(n.content) + '</p>' +
+        '<div class="ops"><button class="link" data-act="edit" type="button">编辑</button>' +
+          '<button class="link danger" data-act="del" type="button">删除</button></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openNewsForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '编辑公告' : '发布公告',
+      '<label class="field"><span>标题<em>*</em></span>' +
+        '<input class="input" id="nTitle" maxlength="60" placeholder="如：本周五运动会安排" value="' + esc(item ? item.title : '') + '"></label>' +
+      '<label class="field"><span>正文<em>*</em></span>' +
+        '<textarea class="textarea" id="nBody" rows="8" placeholder="纯文本，空行分段">' + esc(item ? item.content : '') + '</textarea></label>' +
+      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">' +
+        '<input type="checkbox" id="nPin"' + (item && item.pinned ? ' checked' : '') + ' style="width:16px;height:16px;accent-color:var(--red)"> 置顶显示</label>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="nOk" type="button">' + (edit ? '保存' : '发布') + '</button>', 580);
+
+    m.querySelector('#nOk').onclick = function () {
+      var btn = this;
+      var t = m.querySelector('#nTitle').value.trim();
+      var b = m.querySelector('#nBody').value.trim();
+      if (!t || !b) return toast('标题和正文都要填', 'err');
+      busy(btn, true, '提交中…');
+      api('api_admin_save_announcement', {
+        p_token: S.token, p_id: edit ? item.id : null,
+        p_title: t, p_content: b, p_pinned: m.querySelector('#nPin').checked
+      }).then(function () {
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已发布', 'ok'); loadNews();
+      }, function (e) { busy(btn, false); toast(e.message, 'err'); });
+    };
+  }
+
+  /* ---------- 管理端：我的账号 ---------- */
+  function renderMe() {
+    var p = S.me || {};
+    $('meInfo').innerHTML =
+      '<dt>用户名</dt><dd>' + esc(p.display_name || '—') + '</dd>' +
+      '<dt>登录名</dt><dd>' + esc(p.username || '—') + '</dd>' +
+      '<dt>身份</dt><dd><span class="badge red">管理员</span></dd>' +
+      '<dt>班级</dt><dd>' + esc(p.class_name || '2026级5班') + '</dd>' +
+      '<dt>上次登录</dt><dd>' + esc(fmt(p.last_login_at)) + '</dd>';
+  }
+
+  function openChangePwd() {
+    var m = modal('修改密码',
+      '<label class="field"><span>当前密码</span><input class="input" id="pOld" type="password"></label>' +
+      '<label class="field"><span>新密码（至少 6 位）</span><input class="input" id="pNew" type="password"></label>' +
+      '<label class="field"><span>确认新密码</span><input class="input" id="pNew2" type="password"></label>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="pOk" type="button">确认修改</button>', 420);
+
+    m.querySelector('#pOk').onclick = function () {
+      var btn = this;
+      var o = m.querySelector('#pOld').value;
+      var n = m.querySelector('#pNew').value;
+      var n2 = m.querySelector('#pNew2').value;
+      if (!o || !n) return toast('请填写完整', 'err');
+      if (n.length < 6) return toast('新密码至少 6 位', 'err');
+      if (n !== n2) return toast('两次输入不一致', 'err');
+      busy(btn, true, '提交中…');
+      api('api_change_password', { p_token: S.token, p_old_password: o, p_new_password: n }).then(function () {
+        busy(btn, false); closeModal(); toast('密码已修改', 'ok');
+      }, function (e) { busy(btn, false); toast(e.message, 'err'); });
+    };
+  }
+
+  /* ---------- 绑定 ---------- */
+  function bind() {
+    $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
+    $('btnLogout').addEventListener('click', logout);
+    $('btnAdd').addEventListener('click', openAdd);
+    $('btnReset').addEventListener('click', openReset);
+    $('btnDelete').addEventListener('click', delUser);
+    $('btnReload').addEventListener('click', loadUsers);
+    $('btnAddNews').addEventListener('click', function () { openNewsForm(null); });
+    $('btnChangePwd').addEventListener('click', openChangePwd);
+
+    $('userBody').addEventListener('click', function (e) {
+      var tr = e.target.closest('tr[data-id]');
+      if (!tr) return;
+      S.sel = (S.sel === tr.dataset.id) ? '' : tr.dataset.id;
+      renderUsers();
+    });
+
+    $('newsList').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      var host = btn.closest('.news-item');
+      var id = host.dataset.id;
+      var item = S.news.filter(function (n) { return n.id === id; })[0];
+      if (btn.dataset.act === 'edit' && item) return openNewsForm(item);
+      if (btn.dataset.act === 'del') {
+        confirmBox('删除公告', '确定删除这条公告吗？', '删除后无法恢复。', '删除').then(function (yes) {
+          if (!yes) return;
+          api('api_admin_delete_announcement', { p_token: S.token, p_id: id }).then(function () {
+            toast('已删除', 'ok'); loadNews();
+          }, function (err) { toast(err.message, 'err'); });
+        });
+      }
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+      b.addEventListener('click', function () { switchTab(b.dataset.tab); });
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll('.tile'), function (t) {
+      t.addEventListener('click', function () {
+        openModule(t.dataset.mod, t.dataset.name);
+        // 进模块后去掉角标（提示"有内容"的职责已经完成）
+        var d = $('newsDot');
+        if (d) d.classList.remove('show');
+      });
+    });
+
+    $('modBack').addEventListener('click', function () { closeModule(); });
+    window.addEventListener('popstate', function () {
+      if ($('modView').hidden === false) closeModule();
+    });
+
+    $('search').addEventListener('input', debounce(function () {
+      S.kw = $('search').value.trim();
+      S.sel = '';
+      loadUsers();
+    }, 300));
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (modalEl) return closeModal();
+      if ($('modView').hidden === false) closeModule();
+    });
+  }
+
+  /* ---------- go ---------- */
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { bind(); boot(); });
+  else { bind(); boot(); }
+})();
+</script>
+</body>
+</html>
