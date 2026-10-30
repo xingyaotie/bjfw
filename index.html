@@ -209,7 +209,9 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 .seg button.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:600}
 
 .cube-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
-.cube-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;transition:.15s}
+.cube-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;transition:.15s;position:relative}
+.cube-card .pin{position:absolute;top:8px;right:8px;height:18px;padding:0 7px;border-radius:999px;
+  background:var(--red);color:#fff;font-size:11px;font-weight:600;display:inline-flex;align-items:center}
 .cube-card.on{cursor:pointer}
 .cube-card.on:hover{border-color:#F3C3CB;box-shadow:0 8px 20px rgba(200,16,46,.10);transform:translateY(-1px)}
 .cube-card .t{font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
@@ -297,7 +299,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
       <div class="tile" data-mod="news" data-name="班级热点">班级热点<span class="dot" id="newsDot"></span></div>
       <div class="tile" data-mod="homework" data-name="班级作业">班级作业</div>
       <div class="tile" data-mod="cube" data-name="魔方">魔方</div>
-      <div class="tile" data-mod="push" data-name="广告推流">广告推流</div>
+      <div class="tile" data-mod="more" data-name="更多">更多</div>
     </div>
   </main>
 
@@ -756,7 +758,24 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     if (currentMod === 'news') return renderNewsInModule(body);
     if (currentMod === 'homework') return renderHomeworkInModule(body);
     if (currentMod === 'cube') return renderCubeHome();
-    if (currentMod === 'push') return renderTodoInModule(body, '广告推流', '这个模块还没开放。');
+    if (currentMod === 'more') return renderMore();
+  }
+
+  function renderMore() {
+    var me = S.me || {};
+    $('modBody').innerHTML =
+      '<div style="max-width:520px;margin:10px auto">' +
+        '<div class="card" style="padding:18px">' +
+          '<dl class="kv">' +
+            '<dt>平台</dt><dd>徐悲鸿中学 · 2026级5班</dd>' +
+            '<dt>版本</dt><dd>体验版 v4</dd>' +
+            '<dt>我的账号</dt><dd>' + esc(me.display_name || '—') + '（' + esc(me.username || '—') + '）</dd>' +
+          '</dl>' +
+        '</div>' +
+        '<div class="empty" style="padding:26px 10px 0">' +
+          '<strong>更多功能建设中</strong>想加什么，告诉管理员就行。' +
+        '</div>' +
+      '</div>';
   }
 
   /* ================= 魔方（学生端） ================= */
@@ -830,6 +849,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     box.innerHTML = '<div class="cube-grid">' + list.map(function (t) {
       return '<div class="cube-card ' + (t.allowed ? 'on' : 'locked') + '"' +
         (t.allowed ? ' data-tut="' + esc(t.id) + '"' : '') + '>' +
+        (t.pinned ? '<span class="pin">置顶</span>' : '') +
         '<div class="t">' + esc(t.name) + '</div>' +
         '<div class="m">' + cubeLabel(t.cube_type) + '</div>' +
         (t.allowed ? '' : '<div class="lock">未获得</div>') +
@@ -1265,6 +1285,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
         '<div style="display:flex;align-items:center;gap:8px">' +
           '<span class="badge red">' + cubeLabel(t.cube_type) + '</span>' +
           '<b style="font-size:14px;color:var(--ink)">' + esc(t.name) + '</b>' +
+          (t.pinned ? '<span class="badge red" style="height:18px;font-size:11px">置顶</span>' : '') +
           '<span style="margin-left:auto;font-size:11.5px;color:var(--muted)">' + fmtAbs(t.created_at) + '</span>' +
         '</div>' +
         '<div class="rich" style="font-size:13px;color:var(--muted);max-height:54px;overflow:hidden">' +
@@ -1286,6 +1307,9 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
         '<select class="input" id="cType">' + ['2', '3', '4', '5'].map(function (k) {
           return '<option value="' + k + '"' + (item && String(item.cube_type) === k ? ' selected' : '') + '>' + cubeLabel(k) + '</option>';
         }).join('') + '</select></label>' +
+      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin:0 0 14px">' +
+        '<input type="checkbox" id="cPin"' + (item && item.pinned ? ' checked' : '') +
+        ' style="width:16px;height:16px;accent-color:var(--red)"> 置顶这个教程</label>' +
       '<label class="field"><span>内容</span>' +
         '<textarea class="textarea" id="cBody" rows="9" placeholder="写文字；需要图片就点下面的「插入图片」">' + esc(item ? item.content : '') + '</textarea></label>' +
       '<div class="row" style="margin-top:-6px">' +
@@ -1326,7 +1350,8 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
         p_id: edit ? item.id : null,
         p_name: name,
         p_type: type,
-        p_content: content
+        p_content: content,
+        p_pinned: m.querySelector('#cPin').checked
       }).then(function () {
         busy(btn, false);
         closeModal();
