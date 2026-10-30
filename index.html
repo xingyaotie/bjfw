@@ -414,6 +414,14 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
           </div>
           <button class="btn primary sm" id="btnCubeNew" type="button" style="height:32px;padding:0 14px">＋ 新建教程</button>
         </div>
+        <div class="seg" id="cubeFilter" style="margin-bottom:12px">
+          <button type="button" data-cf="all" class="on">全部</button>
+          <button type="button" data-cf="top">置顶</button>
+          <button type="button" data-cf="2">二阶</button>
+          <button type="button" data-cf="3">三阶</button>
+          <button type="button" data-cf="4">四阶</button>
+          <button type="button" data-cf="5">五阶</button>
+        </div>
         <div id="cubeList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
       </div>
     </section>
@@ -453,7 +461,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 
   var db = null;
   var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
-            cube: [], cubeAll: [], cubeAny: false, permUsers: [] };
+            cube: [], cubeAll: [], cubeAny: false, permUsers: [], cubeFilter: 'all' };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -724,7 +732,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 
   function openModule(mod, name) {
     currentMod = mod;
-    if (mod === 'cube') { S.cubeLoaded = false; cubeState = { view: 'home', type: cubeState.type || '2' }; }
+    if (mod === 'cube') { S.cubeLoaded = false; cubeState = { view: 'home', type: cubeState.type || 'top' }; }
     $('modTitle').textContent = name;
     $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     $('userPanel').hidden = true;
@@ -779,7 +787,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   }
 
   /* ================= 魔方（学生端） ================= */
-  var cubeState = { view: 'home', type: '2' };
+  var cubeState = { view: 'home', type: 'top' };
 
   function renderCubeHome() {
     cubeState.view = 'home';
@@ -828,10 +836,13 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     }
 
     body.innerHTML =
-      '<div class="seg">' + ['2', '3', '4', '5'].map(function (k) {
-        return '<button type="button" data-type="' + k + '" class="' + (k === cubeState.type ? 'on' : '') + '">' +
-          cubeLabel(k) + '教程</button>';
-      }).join('') + '</div>' +
+      '<div class="seg">' +
+        '<button type="button" data-type="top" class="' + (cubeState.type === 'top' ? 'on' : '') + '">置顶</button>' +
+        ['2', '3', '4', '5'].map(function (k) {
+          return '<button type="button" data-type="' + k + '" class="' + (k === cubeState.type ? 'on' : '') + '">' +
+            cubeLabel(k) + '教程</button>';
+        }).join('') +
+      '</div>' +
       '<div id="cubeUserList"></div>';
     renderCubeTypeList();
   }
@@ -839,11 +850,20 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   function renderCubeTypeList() {
     var box = $('cubeUserList');
     if (!box) return;
-    var list = S.cubeAll.filter(function (t) { return String(t.cube_type) === cubeState.type; });
 
-    if (!list.length) {
-      box.innerHTML = '<div class="empty"><strong>没有教程</strong>管理员还没有布置' + cubeLabel(cubeState.type) + '教程</div>';
-      return;
+    var list;
+    if (cubeState.type === 'top') {
+      list = S.cubeAll.filter(function (t) { return t.pinned; });
+      if (!list.length) {
+        box.innerHTML = '<div class="empty"><strong>没有置顶教程</strong>管理员把教程设为置顶后，会出现在这里</div>';
+        return;
+      }
+    } else {
+      list = S.cubeAll.filter(function (t) { return String(t.cube_type) === cubeState.type; });
+      if (!list.length) {
+        box.innerHTML = '<div class="empty"><strong>没有教程</strong>管理员还没有布置' + cubeLabel(cubeState.type) + '教程</div>';
+        return;
+      }
     }
 
     box.innerHTML = '<div class="cube-grid">' + list.map(function (t) {
@@ -1280,7 +1300,21 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
       box.innerHTML = '<div class="empty"><strong>还没有教程</strong>点右上角「新建教程」建第一个框</div>';
       return;
     }
-    box.innerHTML = S.cube.map(function (t) {
+
+    var f = S.cubeFilter || 'all';
+    var list = S.cube.filter(function (t) {
+      if (f === 'all') return true;
+      if (f === 'top') return !!t.pinned;
+      return String(t.cube_type) === f;
+    });
+
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><strong>这里还没有教程</strong>' +
+        (f === 'top' ? '勾选「置顶这个教程」后就会出现在这儿' : '换个筛选看看') + '</div>';
+      return;
+    }
+
+    box.innerHTML = list.map(function (t) {
       return '<div class="perm-row" style="flex-direction:column;align-items:stretch;gap:6px" data-id="' + esc(t.id) + '">' +
         '<div style="display:flex;align-items:center;gap:8px">' +
           '<span class="badge red">' + cubeLabel(t.cube_type) + '</span>' +
@@ -1422,6 +1456,16 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     $('btnPublishHw').addEventListener('click', publishHw);
     $('btnCubeNew').addEventListener('click', function () { openCubeForm(null); });
     $('btnCubeReload').addEventListener('click', loadCubeAdmin);
+
+    $('cubeFilter').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-cf]');
+      if (!b) return;
+      S.cubeFilter = b.dataset.cf;
+      Array.prototype.forEach.call($('cubeFilter').children, function (x) {
+        x.classList.toggle('on', x === b);
+      });
+      renderCubeAdminList();
+    });
 
     $('cubePermList').addEventListener('click', function (e) {
       var b = e.target.closest('.chip-btn');
