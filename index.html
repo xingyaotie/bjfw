@@ -192,6 +192,48 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 .row{display:flex;gap:8px}
 .row .btn{flex:none;height:40px}
 
+/* 魔方模块 */
+.cube-stack{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:10px auto 0}
+.cube-opt{display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;border-radius:16px;border:1px solid var(--line);
+  background:#fff;text-align:left;box-shadow:0 6px 18px rgba(17,24,39,.06);transition:.15s}
+.cube-opt:hover{border-color:#F3C3CB;box-shadow:0 10px 24px rgba(200,16,46,.12);transform:translateY(-2px)}
+.cube-opt .ico{width:44px;height:44px;border-radius:12px;background:#FDF0F2;color:var(--red);display:flex;
+  align-items:center;justify-content:center;font-size:20px;flex:none}
+.cube-opt b{display:block;font-size:17px;color:var(--ink);letter-spacing:1px}
+.cube-opt small{display:block;font-size:12.5px;color:var(--muted);margin-top:3px}
+.cube-opt .arrow{margin-left:auto;color:#C9CED6;font-size:22px}
+
+.seg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.seg button{height:32px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:#fff;
+  font-size:13px;color:var(--ink2)}
+.seg button.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:600}
+
+.cube-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.cube-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff;transition:.15s}
+.cube-card.on{cursor:pointer}
+.cube-card.on:hover{border-color:#F3C3CB;box-shadow:0 8px 20px rgba(200,16,46,.10);transform:translateY(-1px)}
+.cube-card .t{font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.cube-card .m{font-size:12px;color:var(--muted)}
+.cube-card.locked{background:#E9EBEF;border-color:#DEE1E6}
+.cube-card.locked .t,.cube-card.locked .m{color:#9AA0A8}
+.cube-card .lock{display:inline-block;margin-top:10px;font-size:12px;color:#B42318;background:#fff;
+  border:1px solid #F1C6C2;border-radius:6px;padding:2px 8px}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip-btn{height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:#fff;
+  font-size:12.5px;color:var(--ink2);transition:.15s}
+.chip-btn:hover{border-color:#D6DAE0}
+.chip-btn.on{background:var(--red);border-color:var(--red);color:#fff;font-weight:600}
+.chip-btn.none.on{background:#5B6270;border-color:#5B6270;color:#fff}
+
+.perm-row{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid #F1F2F5}
+.perm-row:last-child{border-bottom:none}
+.perm-row .who{width:150px;flex:none;font-size:13.5px;color:var(--ink)}
+.perm-row .who small{display:block;color:var(--muted);font-size:11.5px;margin-top:1px}
+
+.rich{line-height:1.85;font-size:14px;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
+.rich img{max-width:100%;border-radius:10px;margin:8px 0;display:block}
+
 @media(max-width:640px){
   .topbar .inner{padding:0 14px;gap:10px}
   .brand-text b{font-size:15px;letter-spacing:1px}
@@ -272,7 +314,9 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   <main class="wrap" id="adminPanel" hidden>
     <div class="tabs">
       <button class="tab active" data-tab="users" type="button">用户管理</button>
+      <button class="tab" data-tab="hw" type="button">班级作业</button>
       <button class="tab" data-tab="news" type="button">班级热点</button>
+      <button class="tab" data-tab="cube" type="button">魔方教程</button>
       <button class="tab" data-tab="me" type="button">我的账号</button>
     </div>
 
@@ -283,7 +327,10 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
           <h2>用户管理</h2>
           <div class="hint">点一行选中账号，右下角操作</div>
         </div>
-        <span class="hint" id="userCount"></span>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span class="hint" id="userCount"></span>
+          <button class="btn primary sm" id="btnAdd2" type="button" style="height:36px;padding:0 14px">＋ 新增用户</button>
+        </div>
       </div>
       <div class="card">
         <div class="toolbar">
@@ -303,6 +350,31 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
       </div>
     </section>
 
+    <!-- 班级作业 -->
+    <section id="tab-hw" hidden>
+      <div class="panel-head">
+        <div>
+          <h2>班级作业</h2>
+          <div class="hint">写清楚要求和截止时间，发布后学生在「班级作业」里能看到</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <label class="field" style="margin-bottom:10px"><span>作业内容</span>
+          <textarea class="textarea" id="hwInput" rows="5" placeholder="例如：数学 练习册 P32–P35，明天早读前交。英语背诵 Unit 3 课文。"></textarea>
+        </label>
+        <div style="display:flex;justify-content:flex-end">
+          <button class="btn primary" id="btnPublishHw" type="button">发布作业</button>
+        </div>
+      </div>
+
+      <div class="panel-head" style="margin-top:22px">
+        <div><h2 style="font-size:15px">已发布的作业</h2></div>
+        <span class="hint" id="hwCount"></span>
+      </div>
+      <div class="card"><div class="news" id="hwAdminList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
     <!-- 班级热点 -->
     <section id="tab-news" hidden>
       <div class="panel-head">
@@ -313,6 +385,35 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
         <button class="btn primary sm" id="btnAddNews" type="button" style="height:36px;padding:0 16px">＋ 发布公告</button>
       </div>
       <div class="card"><div class="news" id="newsList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- 魔方教程 -->
+    <section id="tab-cube" hidden>
+      <div class="panel-head">
+        <div><h2>魔方教程</h2><div class="hint">先建教程，再给同学开权限</div></div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <div class="panel-head" style="margin:0 0 8px">
+          <div>
+            <h3 style="font-size:15px">① 权限</h3>
+            <div class="hint">点名字后面的标签切换授权；「无授权」= 全部收回</div>
+          </div>
+          <button class="btn ghost sm" id="btnCubeReload" type="button" style="height:32px">刷新</button>
+        </div>
+        <div id="cubePermList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div class="panel-head" style="margin:0 0 8px">
+          <div>
+            <h3 style="font-size:15px">② 内容</h3>
+            <div class="hint">学生点「魔方教程」看到的就是这些框</div>
+          </div>
+          <button class="btn primary sm" id="btnCubeNew" type="button" style="height:32px;padding:0 14px">＋ 新建教程</button>
+        </div>
+        <div id="cubeList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+      </div>
     </section>
 
     <!-- 我的账号 -->
@@ -327,7 +428,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     </section>
   </main>
 
-  <div class="actions" id="adminActions" hidden style="display:none">
+  <div class="actions" id="adminActions" style="display:none">
     <button class="btn ghost" id="btnReset" type="button">重置密码</button>
     <button class="btn primary" id="btnAdd" type="button">新增用户</button>
     <button class="btn danger" id="btnDelete" type="button">删除用户</button>
@@ -349,7 +450,8 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   var TTL = 7 * 24 * 3600 * 1000;
 
   var db = null;
-  var S = { token: '', me: null, users: [], news: [], sel: '', kw: '' };
+  var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
+            cube: [], cubeAll: [], cubeAny: false, permUsers: [] };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -367,6 +469,45 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
     if (diff < 7 * 86400000) return Math.floor(diff / 86400000) + ' 天前';
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+  function fmtAbs(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d)) return '—';
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+           ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  function cubeLabel(type) {
+    return ({ '2': '二阶', '3': '三阶', '4': '四阶', '5': '五阶' })[String(type)] || '魔方';
+  }
+  /* 把「文字 + ![说明](图片)」渲染成 HTML（先转义，再放图片） */
+  function renderRich(text) {
+    var s = esc(text || '');
+    s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, function (_, alt, src) {
+      return '<img src="' + src + '" alt="' + alt + '" loading="lazy">';
+    });
+    return s;
+  }
+  function insertAtCursor(el, text) {
+    if (!el) return;
+    var s = el.selectionStart || 0, e = el.selectionEnd || 0, v = el.value;
+    el.value = v.slice(0, s) + text + v.slice(e);
+    el.selectionStart = el.selectionEnd = s + text.length;
+    el.focus();
+  }
+  function compressImage(src, cb) {
+    var img = new Image();
+    img.onload = function () {
+      var max = 860, w = img.width, h = img.height;
+      if (w > max) { h = Math.round(h * max / w); w = max; }
+      var c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      var g = c.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, w, h); g.drawImage(img, 0, 0, w, h);
+      cb(c.toDataURL('image/jpeg', 0.75));
+    };
+    img.onerror = function () { cb(src); };
+    img.src = src;
   }
   function debounce(fn, ms) {
     var t; return function () { var a = arguments, self = this; clearTimeout(t); t = setTimeout(function () { fn.apply(self, a); }, ms); };
@@ -516,7 +657,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   function showLogin() {
     $('appView').hidden = true;
     $('loginView').hidden = false;
-    $('adminActions').style.display = 'none';
+    showActions(false);
     setTimeout(function () { var u = $('username'); if (u) u.focus(); }, 150);
   }
 
@@ -553,13 +694,11 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
       $('brandSub').textContent = '2026级5班 · 管理端';
       $('userPanel').hidden = true;
       $('adminPanel').hidden = false;
-      $('adminActions').style.display = 'flex';
       switchTab('users');
-      loadUsers();
     } else {
       $('brandSub').textContent = '2026级5班 · 班级服务平台';
       $('adminPanel').hidden = true;
-      $('adminActions').style.display = 'none';
+      showActions(false);
       $('userPanel').hidden = false;
       loadNewsBadge();
     }
@@ -583,6 +722,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 
   function openModule(mod, name) {
     currentMod = mod;
+    if (mod === 'cube') { S.cubeLoaded = false; cubeState = { view: 'home', type: cubeState.type || '2' }; }
     $('modTitle').textContent = name;
     $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     $('userPanel').hidden = true;
@@ -594,6 +734,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 
   function closeModule() {
     currentMod = '';
+    cubeState.view = 'home';
     $('modView').hidden = true;
     document.body.style.overflow = '';
     if (!S.me) return;
@@ -601,12 +742,147 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     if (location.hash) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
   }
 
+  /* 魔方里面有多层，返回键逐层退 */
+  function modBack() {
+    if (currentMod === 'cube') {
+      if (cubeState.view === 'content') return renderCubeTutorials(true);
+      if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
+    }
+    closeModule();
+  }
+
   function renderModule() {
     var body = $('modBody');
     if (currentMod === 'news') return renderNewsInModule(body);
-    if (currentMod === 'homework') return renderTodoInModule(body, '班级作业', '这个模块还没开放，后续会在这里发布作业、截止时间和完成情况。');
-    if (currentMod === 'cube') return renderTodoInModule(body, '魔方', '这个模块还没开放，后续会在这里放玩法说明和公式。');
+    if (currentMod === 'homework') return renderHomeworkInModule(body);
+    if (currentMod === 'cube') return renderCubeHome();
     if (currentMod === 'push') return renderTodoInModule(body, '广告推流', '这个模块还没开放。');
+  }
+
+  /* ================= 魔方（学生端） ================= */
+  var cubeState = { view: 'home', type: '2' };
+
+  function renderCubeHome() {
+    cubeState.view = 'home';
+    $('modBody').innerHTML =
+      '<div class="cube-stack">' +
+        '<button class="cube-opt" type="button" data-cube-go="tutorials">' +
+          '<span class="ico">🧩</span>' +
+          '<span><b>魔方教程</b><small>看管理员授权给你的教程</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>' +
+        '<button class="cube-opt" type="button" data-cube-go="debug">' +
+          '<span class="ico">🛠</span>' +
+          '<span><b>魔方调试</b><small>建设中</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>' +
+      '</div>';
+  }
+
+  function renderCubeTutorials(reload) {
+    cubeState.view = 'tutorials';
+    var body = $('modBody');
+
+    if (!reload && S.cubeLoaded) { paintTutorials(); return; }
+
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>检查授权…</div>';
+    api('api_cube_my_tutorials', { p_token: S.token }).then(function (r) {
+      S.cubeAll = r.items || [];
+      S.cubeAny = !!r.has_any;
+      S.cubeLoaded = true;
+      paintTutorials();
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function paintTutorials() {
+    var body = $('modBody');
+
+    if (!S.cubeAny) {
+      body.innerHTML =
+        '<div class="empty" style="padding:56px 20px">' +
+          '<strong>无授权</strong>' +
+          '你还没有获得任何魔方教程的权限，请联系管理员开通。' +
+        '</div>';
+      return;
+    }
+
+    body.innerHTML =
+      '<div class="seg">' + ['2', '3', '4', '5'].map(function (k) {
+        return '<button type="button" data-type="' + k + '" class="' + (k === cubeState.type ? 'on' : '') + '">' +
+          cubeLabel(k) + '教程</button>';
+      }).join('') + '</div>' +
+      '<div id="cubeUserList"></div>';
+    renderCubeTypeList();
+  }
+
+  function renderCubeTypeList() {
+    var box = $('cubeUserList');
+    if (!box) return;
+    var list = S.cubeAll.filter(function (t) { return String(t.cube_type) === cubeState.type; });
+
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><strong>没有教程</strong>管理员还没有布置' + cubeLabel(cubeState.type) + '教程</div>';
+      return;
+    }
+
+    box.innerHTML = '<div class="cube-grid">' + list.map(function (t) {
+      return '<div class="cube-card ' + (t.allowed ? 'on' : 'locked') + '"' +
+        (t.allowed ? ' data-tut="' + esc(t.id) + '"' : '') + '>' +
+        '<div class="t">' + esc(t.name) + '</div>' +
+        '<div class="m">' + cubeLabel(t.cube_type) + '</div>' +
+        (t.allowed ? '' : '<div class="lock">未获得</div>') +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  function renderCubeContent(id) {
+    cubeState.view = 'content';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_cube_tutorial_content', { p_token: S.token, p_id: id }).then(function (r) {
+      var t = r.tutorial || {};
+      body.innerHTML =
+        '<div style="margin-bottom:14px">' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+            '<span class="badge red">' + cubeLabel(t.cube_type) + '</span>' +
+            '<h2 style="font-size:18px;color:var(--ink)">' + esc(t.name) + '</h2>' +
+          '</div>' +
+        '</div>' +
+        '<div class="card" style="padding:16px"><div class="rich">' + renderRich(t.content) + '</div></div>';
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderCubeDebug() {
+    cubeState.view = 'debug';
+    $('modBody').innerHTML = '<div class="empty" style="padding:60px 20px">' +
+      '<strong>魔方调试正在建设</strong>这个功能还没做，后面会放计时、打乱公式之类的工具。</div>';
+  }
+
+  /* 学生端：作业列表（新的在上面，历史往下排） */
+  function renderHomeworkInModule(body) {
+    api('api_list_homework', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>暂时没有作业</strong>老师发布后会出现在这里</div>';
+        return;
+      }
+      body.innerHTML = items.map(function (h, i) {
+        return '<div class="news-item">' +
+          '<div class="hd">' +
+            (i === 0 ? '<span class="badge red">最新</span>' : '<span class="badge gray">历史</span>') +
+            '<h4>' + esc(fmtAbs(h.created_at)) + '</h4>' +
+            '<span class="time">' + fmt(h.created_at) + '</span>' +
+          '</div>' +
+          '<p>' + esc(h.content) + '</p>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
   }
 
   function renderNewsInModule(body) {
@@ -647,15 +923,27 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   }
 
   /* ---------- 管理端：标签 ---------- */
-  function switchTab(name) {    ['users', 'news', 'me'].forEach(function (k) {
+  function switchTab(name) {
+    ['users', 'hw', 'news', 'cube', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
       b.classList.toggle('active', b.dataset.tab === name);
     });
-    $('adminActions').style.display = (name === 'users') ? 'flex' : 'none';
+    showActions(name === 'users');
+    if (name === 'users') loadUsers();
+    if (name === 'hw') loadHwAdmin();
     if (name === 'news') loadNews();
+    if (name === 'cube') loadCubeAdmin();
     if (name === 'me') renderMe();
+  }
+
+  /* 右下角三个按钮只在「用户管理」里出现 */
+  function showActions(on) {
+    var a = $('adminActions');
+    if (!a) return;
+    a.hidden = !on;
+    a.style.display = on ? 'flex' : 'none';
   }
 
   /* ---------- 管理端：用户 ---------- */
@@ -846,6 +1134,221 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     };
   }
 
+  /* ---------- 管理端：班级作业 ---------- */
+  function loadHwAdmin() {
+    $('hwAdminList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_list_homework', { p_token: S.token }).then(function (r) {
+      S.hw = r.items || [];
+      $('hwCount').textContent = S.hw.length ? ('共 ' + S.hw.length + ' 条') : '';
+      renderHwAdmin();
+    }, function (e) {
+      $('hwAdminList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderHwAdmin() {
+    var box = $('hwAdminList');
+    if (!S.hw.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有作业</strong>在上面写完内容，点「发布作业」就能发出去</div>';
+      return;
+    }
+    box.innerHTML = S.hw.map(function (h) {
+      return '<div class="news-item" data-id="' + esc(h.id) + '">' +
+        '<div class="hd"><h4>' + esc(fmtAbs(h.created_at)) + '</h4>' +
+          '<span class="time">' + fmt(h.created_at) + '</span></div>' +
+        '<p>' + esc(h.content) + '</p>' +
+        '<div class="ops"><button class="link danger" data-hw="del" type="button">删除这条作业</button></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function publishHw() {
+    var el = $('hwInput');
+    var v = el.value.trim();
+    if (!v) { toast('请先写作业内容', 'err'); el.focus(); return; }
+    var btn = $('btnPublishHw');
+    busy(btn, true, '发布中…');
+    api('api_admin_save_homework', { p_token: S.token, p_content: v }).then(function () {
+      busy(btn, false);
+      el.value = '';
+      toast('作业已发布', 'ok');
+      loadHwAdmin();
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message, 'err');
+    });
+  }
+
+  function deleteHw(id) {
+    confirmBox('删除作业', '确定删除这条作业吗？', '删除后学生端也会同步消失。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_delete_homework', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        loadHwAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  /* ---------- 管理端：魔方教程 ---------- */
+  function loadCubeAdmin() {
+    $('cubePermList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    $('cubeList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_cube_overview', { p_token: S.token }).then(function (r) {
+      S.permUsers = r.users || [];
+      S.cube = r.tutorials || [];
+      renderCubePerms();
+      renderCubeAdminList();
+    }, function (e) {
+      $('cubePermList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+      $('cubeList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderCubePerms() {
+    var box = $('cubePermList');
+    if (!S.permUsers.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有学生账号</strong>先去「用户管理」建号</div>';
+      return;
+    }
+    if (!S.cube.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有教程</strong>先在下面「② 内容」里建一个，才能分配权限</div>';
+      return;
+    }
+
+    box.innerHTML = S.permUsers.map(function (u) {
+      var ids = u.tutorial_ids || [];
+      var chips = '<button type="button" class="chip-btn none ' + (ids.length ? '' : 'on') + '" data-uid="' + esc(u.id) + '" data-tid="">无授权</button>' +
+        S.cube.map(function (t) {
+          return '<button type="button" class="chip-btn ' + (ids.indexOf(t.id) >= 0 ? 'on' : '') + '" data-uid="' + esc(u.id) + '" data-tid="' + esc(t.id) + '">' +
+            esc(t.name) + '</button>';
+        }).join('');
+
+      return '<div class="perm-row">' +
+        '<div class="who">' + esc(u.display_name || '未命名') + '<small>' + esc(u.username) + '</small></div>' +
+        '<div class="chips">' + chips + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function togglePerm(uid, tid) {
+    var u = S.permUsers.filter(function (x) { return x.id === uid; })[0];
+    if (!u) return;
+
+    var set = (u.tutorial_ids || []).slice();
+    if (!tid) {
+      set = [];
+    } else {
+      var i = set.indexOf(tid);
+      if (i >= 0) set.splice(i, 1); else set.push(tid);
+    }
+
+    u.tutorial_ids = set;              // 先改界面，再存库
+    renderCubePerms();
+
+    api('api_admin_cube_set_perms', { p_token: S.token, p_user_id: uid, p_tutorial_ids: set }).then(function () {
+      /* 成功就不打扰 */
+    }, function (e) {
+      toast(e.message, 'err');
+      loadCubeAdmin();
+    });
+  }
+
+  function renderCubeAdminList() {
+    var box = $('cubeList');
+    if (!S.cube.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有教程</strong>点右上角「新建教程」建第一个框</div>';
+      return;
+    }
+    box.innerHTML = S.cube.map(function (t) {
+      return '<div class="perm-row" style="flex-direction:column;align-items:stretch;gap:6px" data-id="' + esc(t.id) + '">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span class="badge red">' + cubeLabel(t.cube_type) + '</span>' +
+          '<b style="font-size:14px;color:var(--ink)">' + esc(t.name) + '</b>' +
+          '<span style="margin-left:auto;font-size:11.5px;color:var(--muted)">' + fmtAbs(t.created_at) + '</span>' +
+        '</div>' +
+        '<div class="rich" style="font-size:13px;color:var(--muted);max-height:54px;overflow:hidden">' +
+          renderRich(t.content) + '</div>' +
+        '<div style="display:flex;gap:14px">' +
+          '<button type="button" class="link" data-cube="edit">编辑</button>' +
+          '<button type="button" class="link danger" data-cube="del">删除</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openCubeForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '编辑教程' : '新建教程',
+      '<label class="field"><span>教程名称<em>*</em></span>' +
+        '<input class="input" id="cName" maxlength="30" placeholder="例如：1 或 三阶入门" value="' + esc(item ? item.name : '') + '"></label>' +
+      '<label class="field"><span>是几阶<em>*</em></span>' +
+        '<select class="input" id="cType">' + ['2', '3', '4', '5'].map(function (k) {
+          return '<option value="' + k + '"' + (item && String(item.cube_type) === k ? ' selected' : '') + '>' + cubeLabel(k) + '</option>';
+        }).join('') + '</select></label>' +
+      '<label class="field"><span>内容</span>' +
+        '<textarea class="textarea" id="cBody" rows="9" placeholder="写文字；需要图片就点下面的「插入图片」">' + esc(item ? item.content : '') + '</textarea></label>' +
+      '<div class="row" style="margin-top:-6px">' +
+        '<button class="btn ghost sm" id="cImg" type="button">插入图片</button>' +
+        '<input type="file" id="cFile" accept="image/*" style="display:none">' +
+      '</div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="cOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 620);
+
+    var bodyEl = m.querySelector('#cBody');
+    var fileEl = m.querySelector('#cFile');
+
+    m.querySelector('#cImg').onclick = function () { fileEl.click(); };
+    fileEl.onchange = function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 900000) { toast('这张图太大了，换一张小一点的', 'err'); return; }
+          insertAtCursor(bodyEl, '\n![图片](' + url + ')\n');
+        });
+      };
+      reader.readAsDataURL(f);
+      fileEl.value = '';
+    };
+
+    m.querySelector('#cOk').onclick = function () {
+      var btn = this;
+      var name = m.querySelector('#cName').value.trim();
+      var type = m.querySelector('#cType').value;
+      var content = bodyEl.value;
+      if (!name) { toast('请填写教程名称', 'err'); return; }
+
+      busy(btn, true, '保存中…');
+      api('api_admin_cube_save_tutorial', {
+        p_token: S.token,
+        p_id: edit ? item.id : null,
+        p_name: name,
+        p_type: type,
+        p_content: content
+      }).then(function () {
+        busy(btn, false);
+        closeModal();
+        toast(edit ? '已保存' : '已创建', 'ok');
+        loadCubeAdmin();
+      }, function (e) {
+        busy(btn, false);
+        toast(e.message, 'err', 3600);
+      });
+    };
+  }
+
+  function deleteCube(id) {
+    confirmBox('删除教程', '确定删除这个教程吗？', '删掉后，同学那边也会看不到。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_cube_delete_tutorial', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        loadCubeAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
   /* ---------- 管理端：我的账号 ---------- */
   function renderMe() {
     var p = S.me || {};
@@ -885,11 +1388,56 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
     $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
     $('btnLogout').addEventListener('click', logout);
     $('btnAdd').addEventListener('click', openAdd);
+    $('btnAdd2').addEventListener('click', openAdd);
     $('btnReset').addEventListener('click', openReset);
     $('btnDelete').addEventListener('click', delUser);
     $('btnReload').addEventListener('click', loadUsers);
     $('btnAddNews').addEventListener('click', function () { openNewsForm(null); });
     $('btnChangePwd').addEventListener('click', openChangePwd);
+    $('btnPublishHw').addEventListener('click', publishHw);
+    $('btnCubeNew').addEventListener('click', function () { openCubeForm(null); });
+    $('btnCubeReload').addEventListener('click', loadCubeAdmin);
+
+    $('cubePermList').addEventListener('click', function (e) {
+      var b = e.target.closest('.chip-btn');
+      if (!b) return;
+      togglePerm(b.dataset.uid, b.dataset.tid || '');
+    });
+
+    $('cubeList').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-cube]');
+      if (!b) return;
+      var host = b.closest('.perm-row');
+      if (!host) return;
+      var id = host.dataset.id;
+      var item = S.cube.filter(function (t) { return t.id === id; })[0];
+      if (b.dataset.cube === 'edit' && item) return openCubeForm(item);
+      if (b.dataset.cube === 'del') deleteCube(id);
+    });
+
+    $('modBody').addEventListener('click', function (e) {
+      var go = e.target.closest('[data-cube-go]');
+      if (go) {
+        if (go.dataset.cubeGo === 'tutorials') renderCubeTutorials();
+        else renderCubeDebug();
+        return;
+      }
+      var seg = e.target.closest('[data-type]');
+      if (seg && currentMod === 'cube') {
+        cubeState.type = seg.dataset.type;
+        paintTutorials();
+        return;
+      }
+      var card = e.target.closest('[data-tut]');
+      if (card && currentMod === 'cube') renderCubeContent(card.dataset.tut);
+    });
+
+    $('hwAdminList').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-hw]');
+      if (!btn) return;
+      var host = btn.closest('.news-item');
+      if (host && host.dataset.id) deleteHw(host.dataset.id);
+    });
 
     $('userBody').addEventListener('click', function (e) {
       var tr = e.target.closest('tr[data-id]');
@@ -928,7 +1476,7 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
       });
     });
 
-    $('modBack').addEventListener('click', function () { closeModule(); });
+    $('modBack').addEventListener('click', modBack);
     window.addEventListener('popstate', function () {
       if ($('modView').hidden === false) closeModule();
     });
