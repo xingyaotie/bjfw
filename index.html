@@ -249,6 +249,45 @@ body.s-down #downBar{display:block}
 .pick-row:last-child{border-bottom:none}
 .pick-row input{width:16px;height:16px;accent-color:var(--red)}
 
+/* 黑金主题（高级用户） */
+body.theme-gold{
+  --red:#B8860B; --red-d:#8A6100; --red-l:#D4A017;
+  --ink:#F3E9D2; --ink2:#D9C9A3; --muted:#A08B5B;
+  --line:#3A3122; --bg:#12100C; --card:#1B1710;
+  background:#12100C; color:#F3E9D2;
+}
+body.theme-gold .card,
+body.theme-gold .modal,
+body.theme-gold .login-card,
+body.theme-gold .home-card{ background:#1B1710; border-color:#3A3122; color:#F3E9D2; }
+body.theme-gold .modal-head,
+body.theme-gold .modal-foot,
+body.theme-gold .toolbar,
+body.theme-gold .table-foot,
+body.theme-gold .news-item,
+body.theme-gold .news-card,
+body.theme-gold .perm-row{ border-color:#2E2718; }
+body.theme-gold .modal-foot{ background:#161209; }
+body.theme-gold .input,
+body.theme-gold .textarea,
+body.theme-gold .xbh-input{ background:#221C12; border-color:#3A3122; color:#F3E9D2; }
+body.theme-gold table th{ background:#1E1910; color:#A08B5B; border-color:#3A3122; }
+body.theme-gold table td{ border-color:#2A2318; color:#D9C9A3; }
+body.theme-gold tbody tr:hover{ background:#221C12; }
+body.theme-gold .empty,
+body.theme-gold .hint,
+body.theme-gold .loading{ color:#A08B5B; }
+body.theme-gold .news-item{ background:#1B1710; border-color:#3A3122; }
+body.theme-gold .login-card h1{ color:#D4A017; }
+body.theme-gold #loginView{ background:linear-gradient(180deg,#1A1509 0%,#0F0C07 42%,#12100C 100%); }
+body.theme-gold .login-top .school,
+body.theme-gold .login-top .cls{ color:#D4A017; }
+body.theme-gold .btn.ghost{ background:#1B1710; color:#D9C9A3; border-color:#3A3122; }
+body.theme-gold .btn.ghost:hover{ background:#221C12; color:#F3E9D2; }
+body.theme-gold .chip-btn{ background:#1B1710; border-color:#3A3122; color:#D9C9A3; }
+body.theme-gold .tab{ background:#1B1710; border-color:#3A3122; color:#D9C9A3; }
+body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
+
 /* 魔方模块 */
 .cube-stack{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:10px auto 0}
 .cube-opt{display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;border-radius:16px;border:1px solid var(--line);
@@ -388,6 +427,7 @@ body.s-down #downBar{display:block}
       <button class="tab" data-tab="debug" type="button">魔方调试</button>
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
+      <button class="tab" data-tab="pay" type="button">付费申请</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
       <button class="tab" data-tab="status" type="button">平台状态</button>
       <button class="tab" data-tab="more" type="button">更多</button>
@@ -574,6 +614,21 @@ body.s-down #downBar{display:block}
       <div class="card"><div class="news" id="fbAdminList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
+    <!-- 付费申请 -->
+    <section id="tab-pay" hidden>
+      <div class="panel-head">
+        <div><h2>付费申请</h2>
+          <div class="hint">学生点了收费分支会排在这里；处理后会给他发一封站内信</div></div>
+        <button class="btn ghost sm" id="btnPayReload" type="button" style="height:32px">刷新</button>
+      </div>
+      <div class="seg" id="payFilter">
+        <button type="button" data-ps="new" class="on">待处理</button>
+        <button type="button" data-ps="done">已处理</button>
+        <button type="button" data-ps="all">全部</button>
+      </div>
+      <div class="card"><div class="news" id="payList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
     <!-- 公告 -->
     <section id="tab-notice" hidden>
       <div class="panel-head">
@@ -632,13 +687,21 @@ body.s-down #downBar{display:block}
     <!-- 更多 -->
     <section id="tab-more" hidden>
       <div class="panel-head">
-        <div><h2>更多</h2><div class="hint">版本号和赞助商会显示在学生端「更多」页</div></div>
+        <div><h2>更多</h2><div class="hint">这些内容都会显示在学生端「更多」页</div></div>
       </div>
       <div class="card" style="padding:16px">
         <label class="field"><span>当前版本</span>
           <input class="input" id="setVersion" maxlength="40" placeholder="例如：体验版 v5"></label>
+        <label class="field"><span>更新日志</span>
+          <textarea class="textarea" id="setChangelog" rows="4" placeholder="一行一条，例如：&#10;新增付费分支&#10;魔方权限支持折叠"></textarea></label>
         <label class="field"><span>赞助商</span>
-          <textarea class="textarea" id="setSponsors" rows="5" placeholder="一行写一个，例如：张三爸爸 · 文具店"></textarea></label>
+          <textarea class="textarea" id="setSponsors" rows="4" placeholder="一行写一个，例如：张三爸爸 · 文具店"></textarea></label>
+        <label class="field"><span>赞赏（可以放图片）</span>
+          <textarea class="textarea" id="setAppreciation" rows="4" placeholder="写给支持班级平台的人；点下面「插入图片」可以放收款码之类"></textarea></label>
+        <div class="row" style="margin:-6px 0 12px">
+          <button class="btn ghost sm" id="btnAppImg" type="button">插入图片</button>
+          <input type="file" id="appFile" accept="image/*" style="display:none">
+        </div>
         <div style="text-align:right">
           <button class="btn primary" id="btnSaveMore" type="button">保存</button>
         </div>
@@ -873,6 +936,7 @@ body.s-down #downBar{display:block}
 
     // 不自动登录：每次打开或刷新页面都要重新输入登录名和密码
     clearSession();
+    try { if (localStorage.getItem('xbh_theme') === 'gold') document.body.classList.add('theme-gold'); } catch (e) {}
     showLogin();
     loadBootInfo();
   }
@@ -1085,6 +1149,7 @@ body.s-down #downBar{display:block}
   function modBack() {
     if (currentMod === 'cube') {
       if (cubeState.view === 'content') return renderCubeTutorials(true);
+      if (cubeState.view === 'debugBranch') return renderCubeDebugProject(cubeState.projectId);
       if (cubeState.view === 'debugProject') return renderCubeDebug();
       if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
     }
@@ -1105,6 +1170,10 @@ body.s-down #downBar{display:block}
     var me = S.me || {};
     var b = S.boot || {};
     var sp = String(b.sponsors || '').trim();
+    var cl = String(b.changelog || '').trim();
+    var ap = String(b.appreciation || '').trim();
+    var isVip = me.role === 'vip';
+    var gold = document.body.classList.contains('theme-gold');
 
     $('modBody').innerHTML =
       '<div style="max-width:520px;margin:10px auto">' +
@@ -1113,6 +1182,12 @@ body.s-down #downBar{display:block}
           '<span><b>反馈</b><small>提问题、提建议，管理员会处理</small></span>' +
           '<span class="arrow">›</span>' +
         '</button>' +
+
+        (ap ? '<div class="card" style="padding:18px;margin-bottom:14px">' +
+                '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">赞赏</div>' +
+                '<div class="rich">' + renderRich(ap) + '</div>' +
+              '</div>' : '') +
+
         '<div class="card" style="padding:18px">' +
           '<dl class="kv">' +
             '<dt>平台</dt><dd>徐悲鸿中学 · 2026级5班</dd>' +
@@ -1120,11 +1195,31 @@ body.s-down #downBar{display:block}
             '<dt>我的账号</dt><dd>' + esc(me.display_name || '—') + '（' + esc(me.username || '—') + '）</dd>' +
           '</dl>' +
         '</div>' +
+
+        (isVip ? '<button class="cube-opt" type="button" data-theme-toggle style="margin-top:14px">' +
+            '<span class="ico">' + (gold ? '🌙' : '🎨') + '</span>' +
+            '<span><b>黑金主题</b><small>VIP 专属 · 点一下切换</small></span>' +
+            '<span class="arrow" style="font-size:13px;color:' + (gold ? '#D4A017' : '#C9CED6') + '">' +
+              (gold ? '已开启' : '未开启') + '</span>' +
+          '</button>' : '') +
+
+        (cl ? '<div class="card" style="padding:18px;margin-top:14px">' +
+                '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">更新日志</div>' +
+                '<div class="rich">' + esc(cl) + '</div>' +
+              '</div>' : '') +
+
         (sp ? '<div class="card" style="padding:18px;margin-top:14px">' +
                 '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">赞助商</div>' +
                 '<div class="rich">' + esc(sp) + '</div>' +
               '</div>' : '') +
       '</div>';
+  }
+
+  function toggleTheme() {
+    var on = document.body.classList.toggle('theme-gold');
+    try { localStorage.setItem('xbh_theme', on ? 'gold' : 'red'); } catch (e) {}
+    renderMore();
+    toast(on ? '已切换到黑金主题' : '已切回红色主题', 'ok');
   }
 
   /* ================= 反馈（学生端 + 管理端共用） ================= */
@@ -1349,7 +1444,7 @@ body.s-down #downBar{display:block}
         '</button>' +
         '<button class="cube-opt" type="button" data-cube-go="debug">' +
           '<span class="ico">🛠</span>' +
-          '<span><b>魔方调试</b><small>建设中</small></span>' +
+          '<span><b>魔方调试</b><small>帮助您找到最佳的魔方手感</small></span>' +
           '<span class="arrow">›</span>' +
         '</button>' +
       '</div>';
@@ -1469,27 +1564,82 @@ body.s-down #downBar{display:block}
     });
   }
 
+  var debugProjectCache = { project: null, branches: [] };
+
   function renderCubeDebugProject(id) {
     cubeState.view = 'debugProject';
+    cubeState.projectId = id;
     var body = $('modBody');
     body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
 
     api('api_debug_detail', { p_token: S.token, p_id: id }).then(function (r) {
-      var p = r.project || {};
-      var branches = r.branches || [];
+      debugProjectCache = { project: r.project || {}, branches: r.branches || [] };
+      var list = debugProjectCache.branches;
 
       body.innerHTML =
-        '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(p.name) + '</h2>' +
-        (branches.length
-          ? branches.map(function (b) {
-              return '<div class="card" style="padding:16px;margin-bottom:12px">' +
-                '<div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px">' + esc(b.name) + '</div>' +
-                '<div class="rich">' + esc(b.content) + '</div>' +
-              '</div>';
-            }).join('')
+        '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(debugProjectCache.project.name) + '</h2>' +
+        (list.length
+          ? '<div class="cube-stack" style="max-width:none">' + list.map(function (b) {
+              var sub = b.paid
+                ? (b.tiers && b.tiers.length ? '收费 · ' + b.tiers.length + ' 个价格' : '收费')
+                : '免费';
+              return '<button class="cube-opt" type="button" data-branch="' + esc(b.id) + '">' +
+                '<span class="ico">' + (b.paid ? '💰' : '📄') + '</span>' +
+                '<span><b>' + esc(b.name) + '</b><small>' + sub + '</small></span>' +
+                '<span class="arrow">›</span>' +
+              '</button>';
+            }).join('') + '</div>'
           : '<div class="empty"><strong>这个项目还没有内容</strong>管理员添加后就能看到</div>');
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderCubeDebugBranch(bid) {
+    var b = (debugProjectCache.branches || []).filter(function (x) { return x.id === bid; })[0];
+    if (!b) return;
+    cubeState.view = 'debugBranch';
+    cubeState.branchId = bid;
+
+    var body = $('modBody');
+    var html =
+      '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(b.name) + '</h2>' +
+      '<div class="card" style="padding:16px;margin-bottom:12px">' +
+        '<div class="rich">' + esc(b.content) + '</div>' +
+      '</div>';
+
+    if (b.paid && b.tiers && b.tiers.length) {
+      html += '<div class="card" style="padding:16px">' +
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:10px">这个分支需要付费，选一个：</div>' +
+        b.tiers.map(function (t) {
+          return '<button class="cube-opt" type="button" data-tier="' + esc(t.name) + '" style="margin-bottom:10px;padding:12px 16px">' +
+            '<span class="ico" style="width:34px;height:34px;font-size:15px">￥</span>' +
+            '<span><b>' + esc(t.name) + '</b><small>' + esc(t.price) + ' 元</small></span>' +
+            '<span class="arrow">›</span>' +
+          '</button>';
+        }).join('') +
+      '</div>';
+    }
+
+    body.innerHTML = html;
+  }
+
+  function askPay(tierName) {
+    var b = (debugProjectCache.branches || []).filter(function (x) { return x.id === cubeState.branchId; })[0];
+    if (!b) return;
+    var t = (b.tiers || []).filter(function (x) { return x.name === tierName; })[0];
+    if (!t) return;
+
+    confirmBox('请支付 ' + t.price + ' 元',
+      '「' + t.name + '」' + t.price + ' 元。',
+      '点了「我已支付」会把申请发给管理员，处理后会给你发一封站内信。', '我已支付'
+    ).then(function (yes) {
+      if (!yes) return;
+      api('api_pay_request_add', {
+        p_token: S.token, p_branch_id: b.id, p_tier_name: t.name
+      }).then(function () {
+        toast('已提交，等管理员确认', 'ok', 3200);
+      }, function (e) { toast(e.message, 'err', 3600); });
     });
   }
 
@@ -1555,7 +1705,7 @@ body.s-down #downBar{display:block}
 
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'pay', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -1570,6 +1720,7 @@ body.s-down #downBar{display:block}
     if (name === 'debug') loadDebugAdmin();
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
+    if (name === 'pay') loadPayAdmin();
     if (name === 'notice') loadNoticeAdmin();
     if (name === 'status') loadStatusAdmin();
     if (name === 'more') loadMoreAdmin();
@@ -2421,20 +2572,75 @@ body.s-down #downBar{display:block}
 
   function openBranchForm(debugId, branch) {
     var edit = !!branch;
+    var paid = branch ? !!branch.paid : false;
+    var tiers = (branch && branch.tiers) ? branch.tiers.slice() : [];
+
+    var tierRow = function (t) {
+      return '<div class="row" style="margin-bottom:8px" data-tier-row>' +
+        '<input class="input" data-tn placeholder="名称，如 普通魔方" value="' + esc(t ? t.name : '') + '">' +
+        '<input class="input" data-tp type="number" min="0" step="0.01" placeholder="金额" value="' + esc(t ? t.price : '') + '" style="max-width:110px">' +
+        '<button class="btn ghost sm" type="button" data-trm style="height:40px">删</button>' +
+      '</div>';
+    };
+
     var m = modal(edit ? '编辑分支' : '新建分支',
       '<label class="field"><span>分支名称<em>*</em></span>' +
         '<input class="input" id="bName" maxlength="60" placeholder="例如：手法练习" value="' + esc(branch ? branch.name : '') + '"></label>' +
       '<label class="field"><span>内容</span>' +
-        '<textarea class="textarea" id="bBody" rows="7" placeholder="写这个分支下的说明、步骤…">' + esc(branch ? branch.content : '') + '</textarea></label>',
+        '<textarea class="textarea" id="bBody" rows="6" placeholder="写这个分支下的说明、步骤…">' + esc(branch ? branch.content : '') + '</textarea></label>' +
+      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin:0 0 12px">' +
+        '<input type="checkbox" id="bPaid"' + (paid ? ' checked' : '') +
+        ' style="width:16px;height:16px;accent-color:var(--red)"> 这个分支收费</label>' +
+      '<div id="tierBox" style="' + (paid ? '' : 'display:none') + '">' +
+        '<div class="hint" style="margin-bottom:6px">价格档位（名称 + 金额），学生点的时候选一个</div>' +
+        '<div id="tiers">' + (tiers.length ? tiers.map(tierRow).join('') : tierRow(null)) + '</div>' +
+        '<button class="btn ghost sm" id="tierAdd" type="button" style="margin-top:2px">＋ 添加价格</button>' +
+      '</div>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
-      '<button class="btn primary" id="bOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 560);
+      '<button class="btn primary" id="bOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 580);
+
+    var box = m.querySelector('#tierBox');
+    m.querySelector('#bPaid').onchange = function () {
+      box.style.display = this.checked ? '' : 'none';
+    };
+
+    m.querySelector('#tierAdd').onclick = function () {
+      var wrap = m.querySelector('#tiers');
+      var div = document.createElement('div');
+      div.innerHTML = tierRow(null);
+      wrap.appendChild(div.firstChild);
+    };
+
+    m.querySelector('#tiers').addEventListener('click', function (e) {
+      var del = e.target.closest('[data-trm]');
+      if (!del) return;
+      var row = del.closest('[data-tier-row]');
+      if (row && m.querySelectorAll('#tiers [data-tier-row]').length > 1) row.remove();
+      else if (row) {
+        row.querySelector('[data-tn]').value = '';
+        row.querySelector('[data-tp]').value = '';
+      }
+    });
 
     m.querySelector('#bName').focus();
     m.querySelector('#bOk').onclick = function () {
       var btn = this;
       var nm = m.querySelector('#bName').value.trim();
       var body = m.querySelector('#bBody').value;
+      var isPaid = m.querySelector('#bPaid').checked;
+
       if (!nm) return toast('分支名称不能为空', 'err');
+
+      var ts = Array.prototype.slice.call(m.querySelectorAll('#tiers [data-tier-row]'))
+        .map(function (r) {
+          return {
+            name: r.querySelector('[data-tn]').value.trim(),
+            price: Number(r.querySelector('[data-tp]').value) || 0
+          };
+        })
+        .filter(function (t) { return t.name; });
+
+      if (isPaid && !ts.length) return toast('收费分支至少要填一个价格', 'err');
 
       busy(btn, true, '保存中…');
       api('api_admin_debug_branch_save', {
@@ -2442,7 +2648,9 @@ body.s-down #downBar{display:block}
         p_id: edit ? branch.id : null,
         p_debug_id: debugId,
         p_name: nm,
-        p_content: body
+        p_content: body,
+        p_paid: isPaid,
+        p_tiers: ts
       }).then(function () {
         busy(btn, false);
         closeModal();
@@ -2474,6 +2682,81 @@ body.s-down #downBar{display:block}
         setTimeout(function () { backfillDebug(debugId); }, 60);
       }, function (e) { toast(e.message, 'err'); });
     });
+  }
+
+  /* ---------- 管理端：付费申请 ---------- */
+  function loadPayAdmin() {
+    var box = $('payList');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_pay_list', { p_token: S.token, p_status: S.payFilter || 'new' }).then(function (r) {
+      S.pays = r.items || [];
+      renderPayAdmin();
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderPayAdmin() {
+    var box = $('payList');
+    if (!S.pays.length) {
+      box.innerHTML = '<div class="empty"><strong>没有申请</strong>学生点了收费分支后会出现在这里</div>';
+      return;
+    }
+    box.innerHTML = S.pays.map(function (x) {
+      return '<div class="news-item" data-pay="' + esc(x.id) + '" style="cursor:pointer">' +
+        '<div class="hd">' +
+          (x.status === 'new'
+            ? '<span class="badge st-new" style="height:18px;font-size:11px">待处理</span>'
+            : '<span class="badge st-done" style="height:18px;font-size:11px">已处理</span>') +
+          '<h4>' + esc(x.who) + ' · ' + esc(x.project_name) + ' / ' + esc(x.branch_name) + '</h4>' +
+          '<span class="time">' + fmt(x.created_at) + '</span>' +
+        '</div>' +
+        '<p style="margin:0;font-size:13.5px;color:var(--ink2)">' +
+          esc(x.tier_name) + ' · <b style="color:var(--red)">' + esc(x.price) + ' 元</b>' +
+          (x.note ? '<span style="color:var(--muted)"> · 备注：' + esc(x.note) + '</span>' : '') +
+        '</p>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openPayDetail(id) {
+    var x = (S.pays || []).filter(function (p) { return p.id === id; })[0];
+    if (!x) return;
+
+    var m = modal('付费申请',
+      '<dl class="kv">' +
+        '<dt>学生</dt><dd>' + esc(x.who) + '（' + esc(x.login) + '）</dd>' +
+        '<dt>项目</dt><dd>' + esc(x.project_name) + ' / ' + esc(x.branch_name) + '</dd>' +
+        '<dt>档位</dt><dd>' + esc(x.tier_name) + '</dd>' +
+        '<dt>金额</dt><dd><b style="color:var(--red)">' + esc(x.price) + ' 元</b></dd>' +
+        '<dt>时间</dt><dd>' + fmtAbs(x.created_at) + '</dd>' +
+        '<dt>状态</dt><dd>' + (x.status === 'done' ? '已处理' : '待处理') + '</dd>' +
+      '</dl>' +
+      '<label class="field" style="margin-top:14px"><span>备注（会一起发给他）</span>' +
+        '<textarea class="textarea" id="payNote" rows="3" placeholder="例如：已收到，晚上把魔方带过来">' + esc(x.note || '') + '</textarea></label>' +
+      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2)">' +
+        '<input type="checkbox" id="payAllow" ' + (x.allow_reply ? 'checked' : '') +
+        ' style="width:16px;height:16px;accent-color:var(--red)"> 允许他回复这封通知</label>' +
+      (x.status === 'done' ? '<p class="hint" style="margin-top:10px">这条已经处理过了，再点一次会重新发一封通知。</p>' : ''),
+      '<button class="btn ghost" type="button" data-close>关闭</button>' +
+      '<button class="btn primary" id="payOk" type="button">标记已处理并通知</button>', 520);
+
+    m.querySelector('#payOk').onclick = function () {
+      var btn = this;
+      busy(btn, true, '处理中…');
+      api('api_admin_pay_handle', {
+        p_token: S.token,
+        p_id: id,
+        p_note: m.querySelector('#payNote').value.trim(),
+        p_allow_reply: m.querySelector('#payAllow').checked
+      }).then(function () {
+        busy(btn, false);
+        closeModal();
+        toast('已处理，通知已发出', 'ok');
+        loadPayAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
   }
 
   /* ---------- 管理端：公告 / 平台状态 / 更多 ---------- */
@@ -2543,18 +2826,24 @@ body.s-down #downBar{display:block}
   function loadMoreAdmin() {
     var b = S.boot || {};
     $('setVersion').value = b.version || '';
+    $('setChangelog').value = b.changelog || '';
     $('setSponsors').value = b.sponsors || '';
+    $('setAppreciation').value = b.appreciation || '';
     if (!S.boot) bootInfo().then(loadMoreAdmin, function () {});
   }
 
   function saveMore() {
     var btn = $('btnSaveMore');
     var v = $('setVersion').value.trim();
+    var cl = $('setChangelog').value;
     var s = $('setSponsors').value.trim();
+    var ap = $('setAppreciation').value;
     busy(btn, true, '保存中…');
     Promise.all([
       api('api_admin_save_setting', { p_token: S.token, p_key: 'version', p_value: v }),
-      api('api_admin_save_setting', { p_token: S.token, p_key: 'sponsors', p_value: s })
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'changelog', p_value: cl }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'sponsors', p_value: s }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'appreciation', p_value: ap })
     ]).then(function () {
       busy(btn, false);
       return bootInfo();
@@ -2690,6 +2979,34 @@ body.s-down #downBar{display:block}
       if (it) openFbDetail(it.dataset.fb, true);
     });
 
+    $('btnPayReload').addEventListener('click', loadPayAdmin);
+    $('payFilter').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-ps]');
+      if (!b) return;
+      S.payFilter = b.dataset.ps;
+      Array.prototype.forEach.call($('payFilter').children, function (x) { x.classList.toggle('on', x === b); });
+      loadPayAdmin();
+    });
+    $('payList').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-pay]');
+      if (it) openPayDetail(it.dataset.pay);
+    });
+
+    $('btnAppImg').addEventListener('click', function () { $('appFile').click(); });
+    $('appFile').addEventListener('change', function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 800000) { toast('这张图太大了，换一张小一点的', 'err'); return; }
+          insertAtCursor($('setAppreciation'), '\n![图片](' + url + ')\n');
+        });
+      };
+      reader.readAsDataURL(f);
+      this.value = '';
+    });
+
     $('saveNotice1').addEventListener('click', function () { saveNotice('login_notice', 'noticeLogin', this, '登录公告'); });
     $('saveNotice2').addEventListener('click', function () { saveNotice('login_popup', 'noticePopup', this, '弹窗公告'); });
     $('saveNotice3').addEventListener('click', function () { saveNotice('home_notice', 'noticeHome', this, '登录后公告'); });
@@ -2739,8 +3056,16 @@ body.s-down #downBar{display:block}
       var op = e.target.closest('[data-open]');
       if (op && op.dataset.open === 'fb') { openFeedback(); return; }
 
+      if (e.target.closest('[data-theme-toggle]')) { toggleTheme(); return; }
+
       var dbg = e.target.closest('[data-debug]');
       if (dbg && currentMod === 'cube') { renderCubeDebugProject(dbg.dataset.debug); return; }
+
+      var br = e.target.closest('[data-branch]');
+      if (br && currentMod === 'cube') { renderCubeDebugBranch(br.dataset.branch); return; }
+
+      var tier = e.target.closest('[data-tier]');
+      if (tier && currentMod === 'cube') { askPay(tier.dataset.tier); return; }
 
       var go = e.target.closest('[data-cube-go]');
       if (go) {
