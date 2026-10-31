@@ -252,41 +252,89 @@ body.s-down #downBar{display:block}
 /* 黑金主题（高级用户） */
 body.theme-gold{
   --red:#B8860B; --red-d:#8A6100; --red-l:#D4A017;
-  --ink:#F3E9D2; --ink2:#D9C9A3; --muted:#A08B5B;
+  --ink:#F0D48A; --ink2:#D4B25E; --muted:#9A7B2E;
   --line:#3A3122; --bg:#12100C; --card:#1B1710;
-  background:#12100C; color:#F3E9D2;
+  background:#12100C; color:#E8C46A;
 }
 body.theme-gold .card,
 body.theme-gold .modal,
 body.theme-gold .login-card,
-body.theme-gold .home-card{ background:#1B1710; border-color:#3A3122; color:#F3E9D2; }
+body.theme-gold .home-card,
+body.theme-gold .news-item,
+body.theme-gold .news-card,
+body.theme-gold .cube-card,
+body.theme-gold .cube-opt{ background:#1B1710; border-color:#3A3122; color:#D4B25E; }
+body.theme-gold #modView{ background:#12100C; }
 body.theme-gold .modal-head,
 body.theme-gold .modal-foot,
 body.theme-gold .toolbar,
 body.theme-gold .table-foot,
-body.theme-gold .news-item,
-body.theme-gold .news-card,
-body.theme-gold .perm-row{ border-color:#2E2718; }
+body.theme-gold .perm-row,
+body.theme-gold .fb-replies{ border-color:#2E2718; }
 body.theme-gold .modal-foot{ background:#161209; }
+body.theme-gold .modal-head h3,
+body.theme-gold .modal-body,
+body.theme-gold .hint,
+body.theme-gold .empty strong{ color:#E8C46A; }
 body.theme-gold .input,
 body.theme-gold .textarea,
-body.theme-gold .xbh-input{ background:#221C12; border-color:#3A3122; color:#F3E9D2; }
-body.theme-gold table th{ background:#1E1910; color:#A08B5B; border-color:#3A3122; }
-body.theme-gold table td{ border-color:#2A2318; color:#D9C9A3; }
+body.theme-gold .xbh-input{ background:#221C12; border-color:#3A3122; color:#F0D48A; }
+body.theme-gold table th{ background:#1E1910; color:#9A7B2E; border-color:#3A3122; }
+body.theme-gold table td{ border-color:#2A2318; color:#D4B25E; }
 body.theme-gold tbody tr:hover{ background:#221C12; }
 body.theme-gold .empty,
-body.theme-gold .hint,
-body.theme-gold .loading{ color:#A08B5B; }
-body.theme-gold .news-item{ background:#1B1710; border-color:#3A3122; }
+body.theme-gold .loading,
+body.theme-gold .sub,
+body.theme-gold .foot{ color:#9A7B2E; }
 body.theme-gold .login-card h1{ color:#D4A017; }
 body.theme-gold #loginView{ background:linear-gradient(180deg,#1A1509 0%,#0F0C07 42%,#12100C 100%); }
 body.theme-gold .login-top .school,
 body.theme-gold .login-top .cls{ color:#D4A017; }
-body.theme-gold .btn.ghost{ background:#1B1710; color:#D9C9A3; border-color:#3A3122; }
-body.theme-gold .btn.ghost:hover{ background:#221C12; color:#F3E9D2; }
-body.theme-gold .chip-btn{ background:#1B1710; border-color:#3A3122; color:#D9C9A3; }
-body.theme-gold .tab{ background:#1B1710; border-color:#3A3122; color:#D9C9A3; }
-body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
+body.theme-gold .btn.ghost{ background:#1B1710; color:#D4B25E; border-color:#3A3122; }
+body.theme-gold .btn.ghost:hover{ background:#221C12; color:#F0D48A; }
+body.theme-gold .btn.primary{ background:linear-gradient(135deg,#D4A017,#8A6100); color:#12100C; }
+body.theme-gold .chip-btn{ background:#1B1710; border-color:#3A3122; color:#D4B25E; }
+body.theme-gold .chip-btn.on{ background:#B8860B; border-color:#B8860B; color:#12100C; }
+body.theme-gold .tab{ background:#1B1710; border-color:#3A3122; color:#D4B25E; }
+body.theme-gold .tab.active{ background:#B8860B; border-color:#B8860B; color:#12100C; }
+body.theme-gold .seg button{ background:#1B1710; border-color:#3A3122; color:#D4B25E; }
+body.theme-gold .seg button.on{ background:#B8860B; border-color:#B8860B; color:#12100C; }
+body.theme-gold .badge.red{ background:#3A2A0A; color:#E8C46A; border-color:#5A4413; }
+body.theme-gold .badge.gray{ background:#241E13; color:#9A7B2E; border-color:#3A3122; }
+body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; color:#D4B25E; }
+body.theme-gold .fb-head .who{ color:#F0D48A; }
+body.theme-gold .marquee.on-card{ background:#1B1710; border-color:#3A3122; color:#E8C46A; }
+body.theme-gold .marquee.on-dark{ background:rgba(212,160,23,.14); border-color:#3A3122; color:#E8C46A; }
+body.theme-gold .tile{ background:linear-gradient(135deg,#D4A017,#8A6100); color:#12100C; }
+body.theme-gold .cube-card.locked{ background:#151109; border-color:#241E13; }
+body.theme-gold .cube-card.locked .t,
+body.theme-gold .cube-card.locked .m{ color:#6B5A22; }
+body.theme-gold .chip .dot{ background:#D4A017; color:#12100C; }
+body.theme-gold .btn-logout,
+body.theme-gold .mail-btn{ background:rgba(212,160,23,.16); border-color:#5A4413; color:#E8C46A; }
+body.theme-gold .rich{ color:#D4B25E; }
+
+/* 会员 / 广告 */
+.member-btn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;
+  height:32px;padding:0 14px;border-radius:999px;font-size:13px;letter-spacing:1px}
+.member-btn:hover{background:rgba(255,255,255,.26)}
+body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413;color:#E8C46A}
+
+.member-head{padding:14px 16px;border-radius:12px;background:linear-gradient(135deg,#2A2113,#171208);
+  color:#E8C46A;border:1px solid #3A3122;margin-bottom:14px}
+.member-head b{font-size:15px;letter-spacing:1px}
+.member-head small{display:block;margin-top:4px;font-size:12.5px;color:#9A7B2E}
+
+/* 强制广告 */
+#adMask{position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.72);display:flex;
+  align-items:center;justify-content:center;padding:18px}
+#adMask .ad-box{width:100%;max-width:520px;background:#fff;border-radius:16px;overflow:hidden;
+  box-shadow:0 30px 80px rgba(0,0,0,.5)}
+#adMask .ad-top{background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;
+  padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px}
+#adMask .ad-top .t{flex:1;letter-spacing:1px}
+#adMask .ad-body{padding:18px;max-height:60vh;overflow:auto}
+#adMask .ad-foot{padding:10px 16px 14px;text-align:center;font-size:12.5px;color:var(--muted)}
 
 /* 魔方模块 */
 .cube-stack{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:10px auto 0}
@@ -390,6 +438,7 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
         <b>徐悲鸿中学</b>
         <small id="brandSub">2026级5班 · 班级服务平台</small>
       </div>
+      <button class="member-btn" id="btnMember" type="button">会员</button>
       <span class="chip"><span class="dot" id="userDot">我</span><span id="userName">同学</span></span>
       <button class="mail-btn" id="btnMail" type="button" title="站内信">✉<span class="mail-dot" id="mailDot" hidden></span></button>
       <button class="btn-logout" id="btnLogout" type="button">退出</button>
@@ -428,6 +477,8 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
       <button class="tab" data-tab="pay" type="button">付费申请</button>
+      <button class="tab" data-tab="member" type="button">会员</button>
+      <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
       <button class="tab" data-tab="status" type="button">平台状态</button>
       <button class="tab" data-tab="more" type="button">更多</button>
@@ -629,6 +680,25 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
       <div class="card"><div class="news" id="payList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
+    <!-- 会员 -->
+    <section id="tab-member" hidden>
+      <div class="panel-head">
+        <div><h2>会员</h2><div class="hint">学生点右上角「会员」看到的权益，就是下面这些框</div></div>
+        <button class="btn primary sm" id="btnMemberNew" type="button" style="height:32px;padding:0 14px">＋ 新建权益</button>
+      </div>
+      <div class="card"><div class="news" id="memberList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- 广告推销 -->
+    <section id="tab-ad" hidden>
+      <div class="panel-head">
+        <div><h2>广告推销</h2>
+          <div class="hint">广告名称 → 分支；每个分支可以设收费、排期、是否上架</div></div>
+        <button class="btn primary sm" id="btnAdNew" type="button" style="height:32px;padding:0 14px">＋ 新建广告</button>
+      </div>
+      <div class="card"><div class="news" id="adList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
     <!-- 公告 -->
     <section id="tab-notice" hidden>
       <div class="panel-head">
@@ -744,7 +814,8 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
   var db = null;
   var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
             cube: [], cubeAll: [], cubeAny: false, permUsers: [], cubeFilter: '', permKw: '',
-            boot: null, permOpen: {}, debug: [], debugOpen: {}, debugBranches: {} };
+            boot: null, permOpen: {}, debug: [], debugOpen: {}, debugBranches: {},
+            members: [], ads: [], adOpen: {}, adBranches: {} };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -1060,12 +1131,14 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
       $('brandSub').textContent = '2026级5班 · 管理端';
       $('userPanel').hidden = true;
       $('adminPanel').hidden = false;
+      $('btnMember').hidden = true;
       switchTab('users');
     } else {
       $('brandSub').textContent = profile.role === 'vip'
         ? '高级用户 · ' + name
         : '2026级5班 · 班级服务平台';
       $('adminPanel').hidden = true;
+      $('btnMember').hidden = false;
       showActions(false);
       $('userPanel').hidden = false;
       renderHomeNotice(S.boot && S.boot.home_notice);
@@ -1077,13 +1150,51 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
     var welcome = function () {
       if (profile.role === 'vip') showVipWelcome(name);
     };
+    var popup = (profile.role !== 'admin' && S.boot) ? String(S.boot.login_popup || '').trim() : '';
 
-    // 登录弹窗公告：管理员不弹；高级用户先看公告，关掉后再弹欢迎
-    if (profile.role !== 'admin' && S.boot && String(S.boot.login_popup || '').trim()) {
-      setTimeout(function () { showPopupNotice(S.boot.login_popup, welcome); }, 260);
-    } else if (profile.role === 'vip') {
-      setTimeout(welcome, 400);
+    var afterNotice = function () {
+      if (popup) showPopupNotice(popup, welcome);
+      else welcome();
+    };
+
+    // 强制广告 3 秒 → 公告 → 欢迎
+    if (profile.role === 'admin') {
+      setTimeout(afterNotice, 260);
+    } else {
+      setTimeout(function () { showAdThen(afterNotice); }, 200);
     }
+  }
+
+  /* 登录后强制看 3 秒广告 */
+  function showAdThen(cb) {
+    api('api_ad_current', { p_token: S.token }).then(function (r) {
+      var ad = r.ad;
+      if (!ad) { cb(); return; }
+
+      var mask = document.createElement('div');
+      mask.id = 'adMask';
+      mask.innerHTML =
+        '<div class="ad-box">' +
+          '<div class="ad-top"><span class="t">推广</span><span id="adLeft">3</span> 秒</div>' +
+          '<div class="ad-body"><div class="rich">' + renderRich(ad.content) + '</div></div>' +
+          '<div class="ad-foot">感谢支持班级平台</div>' +
+        '</div>';
+      document.body.appendChild(mask);
+      document.body.style.overflow = 'hidden';
+
+      var left = 3;
+      var el = mask.querySelector('#adLeft');
+      var timer = setInterval(function () {
+        left--;
+        if (el) el.textContent = String(Math.max(0, left));
+        if (left <= 0) {
+          clearInterval(timer);
+          if (mask.parentNode) mask.remove();
+          document.body.style.overflow = '';
+          cb();
+        }
+      }, 1000);
+    }, function () { cb(); });
   }
 
   function showVipWelcome(name) {
@@ -1153,7 +1264,12 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
       if (cubeState.view === 'debugProject') return renderCubeDebug();
       if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
     }
-    if (currentMod === 'more' && moreState.view === 'fb') return renderMore();
+    if (currentMod === 'more') {
+      if (moreState.view === 'fb') return renderMore();
+      if (moreState.view === 'adsBranch') return openAdProject(moreState.adProjectId);
+      if (moreState.view === 'adsProject') return openAds();
+      if (moreState.view === 'ads') return renderMore();
+    }
     closeModule();
   }
 
@@ -1177,9 +1293,15 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
 
     $('modBody').innerHTML =
       '<div style="max-width:520px;margin:10px auto">' +
-        '<button class="cube-opt" type="button" data-open="fb" style="margin-bottom:14px">' +
+        '<button class="cube-opt" type="button" data-open="fb" style="margin-bottom:12px">' +
           '<span class="ico">💬</span>' +
           '<span><b>反馈</b><small>提问题、提建议，管理员会处理</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>' +
+
+        '<button class="cube-opt" type="button" data-open="ads" style="margin-bottom:14px">' +
+          '<span class="ico">📣</span>' +
+          '<span><b>广告推销</b><small>看看有哪些同学 / 店铺在推广</small></span>' +
           '<span class="arrow">›</span>' +
         '</button>' +
 
@@ -1196,13 +1318,6 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
           '</dl>' +
         '</div>' +
 
-        (isVip ? '<button class="cube-opt" type="button" data-theme-toggle style="margin-top:14px">' +
-            '<span class="ico">' + (gold ? '🌙' : '🎨') + '</span>' +
-            '<span><b>黑金主题</b><small>VIP 专属 · 点一下切换</small></span>' +
-            '<span class="arrow" style="font-size:13px;color:' + (gold ? '#D4A017' : '#C9CED6') + '">' +
-              (gold ? '已开启' : '未开启') + '</span>' +
-          '</button>' : '') +
-
         (cl ? '<div class="card" style="padding:18px;margin-top:14px">' +
                 '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">更新日志</div>' +
                 '<div class="rich">' + esc(cl) + '</div>' +
@@ -1218,7 +1333,8 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
   function toggleTheme() {
     var on = document.body.classList.toggle('theme-gold');
     try { localStorage.setItem('xbh_theme', on ? 'gold' : 'red'); } catch (e) {}
-    renderMore();
+    if (currentMod === 'member') renderMember();
+    else if (currentMod === 'more') renderMore();
     toast(on ? '已切换到黑金主题' : '已切回红色主题', 'ok');
   }
 
@@ -1705,7 +1821,7 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
 
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'pay', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'pay', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -1721,6 +1837,8 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
     if (name === 'pay') loadPayAdmin();
+    if (name === 'member') loadMemberAdmin();
+    if (name === 'ad') loadAdAdmin();
     if (name === 'notice') loadNoticeAdmin();
     if (name === 'status') loadStatusAdmin();
     if (name === 'more') loadMoreAdmin();
@@ -2759,6 +2877,486 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
     };
   }
 
+  /* ================= 会员（学生端） ================= */
+  function openMemberModule() {
+    currentMod = 'member';
+    $('modTitle').textContent = '会员';
+    $('modBody').innerHTML = '';
+    $('userPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    try { history.pushState({ mod: 'member' }, '', '#member'); } catch (e) {}
+    renderMember();
+  }
+
+  function renderMember() {
+    var isVip = S.me && S.me.role === 'vip';
+    var gold = document.body.classList.contains('theme-gold');
+
+    $('modBody').innerHTML =
+      '<div style="max-width:560px;margin:0 auto">' +
+        '<div class="member-head">' +
+          '<b>会员专区</b>' +
+          '<small>' + (isVip ? '你已经是高级会员，专享黑金主题' : '开通会员请联系班级管理员') + '</small>' +
+        '</div>' +
+
+        (isVip
+          ? '<button class="cube-opt" type="button" data-theme-toggle style="margin-bottom:14px">' +
+              '<span class="ico">' + (gold ? '🌙' : '🎨') + '</span>' +
+              '<span><b>黑金主题</b><small>会员专属 · 点一下切换</small></span>' +
+              '<span class="arrow" style="font-size:13px">' + (gold ? '已开启' : '未开启') + '</span>' +
+            '</button>'
+          : '<div class="member-head" style="margin-bottom:14px">' +
+              '<b style="color:#9A7B2E">黑金主题</b>' +
+              '<small>会员专属，你目前不是高级用户</small>' +
+            '</div>') +
+
+        '<div id="memberCards"><div class="loading"><span class="spinner"></span>加载中…</div></div>' +
+      '</div>';
+
+    api('api_member_list', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      var box = $('memberCards');
+      if (!items.length) {
+        box.innerHTML = '<div class="empty"><strong>还没有会员权益</strong>管理员添加后会显示在这里</div>';
+        return;
+      }
+      box.innerHTML = items.map(function (c) {
+        return '<div class="card" style="padding:14px 16px;margin-bottom:12px">' +
+          '<div style="display:flex;align-items:center;gap:8px;cursor:pointer" data-mtoggle="' + esc(c.id) + '">' +
+            '<button class="fold" type="button">▸</button>' +
+            '<b style="font-size:14.5px;color:var(--ink)">' + esc(c.title) + '</b>' +
+          '</div>' +
+          '<div class="rich" style="margin-top:10px" hidden data-mbody="' + esc(c.id) + '">' +
+            renderRich(c.content) + '</div>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      $('memberCards').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ================= 广告推销（学生端） ================= */
+  var adCache = { project: null, branches: [] };
+
+  function openAds() {
+    moreState.view = 'ads';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_ad_list', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty" style="padding:50px 20px"><strong>暂时没有广告</strong>管理员发布后会出现在这里</div>';
+        return;
+      }
+      body.innerHTML = '<div class="cube-stack" style="max-width:none">' + items.map(function (a) {
+        return '<button class="cube-opt" type="button" data-ad="' + esc(a.id) + '">' +
+          '<span class="ico">📣</span>' +
+          '<span><b>' + esc(a.name) + '</b><small>' + (a.branch_count || 0) + ' 条内容</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>';
+      }).join('') + '</div>';
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openAdProject(id) {
+    moreState.view = 'adsProject';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_ad_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      adCache = { project: r.project || {}, branches: r.branches || [] };
+      var list = adCache.branches;
+
+      body.innerHTML =
+        '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(adCache.project.name) + '</h2>' +
+        (list.length
+          ? '<div class="cube-stack" style="max-width:none">' + list.map(function (b) {
+              var meta = [];
+              if (b.active) meta.push('正在推广');
+              if (b.start_date || b.end_date) meta.push((b.start_date || '即日') + ' ~ ' + (b.end_date || '长期'));
+              if (b.paid) meta.push('收费');
+              return '<button class="cube-opt" type="button" data-adbranch="' + esc(b.id) + '">' +
+                '<span class="ico">' + (b.paid ? '💰' : '📄') + '</span>' +
+                '<span><b>' + esc(b.name) + '</b><small>' + esc(meta.join(' · ') || '查看详情') + '</small></span>' +
+                '<span class="arrow">›</span>' +
+              '</button>';
+            }).join('') + '</div>'
+          : '<div class="empty"><strong>还没有内容</strong>管理员添加后就会显示</div>');
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openAdBranch(id) {
+    var b = (adCache.branches || []).filter(function (x) { return x.id === id; })[0];
+    if (!b) return;
+    moreState.view = 'adsBranch';
+    moreState.adBranchId = id;
+
+    var html =
+      '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(b.name) + '</h2>' +
+      (b.start_date || b.end_date
+        ? '<div class="hint" style="margin-bottom:10px">排期：' + esc(b.start_date || '即日') + ' ~ ' + esc(b.end_date || '长期') + '</div>'
+        : '') +
+      '<div class="card" style="padding:16px;margin-bottom:12px"><div class="rich">' + renderRich(b.content) + '</div></div>';
+
+    if (b.paid && b.tiers && b.tiers.length) {
+      html += '<div class="card" style="padding:16px">' +
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:10px">需要付费，选一个：</div>' +
+        b.tiers.map(function (t) {
+          return '<button class="cube-opt" type="button" data-adtier="' + esc(t.name) + '" style="margin-bottom:10px;padding:12px 16px">' +
+            '<span class="ico" style="width:34px;height:34px;font-size:15px">￥</span>' +
+            '<span><b>' + esc(t.name) + '</b><small>' + esc(t.price) + ' 元</small></span>' +
+            '<span class="arrow">›</span>' +
+          '</button>';
+        }).join('') +
+      '</div>';
+    }
+
+    $('modBody').innerHTML = html;
+  }
+
+  function askAdPay(tierName) {
+    var b = (adCache.branches || []).filter(function (x) { return x.id === moreState.adBranchId; })[0];
+    if (!b) return;
+    var t = (b.tiers || []).filter(function (x) { return x.name === tierName; })[0];
+    if (!t) return;
+
+    confirmBox('请支付 ' + t.price + ' 元', '「' + t.name + '」' + t.price + ' 元。',
+      '点了「我已支付」会把申请发给管理员。', '我已支付').then(function (yes) {
+      if (!yes) return;
+      api('api_ad_pay_request_add', { p_token: S.token, p_branch_id: b.id, p_tier_name: t.name }).then(function () {
+        toast('已提交，等管理员确认', 'ok', 3200);
+      }, function (e) { toast(e.message, 'err', 3600); });
+    });
+  }
+
+  /* ---------- 管理端：会员 ---------- */
+  function loadMemberAdmin() {
+    $('memberList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_member_list', { p_token: S.token }).then(function (r) {
+      S.members = r.items || [];
+      renderMemberAdmin();
+    }, function (e) {
+      $('memberList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderMemberAdmin() {
+    var box = $('memberList');
+    if (!S.members.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有权益</strong>点右上角「新建权益」写第一条</div>';
+      return;
+    }
+    box.innerHTML = S.members.map(function (c) {
+      return '<div class="perm-row" style="flex-direction:column;align-items:stretch;gap:6px" data-mid="' + esc(c.id) + '">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<b style="font-size:14px;color:var(--ink)">' + esc(c.title) + '</b>' +
+          '<span style="margin-left:auto;display:flex;gap:12px">' +
+            '<button type="button" class="link" data-mact="edit">编辑</button>' +
+            '<button type="button" class="link danger" data-mact="del">删除</button>' +
+          '</span>' +
+        '</div>' +
+        '<div class="rich" style="font-size:13px;color:var(--muted);max-height:54px;overflow:hidden">' +
+          renderRich(c.content) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function openMemberForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '编辑权益' : '新建权益',
+      '<label class="field"><span>标题<em>*</em></span>' +
+        '<input class="input" id="mcTitle" maxlength="60" placeholder="例如：专属魔方教程" value="' + esc(item ? item.title : '') + '"></label>' +
+      '<label class="field"><span>内容</span>' +
+        '<textarea class="textarea" id="mcBody" rows="8" placeholder="写权益说明，点下面可以插图">' + esc(item ? item.content : '') + '</textarea></label>' +
+      '<div class="row" style="margin-top:-6px">' +
+        '<button class="btn ghost sm" id="mcImg" type="button">插入图片</button>' +
+        '<input type="file" id="mcFile" accept="image/*" style="display:none">' +
+      '</div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="mcOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 580);
+
+    var bodyEl = m.querySelector('#mcBody');
+    m.querySelector('#mcImg').onclick = function () { m.querySelector('#mcFile').click(); };
+    m.querySelector('#mcFile').onchange = function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
+          insertAtCursor(bodyEl, '\n![图片](' + url + ')\n');
+        });
+      };
+      reader.readAsDataURL(f);
+      this.value = '';
+    };
+
+    m.querySelector('#mcOk').onclick = function () {
+      var btn = this;
+      var t = m.querySelector('#mcTitle').value.trim();
+      if (!t) return toast('标题不能为空', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_member_save', {
+        p_token: S.token, p_id: edit ? item.id : null, p_title: t, p_content: bodyEl.value
+      }).then(function () {
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadMemberAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function deleteMemberCard(id) {
+    confirmBox('删除权益', '确定删除这条会员权益吗？', '', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_member_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok'); loadMemberAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  /* ---------- 管理端：广告推销 ---------- */
+  function loadAdAdmin() {
+    $('adList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_ad_list', { p_token: S.token }).then(function (r) {
+      S.ads = r.items || [];
+      S.adBranches = {};
+      renderAdAdmin();
+    }, function (e) {
+      $('adList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderAdAdmin() {
+    var box = $('adList');
+    if (!S.ads.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有广告</strong>点右上角「新建广告」建一个</div>';
+      return;
+    }
+    box.innerHTML = S.ads.map(function (a) {
+      var open = !!S.adOpen[a.id];
+      var branches = S.adBranches[a.id];
+      var inner = '';
+
+      if (open) {
+        if (!branches) {
+          inner = '<div class="loading" style="padding:16px"><span class="spinner"></span>加载中…</div>';
+        } else if (!branches.length) {
+          inner = '<div class="empty" style="padding:14px"><strong>还没有分支</strong>点下面新建</div>';
+        } else {
+          inner = branches.map(function (b) {
+            var meta = [];
+            if (b.active) meta.push('<span class="badge st-new" style="height:18px;font-size:11px">正在播放</span>');
+            if (b.start_date || b.end_date) meta.push('<span class="hint">' + esc(b.start_date || '即日') + ' ~ ' + esc(b.end_date || '长期') + '</span>');
+            if (b.paid) meta.push('<span class="badge gold" style="height:18px;font-size:11px">收费</span>');
+            return '<div class="perm-row" style="padding:8px 0">' +
+              '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(b.name) + '<small>' + meta.join(' ') + '</small></div>' +
+              '<button type="button" class="link" data-abact="edit" data-bid="' + esc(b.id) + '" data-aid="' + esc(a.id) + '">编辑</button>' +
+              '<button type="button" class="link danger" data-abact="del" data-bid="' + esc(b.id) + '" data-aid="' + esc(a.id) + '">删除</button>' +
+            '</div>';
+          }).join('');
+        }
+        inner += '<div style="margin-top:10px">' +
+          '<button type="button" class="btn ghost sm" data-abadd="' + esc(a.id) + '">＋ 新建分支</button></div>';
+      }
+
+      return '<div class="perm-row" style="flex-direction:column;align-items:stretch;gap:8px">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<button type="button" class="fold ' + (open ? 'open' : '') + '" data-adfold="' + esc(a.id) + '">▸</button>' +
+          '<b style="font-size:14px;color:var(--ink)">' + esc(a.name) + '</b>' +
+          '<span class="hint">' + (a.branch_count || 0) + ' 条</span>' +
+          '<span style="margin-left:auto;display:flex;gap:12px">' +
+            '<button type="button" class="link" data-aact="edit" data-aid="' + esc(a.id) + '">改名</button>' +
+            '<button type="button" class="link danger" data-aact="del" data-aid="' + esc(a.id) + '">删除</button>' +
+          '</span>' +
+        '</div>' +
+        (open ? '<div style="margin-left:22px">' + inner + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  function toggleAdProject(id) {
+    S.adOpen[id] = !S.adOpen[id];
+    if (!S.adOpen[id] || S.adBranches[id]) { renderAdAdmin(); return; }
+    renderAdAdmin();
+    api('api_ad_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      S.adBranches[id] = r.branches || [];
+      renderAdAdmin();
+    }, function (e) {
+      toast(e.message, 'err');
+      S.adOpen[id] = false;
+      renderAdAdmin();
+    });
+  }
+
+  function openAdForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '修改广告名称' : '新建广告',
+      '<label class="field"><span>名称<em>*</em></span>' +
+        '<input class="input" id="adName" maxlength="40" placeholder="例如：某某文具店" value="' + esc(item ? item.name : '') + '"></label>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="adOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 440);
+
+    m.querySelector('#adName').focus();
+    m.querySelector('#adOk').onclick = function () {
+      var btn = this;
+      var v = m.querySelector('#adName').value.trim();
+      if (!v) return toast('名称不能为空', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_ad_save', { p_token: S.token, p_id: edit ? item.id : null, p_name: v }).then(function () {
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadAdAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function deleteAd(id) {
+    confirmBox('删除广告', '确定删除这个广告吗？', '里面的分支会一起删掉。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_ad_delete', { p_token: S.token, p_id: id }).then(function () {
+        delete S.adBranches[id];
+        toast('已删除', 'ok'); loadAdAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  function openAdBranchForm(adId, branch) {
+    var edit = !!branch;
+    var paid = branch ? !!branch.paid : false;
+    var tiers = (branch && branch.tiers) ? branch.tiers.slice() : [];
+
+    var tierRow = function (t) {
+      return '<div class="row" style="margin-bottom:8px" data-tier-row>' +
+        '<input class="input" data-tn placeholder="名称，如 普通魔方" value="' + esc(t ? t.name : '') + '">' +
+        '<input class="input" data-tp type="number" min="0" step="0.01" placeholder="金额" value="' + esc(t ? t.price : '') + '" style="max-width:110px">' +
+        '<button class="btn ghost sm" type="button" data-trm style="height:40px">删</button>' +
+      '</div>';
+    };
+
+    var m = modal(edit ? '编辑广告分支' : '新建广告分支',
+      '<label class="field"><span>分支名称<em>*</em></span>' +
+        '<input class="input" id="abName" maxlength="60" placeholder="例如：开学季全场八折" value="' + esc(branch ? branch.name : '') + '"></label>' +
+      '<label class="field"><span>内容（可放图片）</span>' +
+        '<textarea class="textarea" id="abBody" rows="6" placeholder="广告文案；点下面可以插图">' + esc(branch ? branch.content : '') + '</textarea></label>' +
+      '<div class="row" style="margin-top:-6px;margin-bottom:12px">' +
+        '<button class="btn ghost sm" id="abImg" type="button">插入图片</button>' +
+        '<input type="file" id="abFile" accept="image/*" style="display:none">' +
+      '</div>' +
+      '<div class="row" style="margin-bottom:10px">' +
+        '<label style="display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2)">排期起 ' +
+          '<input class="input" id="adStart" type="date" value="' + esc(branch && branch.start_date ? String(branch.start_date).slice(0, 10) : '') + '" style="height:36px"></label>' +
+        '<label style="display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2)">止 ' +
+          '<input class="input" id="adEnd" type="date" value="' + esc(branch && branch.end_date ? String(branch.end_date).slice(0, 10) : '') + '" style="height:36px"></label>' +
+      '</div>' +
+      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin-bottom:12px">' +
+        '<input type="checkbox" id="abActive"' + (branch && branch.active ? ' checked' : '') +
+        ' style="width:16px;height:16px;accent-color:var(--red)"> 设为正在播放（登录时强制看 3 秒）</label>' +
+      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin-bottom:12px">' +
+        '<input type="checkbox" id="abPaid"' + (paid ? ' checked' : '') +
+        ' style="width:16px;height:16px;accent-color:var(--red)"> 这个分支收费</label>' +
+      '<div id="adTierBox" style="' + (paid ? '' : 'display:none') + '">' +
+        '<div class="hint" style="margin-bottom:6px">价格档位</div>' +
+        '<div id="adTiers">' + (tiers.length ? tiers.map(tierRow).join('') : tierRow(null)) + '</div>' +
+        '<button class="btn ghost sm" id="adTierAdd" type="button" style="margin-top:2px">＋ 添加价格</button>' +
+      '</div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="abOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 620);
+
+    var bodyEl = m.querySelector('#abBody');
+    var box = m.querySelector('#adTierBox');
+
+    m.querySelector('#abImg').onclick = function () { m.querySelector('#abFile').click(); };
+    m.querySelector('#abFile').onchange = function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
+          insertAtCursor(bodyEl, '\n![图片](' + url + ')\n');
+        });
+      };
+      reader.readAsDataURL(f);
+      this.value = '';
+    };
+
+    m.querySelector('#abPaid').onchange = function () { box.style.display = this.checked ? '' : 'none'; };
+    m.querySelector('#adTierAdd').onclick = function () {
+      var wrap = m.querySelector('#adTiers');
+      var div = document.createElement('div');
+      div.innerHTML = tierRow(null);
+      wrap.appendChild(div.firstChild);
+    };
+    m.querySelector('#adTiers').addEventListener('click', function (e) {
+      var del = e.target.closest('[data-trm]');
+      if (!del) return;
+      var row = del.closest('[data-tier-row]');
+      if (row && m.querySelectorAll('#adTiers [data-tier-row]').length > 1) row.remove();
+      else if (row) { row.querySelector('[data-tn]').value = ''; row.querySelector('[data-tp]').value = ''; }
+    });
+
+    m.querySelector('#abOk').onclick = function () {
+      var btn = this;
+      var nm = m.querySelector('#abName').value.trim();
+      var isPaid = m.querySelector('#abPaid').checked;
+      if (!nm) return toast('分支名称不能为空', 'err');
+
+      var ts = Array.prototype.slice.call(m.querySelectorAll('#adTiers [data-tier-row]'))
+        .map(function (r) {
+          return { name: r.querySelector('[data-tn]').value.trim(), price: Number(r.querySelector('[data-tp]').value) || 0 };
+        })
+        .filter(function (t) { return t.name; });
+
+      if (isPaid && !ts.length) return toast('收费分支至少要填一个价格', 'err');
+
+      busy(btn, true, '保存中…');
+      api('api_admin_ad_branch_save', {
+        p_token: S.token,
+        p_id: edit ? branch.id : null,
+        p_ad_id: adId,
+        p_name: nm,
+        p_content: bodyEl.value,
+        p_paid: isPaid,
+        p_tiers: ts,
+        p_active: m.querySelector('#abActive').checked,
+        p_start: m.querySelector('#adStart').value || null,
+        p_end: m.querySelector('#adEnd').value || null
+      }).then(function () {
+        busy(btn, false);
+        closeModal();
+        toast(edit ? '已保存' : '已创建', 'ok');
+        delete S.adBranches[adId];
+        S.adOpen[adId] = true;
+        loadAdAdmin();
+        setTimeout(function () { backfillAd(adId); }, 60);
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function backfillAd(id) {
+    if (!S.adOpen[id]) return;
+    api('api_ad_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      S.adBranches[id] = r.branches || [];
+      renderAdAdmin();
+    }, function () {});
+  }
+
+  function deleteAdBranch(id, adId) {
+    confirmBox('删除分支', '确定删除这条广告内容吗？', '', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_ad_branch_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        delete S.adBranches[adId];
+        S.adOpen[adId] = true;
+        loadAdAdmin();
+        setTimeout(function () { backfillAd(adId); }, 60);
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
   /* ---------- 管理端：公告 / 平台状态 / 更多 ---------- */
   function bootInfo() {
     return api('api_get_boot_info', {}).then(function (r) {
@@ -2904,6 +3502,44 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
     $('btnCubeNew').addEventListener('click', function () { openCubeForm(null); });
     $('btnCubeReload').addEventListener('click', loadCubeAdmin);
     $('btnDebugNew').addEventListener('click', function () { openDebugForm(null); });
+    $('btnMember').addEventListener('click', openMemberModule);
+    $('btnMemberNew').addEventListener('click', function () { openMemberForm(null); });
+    $('btnAdNew').addEventListener('click', function () { openAdForm(null); });
+
+    $('memberList').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mact]');
+      var host = b && b.closest('[data-mid]');
+      if (!host) return;
+      var item = (S.members || []).filter(function (x) { return x.id === host.dataset.mid; })[0];
+      if (b.dataset.mact === 'edit' && item) return openMemberForm(item);
+      if (b.dataset.mact === 'del') return deleteMemberCard(host.dataset.mid);
+    });
+
+    $('adList').addEventListener('click', function (e) {
+      var f = e.target.closest('[data-adfold]');
+      if (f) { toggleAdProject(f.dataset.adfold); return; }
+
+      var aact = e.target.closest('[data-aact]');
+      if (aact) {
+        var aid = aact.dataset.aid;
+        var item = (S.ads || []).filter(function (x) { return x.id === aid; })[0];
+        if (aact.dataset.aact === 'edit' && item) return openAdForm(item);
+        if (aact.dataset.aact === 'del') return deleteAd(aid);
+        return;
+      }
+
+      var abadd = e.target.closest('[data-abadd]');
+      if (abadd) { openAdBranchForm(abadd.dataset.abadd, null); return; }
+
+      var abact = e.target.closest('[data-abact]');
+      if (abact) {
+        var adid = abact.dataset.aid, bid = abact.dataset.bid;
+        var arr = S.adBranches[adid] || [];
+        var br = arr.filter(function (x) { return x.id === bid; })[0];
+        if (abact.dataset.abact === 'edit' && br) return openAdBranchForm(adid, br);
+        if (abact.dataset.abact === 'del') return deleteAdBranch(bid, adid);
+      }
+    });
 
     $('permFold').addEventListener('click', function () {
       var wrap = $('permWrap');
@@ -3055,8 +3691,30 @@ body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; }
     $('modBody').addEventListener('click', function (e) {
       var op = e.target.closest('[data-open]');
       if (op && op.dataset.open === 'fb') { openFeedback(); return; }
+      if (op && op.dataset.open === 'ads') { openAds(); return; }
 
       if (e.target.closest('[data-theme-toggle]')) { toggleTheme(); return; }
+
+      var mt = e.target.closest('[data-mtoggle]');
+      if (mt) {
+        var id = mt.dataset.mtoggle;
+        var bodyEl = $('modBody').querySelector('[data-mbody="' + id + '"]');
+        var fold = mt.querySelector('.fold');
+        if (bodyEl) {
+          bodyEl.hidden = !bodyEl.hidden;
+          if (fold) fold.classList.toggle('open', !bodyEl.hidden);
+        }
+        return;
+      }
+
+      var ad = e.target.closest('[data-ad]');
+      if (ad && currentMod === 'more') { openAdProject(ad.dataset.ad); return; }
+
+      var adb = e.target.closest('[data-adbranch]');
+      if (adb && currentMod === 'more') { moreState.adProjectId = adCache.project && adCache.project.id; openAdBranch(adb.dataset.adbranch); return; }
+
+      var adt = e.target.closest('[data-adtier]');
+      if (adt && currentMod === 'more') { askAdPay(adt.dataset.adtier); return; }
 
       var dbg = e.target.closest('[data-debug]');
       if (dbg && currentMod === 'cube') { renderCubeDebugProject(dbg.dataset.debug); return; }
