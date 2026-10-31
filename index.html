@@ -385,6 +385,7 @@ body.s-down #downBar{display:block}
       <button class="tab" data-tab="hw" type="button">班级作业</button>
       <button class="tab" data-tab="news" type="button">班级热点</button>
       <button class="tab" data-tab="cube" type="button">魔方教程</button>
+      <button class="tab" data-tab="debug" type="button">魔方调试</button>
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
@@ -467,14 +468,21 @@ body.s-down #downBar{display:block}
       </div>
 
       <div class="card" style="padding:16px;margin-bottom:18px">
-        <div class="panel-head" style="margin:0 0 8px">
-          <div>
-            <h3 style="font-size:15px">① 权限</h3>
-            <div class="hint">点名字后面的标签切换授权；「无授权」= 全部收回</div>
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:6px;min-width:0">
+            <button class="fold" id="permFold" type="button" aria-label="展开或收起">▸</button>
+            <div>
+              <h3 style="font-size:15px">① 权限</h3>
+              <div class="hint" id="permHint">点箭头展开，给同学开教程权限</div>
+            </div>
           </div>
           <button class="btn ghost sm" id="btnCubeReload" type="button" style="height:32px">刷新</button>
         </div>
-        <div id="cubePermList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+
+        <div id="permWrap" hidden style="margin-top:12px">
+          <input class="input" id="permSearch" placeholder="搜索用户名 / 登录名" style="height:36px;margin-bottom:10px">
+          <div id="cubePermList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+        </div>
       </div>
 
       <div class="card" style="padding:16px">
@@ -486,7 +494,7 @@ body.s-down #downBar{display:block}
           <button class="btn primary sm" id="btnCubeNew" type="button" style="height:32px;padding:0 14px">＋ 新建教程</button>
         </div>
         <div class="seg" id="cubeFilter" style="margin-bottom:12px">
-          <button type="button" data-cf="all" class="on">全部</button>
+          <button type="button" data-cf="" class="on">全部</button>
           <button type="button" data-cf="top">置顶</button>
           <button type="button" data-cf="2">二阶</button>
           <button type="button" data-cf="3">三阶</button>
@@ -497,6 +505,16 @@ body.s-down #downBar{display:block}
         </div>
         <div id="cubeList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
       </div>
+    </section>
+
+    <!-- 魔方调试 -->
+    <section id="tab-debug" hidden>
+      <div class="panel-head">
+        <div><h2>魔方调试</h2>
+          <div class="hint">总名称 → 分支（名字 + 文字）；所有人都能看，不用授权</div></div>
+        <button class="btn primary sm" id="btnDebugNew" type="button" style="height:32px;padding:0 14px">＋ 新建总名称</button>
+      </div>
+      <div class="card"><div class="news" id="debugList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
     <!-- 身份管理 -->
@@ -662,8 +680,8 @@ body.s-down #downBar{display:block}
 
   var db = null;
   var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
-            cube: [], cubeAll: [], cubeAny: false, permUsers: [], cubeFilter: 'all',
-            boot: null, permOpen: {} };
+            cube: [], cubeAll: [], cubeAny: false, permUsers: [], cubeFilter: '', permKw: '',
+            boot: null, permOpen: {}, debug: [], debugOpen: {}, debugBranches: {} };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -992,29 +1010,36 @@ body.s-down #downBar{display:block}
 
     loadMailBadge();
 
-    // 登录弹窗公告：管理员不弹
-    if (profile.role !== 'admin' && S.boot && String(S.boot.login_popup || '').trim()) {
-      setTimeout(function () { showPopupNotice(S.boot.login_popup); }, 260);
-    }
+    var welcome = function () {
+      if (profile.role === 'vip') showVipWelcome(name);
+    };
 
-    // 高级用户：欢迎弹窗，5 秒自动关
-    if (profile.role === 'vip') {
-      setTimeout(function () {
-        modal('欢迎',
-          '<div style="text-align:center;padding:10px 0 6px">' +
-            '<div style="font-size:20px;color:var(--red);font-weight:700;letter-spacing:1px">欢迎您 · ' + esc(name) + '</div>' +
-          '</div>',
-          '', 380);
-        setTimeout(closeModal, 5000);
-      }, 400);
+    // 登录弹窗公告：管理员不弹；高级用户先看公告，关掉后再弹欢迎
+    if (profile.role !== 'admin' && S.boot && String(S.boot.login_popup || '').trim()) {
+      setTimeout(function () { showPopupNotice(S.boot.login_popup, welcome); }, 260);
+    } else if (profile.role === 'vip') {
+      setTimeout(welcome, 400);
     }
   }
 
-  function showPopupNotice(text) {
+  function showVipWelcome(name) {
+    modal('欢迎',
+      '<div style="text-align:center;padding:10px 0 6px">' +
+        '<div style="font-size:20px;color:var(--red);font-weight:700;letter-spacing:1px">欢迎您 · ' + esc(name) + '</div>' +
+      '</div>',
+      '', 380);
+    setTimeout(closeModal, 5000);
+  }
+
+  function showPopupNotice(text, cb) {
+    var done = false;
+    function finish() { if (done) return; done = true; if (cb) cb(); }
     var m = modal('公告',
       '<div class="rich" style="font-size:14.5px;color:var(--ink)">' + esc(text) + '</div>',
       '<button class="btn primary" type="button" data-close>我知道了</button>', 460);
-    m.querySelector('[data-close]').addEventListener('click', closeModal);
+    m.addEventListener('click', function (e) {
+      if (e.target === m || (e.target.hasAttribute && e.target.hasAttribute('data-close'))) finish();
+    });
   }
 
   function logout() {
@@ -1060,6 +1085,7 @@ body.s-down #downBar{display:block}
   function modBack() {
     if (currentMod === 'cube') {
       if (cubeState.view === 'content') return renderCubeTutorials(true);
+      if (cubeState.view === 'debugProject') return renderCubeDebug();
       if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
     }
     if (currentMod === 'more' && moreState.view === 'fb') return renderMore();
@@ -1421,8 +1447,50 @@ body.s-down #downBar{display:block}
 
   function renderCubeDebug() {
     cubeState.view = 'debug';
-    $('modBody').innerHTML = '<div class="empty" style="padding:60px 20px">' +
-      '<strong>魔方调试正在建设</strong>这个功能还没做，后面会放计时、打乱公式之类的工具。</div>';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_debug_list', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty" style="padding:56px 20px">' +
+          '<strong>还没有调试内容</strong>管理员添加后会出现在这里</div>';
+        return;
+      }
+      body.innerHTML = '<div class="cube-stack">' + items.map(function (d) {
+        return '<button class="cube-opt" type="button" data-debug="' + esc(d.id) + '">' +
+          '<span class="ico">🛠</span>' +
+          '<span><b>' + esc(d.name) + '</b><small>' + (d.branch_count || 0) + ' 个分支</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>';
+      }).join('') + '</div>';
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderCubeDebugProject(id) {
+    cubeState.view = 'debugProject';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_debug_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      var p = r.project || {};
+      var branches = r.branches || [];
+
+      body.innerHTML =
+        '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(p.name) + '</h2>' +
+        (branches.length
+          ? branches.map(function (b) {
+              return '<div class="card" style="padding:16px;margin-bottom:12px">' +
+                '<div style="font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px">' + esc(b.name) + '</div>' +
+                '<div class="rich">' + esc(b.content) + '</div>' +
+              '</div>';
+            }).join('')
+          : '<div class="empty"><strong>这个项目还没有内容</strong>管理员添加后就能看到</div>');
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
   }
 
   /* 学生端：作业列表（新的在上面，历史往下排） */
@@ -1487,7 +1555,7 @@ body.s-down #downBar{display:block}
 
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'mail', 'feedback', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -1499,6 +1567,7 @@ body.s-down #downBar{display:block}
     if (name === 'hw') loadHwAdmin();
     if (name === 'news') loadNews();
     if (name === 'cube') loadCubeAdmin();
+    if (name === 'debug') loadDebugAdmin();
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
     if (name === 'notice') loadNoticeAdmin();
@@ -2067,6 +2136,7 @@ body.s-down #downBar{display:block}
 
   function renderCubePerms() {
     var box = $('cubePermList');
+    if (!box) return;
     if (!S.permUsers.length) {
       box.innerHTML = '<div class="empty"><strong>还没有学生账号</strong>先去「用户管理」建号</div>';
       return;
@@ -2076,7 +2146,19 @@ body.s-down #downBar{display:block}
       return;
     }
 
-    box.innerHTML = S.permUsers.map(function (u) {
+    var kw = String(S.permKw || '').trim().toLowerCase();
+    var users = S.permUsers.filter(function (u) {
+      if (!kw) return true;
+      return String(u.username || '').toLowerCase().indexOf(kw) >= 0 ||
+             String(u.display_name || '').toLowerCase().indexOf(kw) >= 0;
+    });
+
+    if (!users.length) {
+      box.innerHTML = '<div class="empty"><strong>没搜到人</strong>换个关键词试试</div>';
+      return;
+    }
+
+    box.innerHTML = users.map(function (u) {
       var ids = u.tutorial_ids || [];
       var open = !!S.permOpen[u.id];
       var chips = '<button type="button" class="chip-btn none ' + (ids.length ? '' : 'on') + '" data-uid="' + esc(u.id) + '" data-tid="">无授权</button>' +
@@ -2125,9 +2207,9 @@ body.s-down #downBar{display:block}
       return;
     }
 
-    var f = S.cubeFilter || 'all';
+    var f = S.cubeFilter || '';
     var list = S.cube.filter(function (t) {
-      if (f === 'all') return true;
+      if (!f) return true;
       if (f === 'top') return !!t.pinned;
       return String(t.cube_type) === f;
     });
@@ -2228,6 +2310,168 @@ body.s-down #downBar{display:block}
       api('api_admin_cube_delete_tutorial', { p_token: S.token, p_id: id }).then(function () {
         toast('已删除', 'ok');
         loadCubeAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  /* ---------- 管理端：魔方调试 ---------- */
+  function loadDebugAdmin() {
+    $('debugList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_debug_list', { p_token: S.token }).then(function (r) {
+      S.debug = r.items || [];
+      S.debugBranches = {};
+      renderDebugAdmin();
+    }, function (e) {
+      $('debugList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderDebugAdmin() {
+    var box = $('debugList');
+    if (!S.debug.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有调试项目</strong>点右上角「新建总名称」建第一个</div>';
+      return;
+    }
+
+    box.innerHTML = S.debug.map(function (d) {
+      var open = !!S.debugOpen[d.id];
+      var branches = S.debugBranches[d.id];
+      var inner = '';
+
+      if (open) {
+        if (!branches) {
+          inner = '<div class="loading" style="padding:16px"><span class="spinner"></span>加载分支…</div>';
+        } else if (!branches.length) {
+          inner = '<div class="empty" style="padding:14px"><strong>还没有分支</strong>点下面新建一个</div>';
+        } else {
+          inner = branches.map(function (b) {
+            return '<div class="perm-row" style="padding:8px 0">' +
+              '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(b.name) + '</div>' +
+              '<button type="button" class="link" data-bact="edit" data-bid="' + esc(b.id) + '" data-did="' + esc(d.id) + '">编辑</button>' +
+              '<button type="button" class="link danger" data-bact="del" data-bid="' + esc(b.id) + '" data-did="' + esc(d.id) + '">删除</button>' +
+            '</div>';
+          }).join('');
+        }
+        inner += '<div style="margin-top:10px">' +
+          '<button type="button" class="btn ghost sm" data-badd="' + esc(d.id) + '">＋ 新建分支</button></div>';
+      }
+
+      return '<div class="perm-row" style="flex-direction:column;align-items:stretch;gap:8px" data-did="' + esc(d.id) + '">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<button type="button" class="fold ' + (open ? 'open' : '') + '" data-dfold="' + esc(d.id) + '">▸</button>' +
+          '<b style="font-size:14px;color:var(--ink)">' + esc(d.name) + '</b>' +
+          '<span class="hint">' + (d.branch_count || 0) + ' 个分支</span>' +
+          '<span style="margin-left:auto;display:flex;gap:12px">' +
+            '<button type="button" class="link" data-dact="edit" data-did="' + esc(d.id) + '">改名</button>' +
+            '<button type="button" class="link danger" data-dact="del" data-did="' + esc(d.id) + '">删除</button>' +
+          '</span>' +
+        '</div>' +
+        (open ? '<div style="margin-left:22px">' + inner + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  function toggleDebugProject(id) {
+    S.debugOpen[id] = !S.debugOpen[id];
+    if (!S.debugOpen[id]) { renderDebugAdmin(); return; }
+    if (S.debugBranches[id]) { renderDebugAdmin(); return; }
+
+    renderDebugAdmin();
+    api('api_debug_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      S.debugBranches[id] = r.branches || [];
+      renderDebugAdmin();
+    }, function (e) {
+      toast(e.message, 'err');
+      S.debugOpen[id] = false;
+      renderDebugAdmin();
+    });
+  }
+
+  function openDebugForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '修改总名称' : '新建总名称',
+      '<label class="field"><span>总名称<em>*</em></span>' +
+        '<input class="input" id="dName" maxlength="40" placeholder="例如：三阶提速训练" value="' + esc(item ? item.name : '') + '"></label>' +
+      '<p class="hint" style="font-size:12.5px">建好后可以在里面加分支（每个分支 = 名字 + 一段文字）。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="dOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 460);
+
+    m.querySelector('#dName').focus();
+    m.querySelector('#dOk').onclick = function () {
+      var btn = this;
+      var v = m.querySelector('#dName').value.trim();
+      if (!v) return toast('名称不能为空', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_debug_save', { p_token: S.token, p_id: edit ? item.id : null, p_name: v }).then(function () {
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadDebugAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function deleteDebug(id) {
+    confirmBox('删除总名称', '确定删除这个调试项目吗？', '里面的分支会一起删掉。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_debug_delete', { p_token: S.token, p_id: id }).then(function () {
+        delete S.debugBranches[id];
+        toast('已删除', 'ok');
+        loadDebugAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  function openBranchForm(debugId, branch) {
+    var edit = !!branch;
+    var m = modal(edit ? '编辑分支' : '新建分支',
+      '<label class="field"><span>分支名称<em>*</em></span>' +
+        '<input class="input" id="bName" maxlength="60" placeholder="例如：手法练习" value="' + esc(branch ? branch.name : '') + '"></label>' +
+      '<label class="field"><span>内容</span>' +
+        '<textarea class="textarea" id="bBody" rows="7" placeholder="写这个分支下的说明、步骤…">' + esc(branch ? branch.content : '') + '</textarea></label>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="bOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 560);
+
+    m.querySelector('#bName').focus();
+    m.querySelector('#bOk').onclick = function () {
+      var btn = this;
+      var nm = m.querySelector('#bName').value.trim();
+      var body = m.querySelector('#bBody').value;
+      if (!nm) return toast('分支名称不能为空', 'err');
+
+      busy(btn, true, '保存中…');
+      api('api_admin_debug_branch_save', {
+        p_token: S.token,
+        p_id: edit ? branch.id : null,
+        p_debug_id: debugId,
+        p_name: nm,
+        p_content: body
+      }).then(function () {
+        busy(btn, false);
+        closeModal();
+        toast(edit ? '已保存' : '已创建', 'ok');
+        delete S.debugBranches[debugId];
+        S.debugOpen[debugId] = true;
+        loadDebugAdmin();
+        setTimeout(function () { backfillDebug(debugId); }, 60);
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function backfillDebug(id) {
+    if (!S.debugOpen[id]) return;
+    api('api_debug_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      S.debugBranches[id] = r.branches || [];
+      renderDebugAdmin();
+    }, function () {});
+  }
+
+  function deleteBranch(id, debugId) {
+    confirmBox('删除分支', '确定删除这个分支吗？', '删除后不能恢复。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_debug_branch_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        delete S.debugBranches[debugId];
+        S.debugOpen[debugId] = true;
+        loadDebugAdmin();
+        setTimeout(function () { backfillDebug(debugId); }, 60);
       }, function (e) { toast(e.message, 'err'); });
     });
   }
@@ -2370,6 +2614,46 @@ body.s-down #downBar{display:block}
     $('btnPublishHw').addEventListener('click', publishHw);
     $('btnCubeNew').addEventListener('click', function () { openCubeForm(null); });
     $('btnCubeReload').addEventListener('click', loadCubeAdmin);
+    $('btnDebugNew').addEventListener('click', function () { openDebugForm(null); });
+
+    $('permFold').addEventListener('click', function () {
+      var wrap = $('permWrap');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+      $('permHint').textContent = wrap.hidden
+        ? '点箭头展开，给同学开教程权限'
+        : '点名字后面的标签切换授权；「无授权」= 全部收回';
+    });
+    $('permSearch').addEventListener('input', debounce(function () {
+      S.permKw = $('permSearch').value;
+      renderCubePerms();
+    }, 250));
+
+    $('debugList').addEventListener('click', function (e) {
+      var f = e.target.closest('[data-dfold]');
+      if (f) { toggleDebugProject(f.dataset.dfold); return; }
+
+      var dact = e.target.closest('[data-dact]');
+      if (dact) {
+        var id = dact.dataset.did;
+        var item = S.debug.filter(function (x) { return x.id === id; })[0];
+        if (dact.dataset.dact === 'edit' && item) return openDebugForm(item);
+        if (dact.dataset.dact === 'del') return deleteDebug(id);
+        return;
+      }
+
+      var badd = e.target.closest('[data-badd]');
+      if (badd) { openBranchForm(badd.dataset.badd, null); return; }
+
+      var bact = e.target.closest('[data-bact]');
+      if (bact) {
+        var did = bact.dataset.did, bid = bact.dataset.bid;
+        var arr = S.debugBranches[did] || [];
+        var br = arr.filter(function (x) { return x.id === bid; })[0];
+        if (bact.dataset.bact === 'edit' && br) return openBranchForm(did, br);
+        if (bact.dataset.bact === 'del') return deleteBranch(bid, did);
+      }
+    });
     $('btnMail').addEventListener('click', openMailbox);
 
     $('identityList').addEventListener('click', function (e) {
@@ -2454,6 +2738,9 @@ body.s-down #downBar{display:block}
     $('modBody').addEventListener('click', function (e) {
       var op = e.target.closest('[data-open]');
       if (op && op.dataset.open === 'fb') { openFeedback(); return; }
+
+      var dbg = e.target.closest('[data-debug]');
+      if (dbg && currentMod === 'cube') { renderCubeDebugProject(dbg.dataset.debug); return; }
 
       var go = e.target.closest('[data-cube-go]');
       if (go) {
