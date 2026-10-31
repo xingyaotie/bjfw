@@ -292,20 +292,25 @@ body.theme-gold .login-top .school,
 body.theme-gold .login-top .cls{ color:#D4A017; }
 body.theme-gold .btn.ghost{ background:#1B1710; color:#D4B25E; border-color:#3A3122; }
 body.theme-gold .btn.ghost:hover{ background:#221C12; color:#F0D48A; }
-body.theme-gold .btn.primary{ background:linear-gradient(135deg,#D4A017,#8A6100); color:#12100C; }
+body.theme-gold .btn.primary{ background:#1B1710; color:#E8C46A; border:1px solid #B8860B; box-shadow:none; }
+body.theme-gold .btn.primary:hover{ background:#221C12; box-shadow:none; }
 body.theme-gold .chip-btn{ background:#1B1710; border-color:#3A3122; color:#D4B25E; }
-body.theme-gold .chip-btn.on{ background:#B8860B; border-color:#B8860B; color:#12100C; }
+body.theme-gold .chip-btn.on{ background:#1B1710; border-color:#B8860B; color:#E8C46A; }
 body.theme-gold .tab{ background:#1B1710; border-color:#3A3122; color:#D4B25E; }
-body.theme-gold .tab.active{ background:#B8860B; border-color:#B8860B; color:#12100C; }
+body.theme-gold .tab.active{ background:#1B1710; border-color:#B8860B; color:#E8C46A; font-weight:600; }
 body.theme-gold .seg button{ background:#1B1710; border-color:#3A3122; color:#D4B25E; }
-body.theme-gold .seg button.on{ background:#B8860B; border-color:#B8860B; color:#12100C; }
+body.theme-gold .seg button.on{ background:#1B1710; border-color:#B8860B; color:#E8C46A; }
 body.theme-gold .badge.red{ background:#3A2A0A; color:#E8C46A; border-color:#5A4413; }
 body.theme-gold .badge.gray{ background:#241E13; color:#9A7B2E; border-color:#3A3122; }
 body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; color:#D4B25E; }
 body.theme-gold .fb-head .who{ color:#F0D48A; }
 body.theme-gold .marquee.on-card{ background:#1B1710; border-color:#3A3122; color:#E8C46A; }
 body.theme-gold .marquee.on-dark{ background:rgba(212,160,23,.14); border-color:#3A3122; color:#E8C46A; }
-body.theme-gold .tile{ background:linear-gradient(135deg,#D4A017,#8A6100); color:#12100C; }
+body.theme-gold .tile{ background:linear-gradient(135deg,#241D12,#12100C); color:#E8C46A;
+  border:1px solid #3A3122; box-shadow:0 10px 30px rgba(0,0,0,.55); }
+body.theme-gold .tile:hover{ box-shadow:0 14px 34px rgba(212,160,23,.22); }
+body.theme-gold .ad-top{ background:linear-gradient(135deg,#2A2113,#171208); color:#E8C46A; }
+body.theme-gold .status-banner{ background:#1B1710; color:#E8C46A; border:1px solid #3A3122; }
 body.theme-gold .cube-card.locked{ background:#151109; border-color:#241E13; }
 body.theme-gold .cube-card.locked .t,
 body.theme-gold .cube-card.locked .m{ color:#6B5A22; }
@@ -335,6 +340,16 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
 #adMask .ad-top .t{flex:1;letter-spacing:1px}
 #adMask .ad-body{padding:18px;max-height:60vh;overflow:auto}
 #adMask .ad-foot{padding:10px 16px 14px;text-align:center;font-size:12.5px;color:var(--muted)}
+
+/* 广告排期时间轴 */
+.timeline{position:relative;padding-left:6px}
+.tl-item{position:relative;padding:0 0 16px 18px;border-left:2px solid var(--line)}
+.tl-item:last-child{border-left-color:transparent;padding-bottom:0}
+.tl-item::before{content:'';position:absolute;left:-6px;top:3px;width:10px;height:10px;border-radius:50%;
+  background:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.14)}
+.tl-date{font-size:12.5px;color:var(--muted);margin-bottom:2px}
+.tl-text{font-size:14px;color:var(--ink);line-height:1.6}
+body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(212,160,23,.18)}
 
 /* 魔方模块 */
 .cube-stack{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:10px auto 0}
@@ -440,7 +455,7 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
       </div>
       <button class="member-btn" id="btnMember" type="button">会员</button>
       <span class="chip"><span class="dot" id="userDot">我</span><span id="userName">同学</span></span>
-      <button class="mail-btn" id="btnMail" type="button" title="站内信">✉<span class="mail-dot" id="mailDot" hidden></span></button>
+      <button class="mail-btn" id="btnMail" type="button" title="站内信">✉</button>
       <button class="btn-logout" id="btnLogout" type="button">退出</button>
     </div>
   </header>
@@ -449,7 +464,7 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
   <main class="wrap" id="userPanel" hidden>
     <div class="marquee on-card" id="homeNotice" hidden><span id="homeNoticeText"></span></div>
     <div class="grid">
-      <div class="tile" data-mod="news" data-name="班级热点">班级热点<span class="dot" id="newsDot"></span></div>
+      <div class="tile" data-mod="news" data-name="班级热点">班级热点</div>
       <div class="tile" data-mod="homework" data-name="班级作业">班级作业</div>
       <div class="tile" data-mod="cube" data-name="魔方">魔方</div>
       <div class="tile" data-mod="more" data-name="更多">更多</div>
@@ -476,7 +491,6 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
       <button class="tab" data-tab="debug" type="button">魔方调试</button>
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
-      <button class="tab" data-tab="pay" type="button">付费申请</button>
       <button class="tab" data-tab="member" type="button">会员</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
@@ -605,7 +619,19 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
           <div class="hint">总名称 → 分支（名字 + 文字）；所有人都能看，不用授权</div></div>
         <button class="btn primary sm" id="btnDebugNew" type="button" style="height:32px;padding:0 14px">＋ 新建总名称</button>
       </div>
-      <div class="card"><div class="news" id="debugList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+      <div class="card" style="margin-bottom:18px"><div class="news" id="debugList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+
+      <div class="panel-head">
+        <div><h2 style="font-size:16px">付费申请</h2>
+          <div class="hint">学生点了收费分支会排在这里；处理后会给他发一封站内信</div></div>
+        <button class="btn ghost sm" id="btnPayReload" type="button" style="height:32px">刷新</button>
+      </div>
+      <div class="seg" id="payFilter">
+        <button type="button" data-ps="new" class="on">待处理</button>
+        <button type="button" data-ps="done">已处理</button>
+        <button type="button" data-ps="all">全部</button>
+      </div>
+      <div class="card"><div class="news" id="payList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
     <!-- 身份管理 -->
@@ -665,21 +691,6 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
       <div class="card"><div class="news" id="fbAdminList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
-    <!-- 付费申请 -->
-    <section id="tab-pay" hidden>
-      <div class="panel-head">
-        <div><h2>付费申请</h2>
-          <div class="hint">学生点了收费分支会排在这里；处理后会给他发一封站内信</div></div>
-        <button class="btn ghost sm" id="btnPayReload" type="button" style="height:32px">刷新</button>
-      </div>
-      <div class="seg" id="payFilter">
-        <button type="button" data-ps="new" class="on">待处理</button>
-        <button type="button" data-ps="done">已处理</button>
-        <button type="button" data-ps="all">全部</button>
-      </div>
-      <div class="card"><div class="news" id="payList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
-    </section>
-
     <!-- 会员 -->
     <section id="tab-member" hidden>
       <div class="panel-head">
@@ -692,11 +703,42 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
     <!-- 广告推销 -->
     <section id="tab-ad" hidden>
       <div class="panel-head">
-        <div><h2>广告推销</h2>
-          <div class="hint">广告名称 → 分支；每个分支可以设收费、排期、是否上架</div></div>
-        <button class="btn primary sm" id="btnAdNew" type="button" style="height:32px;padding:0 14px">＋ 新建广告</button>
+        <div><h2>广告推销</h2><div class="hint">三块互不关联：价格给学生看、广告在登录时播、排期是时间轴</div></div>
       </div>
-      <div class="card"><div class="news" id="adList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+
+      <div class="card" style="padding:16px;margin-bottom:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div><h3 style="font-size:15px">① 广告价格</h3>
+            <div class="hint">学生端「广告推销」页最上面显示这段文字</div></div>
+          <button class="btn primary sm" id="btnAdPriceSave" type="button" style="height:32px;padding:0 14px">保存</button>
+        </div>
+        <textarea class="textarea" id="adPrice" rows="4" placeholder="例如：&#10;置顶位 50 元/月&#10;普通位 20 元/月&#10;联系：管理员"></textarea>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div><h3 style="font-size:15px">② 公布广告</h3>
+            <div class="hint">学生登录时强制看 3 秒的就是这段内容</div></div>
+          <button class="btn primary sm" id="btnAdContentSave" type="button" style="height:32px;padding:0 14px">保存</button>
+        </div>
+        <textarea class="textarea" id="adContent" rows="5" placeholder="广告正文，可以插图"></textarea>
+        <div class="row" style="margin-top:-6px;margin-bottom:10px">
+          <button class="btn ghost sm" id="btnAdImg" type="button">插入图片</button>
+          <input type="file" id="adFile" accept="image/*" style="display:none">
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">
+          <input type="checkbox" id="adForce" checked style="width:16px;height:16px;accent-color:var(--red)"> 登录时强制播放
+        </label>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div><h3 style="font-size:15px">③ 设置排期</h3>
+            <div class="hint">手动一条条加，会按日期排成时间轴给学生看</div></div>
+          <button class="btn primary sm" id="btnAdSchNew" type="button" style="height:32px;padding:0 14px">＋ 加一条</button>
+        </div>
+        <div id="adSchList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+      </div>
     </section>
 
     <!-- 公告 -->
@@ -815,7 +857,7 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
   var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
             cube: [], cubeAll: [], cubeAny: false, permUsers: [], cubeFilter: '', permKw: '',
             boot: null, permOpen: {}, debug: [], debugOpen: {}, debugBranches: {},
-            members: [], ads: [], adOpen: {}, adBranches: {} };
+            members: [], ads: [], adOpen: {}, adBranches: {}, adSch: [] };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -1266,8 +1308,6 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
     }
     if (currentMod === 'more') {
       if (moreState.view === 'fb') return renderMore();
-      if (moreState.view === 'adsBranch') return openAdProject(moreState.adProjectId);
-      if (moreState.view === 'adsProject') return openAds();
       if (moreState.view === 'ads') return renderMore();
     }
     closeModule();
@@ -1807,21 +1847,11 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
   }
 
   /* ---------- 用户端 ---------- */
-  function loadNewsBadge() {
-    api('api_list_announcements', { p_token: S.token }).then(function (r) {
-      S.news = r.items || [];
-      var d = $('newsDot');
-      if (S.news.length && d) {
-        d.textContent = S.news.length > 99 ? '99+' : S.news.length;
-        d.title = '共 ' + S.news.length + ' 条公告';
-        d.classList.add('show');
-      }
-    }, function () {});
-  }
+  function loadNewsBadge() { /* 小圆点已去掉，不再需要 */ }
 
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'pay', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -1833,10 +1863,9 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
     if (name === 'hw') loadHwAdmin();
     if (name === 'news') loadNews();
     if (name === 'cube') loadCubeAdmin();
-    if (name === 'debug') loadDebugAdmin();
+    if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
-    if (name === 'pay') loadPayAdmin();
     if (name === 'member') loadMemberAdmin();
     if (name === 'ad') loadAdAdmin();
     if (name === 'notice') loadNoticeAdmin();
@@ -2119,17 +2148,37 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
   }
 
   /* ---------- 站内信 ---------- */
+  /* 有新信就弹一次提醒，只显示标题；点「去看看」打开信箱 */
   function loadMailBadge() {
+    if (S.me && S.me.role === 'admin') return;
+
     api('api_list_mails', { p_token: S.token }).then(function (r) {
       S.mails = r.items || [];
-      var d = $('mailDot');
-      if (!d) return;
-      if (S.mails.length) {
-        d.textContent = S.mails.length > 99 ? '99+' : String(S.mails.length);
-        d.hidden = false;
-      } else {
-        d.hidden = true;
-      }
+      if (!S.mails.length) return;
+
+      var newest = S.mails[0];
+      var seen = '';
+      try { seen = localStorage.getItem('xbh_mail_seen') || ''; } catch (e) {}
+
+      if (seen === newest.id) return;
+
+      var m = modal('收到 ' + S.mails.length + ' 封公告',
+        '<div style="font-size:13px;color:var(--muted);margin-bottom:10px">只看标题，内容请到信箱里看</div>' +
+        S.mails.map(function (x, i) {
+          return '<div style="padding:9px 0;border-bottom:1px solid #F1F2F5;font-size:14px;color:var(--ink)">' +
+            (i + 1) + '. ' + esc(x.subject || '（无标题）') +
+            '<span style="float:right;font-size:11.5px;color:var(--muted)">' + fmt(x.created_at) + '</span>' +
+          '</div>';
+        }).join(''),
+        '<button class="btn ghost" type="button" id="mailLater">稍后</button>' +
+        '<button class="btn primary" type="button" id="mailGo">去看看</button>', 480);
+
+      var markSeen = function () {
+        try { localStorage.setItem('xbh_mail_seen', newest.id); } catch (e) {}
+      };
+
+      m.querySelector('#mailLater').onclick = function () { markSeen(); closeModal(); };
+      m.querySelector('#mailGo').onclick = function () { markSeen(); openMailbox(); };
     }, function () {});
   }
 
@@ -2150,12 +2199,25 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
           '<div class="hd"><h4>' + esc(x.subject || '（无标题）') + '</h4>' +
             '<span class="time">' + fmt(x.created_at) + '</span></div>' +
           '<p>' + esc(txt.slice(0, 80)) + (txt.length > 80 ? '…' : '') + '</p>' +
-          '<div style="margin-top:8px;font-size:12px;color:var(--muted)">' +
-            esc(x.created_by || '管理员') + (x.reply_count ? ' · ' + x.reply_count + ' 条回复' : '') +
+          '<div style="margin-top:8px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:10px">' +
+            '<span>' + esc(x.created_by || '管理员') + (x.reply_count ? ' · ' + x.reply_count + ' 条回复' : '') + '</span>' +
+            '<button type="button" class="link danger" data-mdel="' + esc(x.id) + '" style="margin-left:auto">删除</button>' +
           '</div></div>';
       }).join('');
 
       body.addEventListener('click', function (e) {
+        var del = e.target.closest('[data-mdel]');
+        if (del) {
+          e.stopPropagation();
+          confirmBox('删除这封信', '删除后你自己的信箱里就看不到了。', '', '删除').then(function (yes) {
+            if (!yes) return;
+            api('api_delete_my_mail', { p_token: S.token, p_id: del.dataset.mdel }).then(function () {
+              toast('已删除', 'ok');
+              openMailbox();
+            }, function (err) { toast(err.message, 'err'); });
+          });
+          return;
+        }
         var it = e.target.closest('[data-mail]');
         if (it) openMailDetail(it.dataset.mail);
       });
@@ -2937,101 +2999,38 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
   }
 
   /* ================= 广告推销（学生端） ================= */
-  var adCache = { project: null, branches: [] };
-
   function openAds() {
     moreState.view = 'ads';
     var body = $('modBody');
     body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
 
-    api('api_ad_list', { p_token: S.token }).then(function (r) {
-      var items = r.items || [];
-      if (!items.length) {
-        body.innerHTML = '<div class="empty" style="padding:50px 20px"><strong>暂时没有广告</strong>管理员发布后会出现在这里</div>';
-        return;
-      }
-      body.innerHTML = '<div class="cube-stack" style="max-width:none">' + items.map(function (a) {
-        return '<button class="cube-opt" type="button" data-ad="' + esc(a.id) + '">' +
-          '<span class="ico">📣</span>' +
-          '<span><b>' + esc(a.name) + '</b><small>' + (a.branch_count || 0) + ' 条内容</small></span>' +
-          '<span class="arrow">›</span>' +
-        '</button>';
-      }).join('') + '</div>';
-    }, function (e) {
-      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
-    });
-  }
-
-  function openAdProject(id) {
-    moreState.view = 'adsProject';
-    var body = $('modBody');
-    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
-
-    api('api_ad_detail', { p_token: S.token, p_id: id }).then(function (r) {
-      adCache = { project: r.project || {}, branches: r.branches || [] };
-      var list = adCache.branches;
+    api('api_ad_page', { p_token: S.token }).then(function (r) {
+      var price = String(r.price || '').trim();
+      var list = r.schedule || [];
 
       body.innerHTML =
-        '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(adCache.project.name) + '</h2>' +
-        (list.length
-          ? '<div class="cube-stack" style="max-width:none">' + list.map(function (b) {
-              var meta = [];
-              if (b.active) meta.push('正在推广');
-              if (b.start_date || b.end_date) meta.push((b.start_date || '即日') + ' ~ ' + (b.end_date || '长期'));
-              if (b.paid) meta.push('收费');
-              return '<button class="cube-opt" type="button" data-adbranch="' + esc(b.id) + '">' +
-                '<span class="ico">' + (b.paid ? '💰' : '📄') + '</span>' +
-                '<span><b>' + esc(b.name) + '</b><small>' + esc(meta.join(' · ') || '查看详情') + '</small></span>' +
-                '<span class="arrow">›</span>' +
-              '</button>';
-            }).join('') + '</div>'
-          : '<div class="empty"><strong>还没有内容</strong>管理员添加后就会显示</div>');
+        '<div style="max-width:560px;margin:0 auto">' +
+          '<div class="card" style="padding:16px;margin-bottom:14px">' +
+            '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">广告价格</div>' +
+            (price
+              ? '<div class="rich">' + esc(price) + '</div>'
+              : '<div class="empty" style="padding:12px 0"><strong>暂无价格</strong>管理员还没填</div>') +
+          '</div>' +
+
+          '<div class="card" style="padding:16px">' +
+            '<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;letter-spacing:1px">排期</div>' +
+            (list.length
+              ? '<div class="timeline">' + list.map(function (s) {
+                  return '<div class="tl-item">' +
+                    '<div class="tl-date">' + esc(s.when_date || '待定') + '</div>' +
+                    '<div class="tl-text">' + esc(s.label) + '</div>' +
+                  '</div>';
+                }).join('') + '</div>'
+              : '<div class="empty" style="padding:14px 0"><strong>还没有排期</strong>管理员添加后会显示在这里</div>') +
+          '</div>' +
+        '</div>';
     }, function (e) {
-      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
-    });
-  }
-
-  function openAdBranch(id) {
-    var b = (adCache.branches || []).filter(function (x) { return x.id === id; })[0];
-    if (!b) return;
-    moreState.view = 'adsBranch';
-    moreState.adBranchId = id;
-
-    var html =
-      '<h2 style="font-size:18px;color:var(--ink);margin:4px 0 12px">' + esc(b.name) + '</h2>' +
-      (b.start_date || b.end_date
-        ? '<div class="hint" style="margin-bottom:10px">排期：' + esc(b.start_date || '即日') + ' ~ ' + esc(b.end_date || '长期') + '</div>'
-        : '') +
-      '<div class="card" style="padding:16px;margin-bottom:12px"><div class="rich">' + renderRich(b.content) + '</div></div>';
-
-    if (b.paid && b.tiers && b.tiers.length) {
-      html += '<div class="card" style="padding:16px">' +
-        '<div style="font-size:13px;color:var(--muted);margin-bottom:10px">需要付费，选一个：</div>' +
-        b.tiers.map(function (t) {
-          return '<button class="cube-opt" type="button" data-adtier="' + esc(t.name) + '" style="margin-bottom:10px;padding:12px 16px">' +
-            '<span class="ico" style="width:34px;height:34px;font-size:15px">￥</span>' +
-            '<span><b>' + esc(t.name) + '</b><small>' + esc(t.price) + ' 元</small></span>' +
-            '<span class="arrow">›</span>' +
-          '</button>';
-        }).join('') +
-      '</div>';
-    }
-
-    $('modBody').innerHTML = html;
-  }
-
-  function askAdPay(tierName) {
-    var b = (adCache.branches || []).filter(function (x) { return x.id === moreState.adBranchId; })[0];
-    if (!b) return;
-    var t = (b.tiers || []).filter(function (x) { return x.name === tierName; })[0];
-    if (!t) return;
-
-    confirmBox('请支付 ' + t.price + ' 元', '「' + t.name + '」' + t.price + ' 元。',
-      '点了「我已支付」会把申请发给管理员。', '我已支付').then(function (yes) {
-      if (!yes) return;
-      api('api_ad_pay_request_add', { p_token: S.token, p_branch_id: b.id, p_tier_name: t.name }).then(function () {
-        toast('已提交，等管理员确认', 'ok', 3200);
-      }, function (e) { toast(e.message, 'err', 3600); });
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
   }
 
@@ -3119,240 +3118,97 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
     });
   }
 
-  /* ---------- 管理端：广告推销 ---------- */
+  /* ---------- 管理端：广告推销（价格 / 公布广告 / 排期） ---------- */
   function loadAdAdmin() {
-    $('adList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
-    api('api_ad_list', { p_token: S.token }).then(function (r) {
-      S.ads = r.items || [];
-      S.adBranches = {};
-      renderAdAdmin();
+    if (!S.boot) { bootInfo().then(loadAdAdmin, function () {}); return; }
+    $('adPrice').value = S.boot.ad_price || '';
+    $('adContent').value = S.boot.ad_content || '';
+    $('adForce').checked = String(S.boot.ad_force || '1') !== '0';
+    loadAdSchedule();
+  }
+
+  function saveAdPrice(btn) {
+    var v = $('adPrice').value;
+    busy(btn, true, '保存中…');
+    saveSetting('ad_price', v, btn).then(function () {
+      toast('广告价格已保存', 'ok');
+    }, function (e) { toast(e.message, 'err', 3600); });
+  }
+
+  function saveAdContent(btn) {
+    busy(btn, true, '保存中…');
+    Promise.all([
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_content', p_value: $('adContent').value }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_force', p_value: $('adForce').checked ? '1' : '0' })
+    ]).then(function () {
+      busy(btn, false);
+      return bootInfo();
+    }).then(function () {
+      toast('广告已保存', 'ok');
     }, function (e) {
-      $('adList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+      busy(btn, false);
+      toast(e.message, 'err', 3600);
     });
   }
 
-  function renderAdAdmin() {
-    var box = $('adList');
-    if (!S.ads.length) {
-      box.innerHTML = '<div class="empty"><strong>还没有广告</strong>点右上角「新建广告」建一个</div>';
+  function loadAdSchedule() {
+    $('adSchList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_ad_page', { p_token: S.token }).then(function (r) {
+      S.adSch = r.schedule || [];
+      renderAdSchedule();
+    }, function (e) {
+      $('adSchList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderAdSchedule() {
+    var box = $('adSchList');
+    if (!S.adSch.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有排期</strong>点右上角「加一条」，按日期往下排</div>';
       return;
     }
-    box.innerHTML = S.ads.map(function (a) {
-      var open = !!S.adOpen[a.id];
-      var branches = S.adBranches[a.id];
-      var inner = '';
-
-      if (open) {
-        if (!branches) {
-          inner = '<div class="loading" style="padding:16px"><span class="spinner"></span>加载中…</div>';
-        } else if (!branches.length) {
-          inner = '<div class="empty" style="padding:14px"><strong>还没有分支</strong>点下面新建</div>';
-        } else {
-          inner = branches.map(function (b) {
-            var meta = [];
-            if (b.active) meta.push('<span class="badge st-new" style="height:18px;font-size:11px">正在播放</span>');
-            if (b.start_date || b.end_date) meta.push('<span class="hint">' + esc(b.start_date || '即日') + ' ~ ' + esc(b.end_date || '长期') + '</span>');
-            if (b.paid) meta.push('<span class="badge gold" style="height:18px;font-size:11px">收费</span>');
-            return '<div class="perm-row" style="padding:8px 0">' +
-              '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(b.name) + '<small>' + meta.join(' ') + '</small></div>' +
-              '<button type="button" class="link" data-abact="edit" data-bid="' + esc(b.id) + '" data-aid="' + esc(a.id) + '">编辑</button>' +
-              '<button type="button" class="link danger" data-abact="del" data-bid="' + esc(b.id) + '" data-aid="' + esc(a.id) + '">删除</button>' +
-            '</div>';
-          }).join('');
-        }
-        inner += '<div style="margin-top:10px">' +
-          '<button type="button" class="btn ghost sm" data-abadd="' + esc(a.id) + '">＋ 新建分支</button></div>';
-      }
-
-      return '<div class="perm-row" style="flex-direction:column;align-items:stretch;gap:8px">' +
-        '<div style="display:flex;align-items:center;gap:8px">' +
-          '<button type="button" class="fold ' + (open ? 'open' : '') + '" data-adfold="' + esc(a.id) + '">▸</button>' +
-          '<b style="font-size:14px;color:var(--ink)">' + esc(a.name) + '</b>' +
-          '<span class="hint">' + (a.branch_count || 0) + ' 条</span>' +
-          '<span style="margin-left:auto;display:flex;gap:12px">' +
-            '<button type="button" class="link" data-aact="edit" data-aid="' + esc(a.id) + '">改名</button>' +
-            '<button type="button" class="link danger" data-aact="del" data-aid="' + esc(a.id) + '">删除</button>' +
-          '</span>' +
-        '</div>' +
-        (open ? '<div style="margin-left:22px">' + inner + '</div>' : '') +
+    box.innerHTML = S.adSch.map(function (s) {
+      return '<div class="perm-row" data-sid="' + esc(s.id) + '">' +
+        '<div class="who" style="width:108px;flex:none">' + esc(s.when_date || '待定') + '</div>' +
+        '<div style="flex:1;min-width:0;font-size:13.5px;color:var(--ink2)">' + esc(s.label) + '</div>' +
+        '<button type="button" class="link" data-sact="edit">编辑</button>' +
+        '<button type="button" class="link danger" data-sact="del">删除</button>' +
       '</div>';
     }).join('');
   }
 
-  function toggleAdProject(id) {
-    S.adOpen[id] = !S.adOpen[id];
-    if (!S.adOpen[id] || S.adBranches[id]) { renderAdAdmin(); return; }
-    renderAdAdmin();
-    api('api_ad_detail', { p_token: S.token, p_id: id }).then(function (r) {
-      S.adBranches[id] = r.branches || [];
-      renderAdAdmin();
-    }, function (e) {
-      toast(e.message, 'err');
-      S.adOpen[id] = false;
-      renderAdAdmin();
-    });
-  }
-
-  function openAdForm(item) {
+  function openAdSchForm(item) {
     var edit = !!item;
-    var m = modal(edit ? '修改广告名称' : '新建广告',
-      '<label class="field"><span>名称<em>*</em></span>' +
-        '<input class="input" id="adName" maxlength="40" placeholder="例如：某某文具店" value="' + esc(item ? item.name : '') + '"></label>',
+    var m = modal(edit ? '修改排期' : '加一条排期',
+      '<label class="field"><span>日期</span>' +
+        '<input class="input" id="schDate" type="date" value="' + esc(item && item.when_date ? String(item.when_date).slice(0, 10) : '') + '"></label>' +
+      '<label class="field"><span>内容<em>*</em></span>' +
+        '<input class="input" id="schLabel" maxlength="200" placeholder="例如：9月30日 某某文具店下架" value="' + esc(item ? item.label : '') + '"></label>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
-      '<button class="btn primary" id="adOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 440);
+      '<button class="btn primary" id="schOk" type="button">' + (edit ? '保存' : '添加') + '</button>', 480);
 
-    m.querySelector('#adName').focus();
-    m.querySelector('#adOk').onclick = function () {
+    m.querySelector('#schLabel').focus();
+    m.querySelector('#schOk').onclick = function () {
       var btn = this;
-      var v = m.querySelector('#adName').value.trim();
-      if (!v) return toast('名称不能为空', 'err');
+      var lb = m.querySelector('#schLabel').value.trim();
+      if (!lb) return toast('写一句话', 'err');
       busy(btn, true, '保存中…');
-      api('api_admin_ad_save', { p_token: S.token, p_id: edit ? item.id : null, p_name: v }).then(function () {
-        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadAdAdmin();
-      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
-    };
-  }
-
-  function deleteAd(id) {
-    confirmBox('删除广告', '确定删除这个广告吗？', '里面的分支会一起删掉。', '删除').then(function (yes) {
-      if (!yes) return;
-      api('api_admin_ad_delete', { p_token: S.token, p_id: id }).then(function () {
-        delete S.adBranches[id];
-        toast('已删除', 'ok'); loadAdAdmin();
-      }, function (e) { toast(e.message, 'err'); });
-    });
-  }
-
-  function openAdBranchForm(adId, branch) {
-    var edit = !!branch;
-    var paid = branch ? !!branch.paid : false;
-    var tiers = (branch && branch.tiers) ? branch.tiers.slice() : [];
-
-    var tierRow = function (t) {
-      return '<div class="row" style="margin-bottom:8px" data-tier-row>' +
-        '<input class="input" data-tn placeholder="名称，如 普通魔方" value="' + esc(t ? t.name : '') + '">' +
-        '<input class="input" data-tp type="number" min="0" step="0.01" placeholder="金额" value="' + esc(t ? t.price : '') + '" style="max-width:110px">' +
-        '<button class="btn ghost sm" type="button" data-trm style="height:40px">删</button>' +
-      '</div>';
-    };
-
-    var m = modal(edit ? '编辑广告分支' : '新建广告分支',
-      '<label class="field"><span>分支名称<em>*</em></span>' +
-        '<input class="input" id="abName" maxlength="60" placeholder="例如：开学季全场八折" value="' + esc(branch ? branch.name : '') + '"></label>' +
-      '<label class="field"><span>内容（可放图片）</span>' +
-        '<textarea class="textarea" id="abBody" rows="6" placeholder="广告文案；点下面可以插图">' + esc(branch ? branch.content : '') + '</textarea></label>' +
-      '<div class="row" style="margin-top:-6px;margin-bottom:12px">' +
-        '<button class="btn ghost sm" id="abImg" type="button">插入图片</button>' +
-        '<input type="file" id="abFile" accept="image/*" style="display:none">' +
-      '</div>' +
-      '<div class="row" style="margin-bottom:10px">' +
-        '<label style="display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2)">排期起 ' +
-          '<input class="input" id="adStart" type="date" value="' + esc(branch && branch.start_date ? String(branch.start_date).slice(0, 10) : '') + '" style="height:36px"></label>' +
-        '<label style="display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2)">止 ' +
-          '<input class="input" id="adEnd" type="date" value="' + esc(branch && branch.end_date ? String(branch.end_date).slice(0, 10) : '') + '" style="height:36px"></label>' +
-      '</div>' +
-      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin-bottom:12px">' +
-        '<input type="checkbox" id="abActive"' + (branch && branch.active ? ' checked' : '') +
-        ' style="width:16px;height:16px;accent-color:var(--red)"> 设为正在播放（登录时强制看 3 秒）</label>' +
-      '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin-bottom:12px">' +
-        '<input type="checkbox" id="abPaid"' + (paid ? ' checked' : '') +
-        ' style="width:16px;height:16px;accent-color:var(--red)"> 这个分支收费</label>' +
-      '<div id="adTierBox" style="' + (paid ? '' : 'display:none') + '">' +
-        '<div class="hint" style="margin-bottom:6px">价格档位</div>' +
-        '<div id="adTiers">' + (tiers.length ? tiers.map(tierRow).join('') : tierRow(null)) + '</div>' +
-        '<button class="btn ghost sm" id="adTierAdd" type="button" style="margin-top:2px">＋ 添加价格</button>' +
-      '</div>',
-      '<button class="btn ghost" type="button" data-close>取消</button>' +
-      '<button class="btn primary" id="abOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 620);
-
-    var bodyEl = m.querySelector('#abBody');
-    var box = m.querySelector('#adTierBox');
-
-    m.querySelector('#abImg').onclick = function () { m.querySelector('#abFile').click(); };
-    m.querySelector('#abFile').onchange = function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        compressImage(reader.result, function (url) {
-          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
-          insertAtCursor(bodyEl, '\n![图片](' + url + ')\n');
-        });
-      };
-      reader.readAsDataURL(f);
-      this.value = '';
-    };
-
-    m.querySelector('#abPaid').onchange = function () { box.style.display = this.checked ? '' : 'none'; };
-    m.querySelector('#adTierAdd').onclick = function () {
-      var wrap = m.querySelector('#adTiers');
-      var div = document.createElement('div');
-      div.innerHTML = tierRow(null);
-      wrap.appendChild(div.firstChild);
-    };
-    m.querySelector('#adTiers').addEventListener('click', function (e) {
-      var del = e.target.closest('[data-trm]');
-      if (!del) return;
-      var row = del.closest('[data-tier-row]');
-      if (row && m.querySelectorAll('#adTiers [data-tier-row]').length > 1) row.remove();
-      else if (row) { row.querySelector('[data-tn]').value = ''; row.querySelector('[data-tp]').value = ''; }
-    });
-
-    m.querySelector('#abOk').onclick = function () {
-      var btn = this;
-      var nm = m.querySelector('#abName').value.trim();
-      var isPaid = m.querySelector('#abPaid').checked;
-      if (!nm) return toast('分支名称不能为空', 'err');
-
-      var ts = Array.prototype.slice.call(m.querySelectorAll('#adTiers [data-tier-row]'))
-        .map(function (r) {
-          return { name: r.querySelector('[data-tn]').value.trim(), price: Number(r.querySelector('[data-tp]').value) || 0 };
-        })
-        .filter(function (t) { return t.name; });
-
-      if (isPaid && !ts.length) return toast('收费分支至少要填一个价格', 'err');
-
-      busy(btn, true, '保存中…');
-      api('api_admin_ad_branch_save', {
+      api('api_admin_ad_schedule_save', {
         p_token: S.token,
-        p_id: edit ? branch.id : null,
-        p_ad_id: adId,
-        p_name: nm,
-        p_content: bodyEl.value,
-        p_paid: isPaid,
-        p_tiers: ts,
-        p_active: m.querySelector('#abActive').checked,
-        p_start: m.querySelector('#adStart').value || null,
-        p_end: m.querySelector('#adEnd').value || null
+        p_id: edit ? item.id : null,
+        p_when: m.querySelector('#schDate').value || null,
+        p_label: lb
       }).then(function () {
-        busy(btn, false);
-        closeModal();
-        toast(edit ? '已保存' : '已创建', 'ok');
-        delete S.adBranches[adId];
-        S.adOpen[adId] = true;
-        loadAdAdmin();
-        setTimeout(function () { backfillAd(adId); }, 60);
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已添加', 'ok'); loadAdSchedule();
       }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
     };
   }
 
-  function backfillAd(id) {
-    if (!S.adOpen[id]) return;
-    api('api_ad_detail', { p_token: S.token, p_id: id }).then(function (r) {
-      S.adBranches[id] = r.branches || [];
-      renderAdAdmin();
-    }, function () {});
-  }
-
-  function deleteAdBranch(id, adId) {
-    confirmBox('删除分支', '确定删除这条广告内容吗？', '', '删除').then(function (yes) {
+  function deleteAdSch(id) {
+    confirmBox('删除排期', '确定删掉这条排期吗？', '', '删除').then(function (yes) {
       if (!yes) return;
-      api('api_admin_ad_branch_delete', { p_token: S.token, p_id: id }).then(function () {
-        toast('已删除', 'ok');
-        delete S.adBranches[adId];
-        S.adOpen[adId] = true;
-        loadAdAdmin();
-        setTimeout(function () { backfillAd(adId); }, 60);
+      api('api_admin_ad_schedule_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok'); loadAdSchedule();
       }, function (e) { toast(e.message, 'err'); });
     });
   }
@@ -3504,7 +3360,6 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
     $('btnDebugNew').addEventListener('click', function () { openDebugForm(null); });
     $('btnMember').addEventListener('click', openMemberModule);
     $('btnMemberNew').addEventListener('click', function () { openMemberForm(null); });
-    $('btnAdNew').addEventListener('click', function () { openAdForm(null); });
 
     $('memberList').addEventListener('click', function (e) {
       var b = e.target.closest('[data-mact]');
@@ -3515,30 +3370,32 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
       if (b.dataset.mact === 'del') return deleteMemberCard(host.dataset.mid);
     });
 
-    $('adList').addEventListener('click', function (e) {
-      var f = e.target.closest('[data-adfold]');
-      if (f) { toggleAdProject(f.dataset.adfold); return; }
+    $('btnAdPriceSave').addEventListener('click', function () { saveAdPrice(this); });
+    $('btnAdContentSave').addEventListener('click', function () { saveAdContent(this); });
+    $('btnAdSchNew').addEventListener('click', function () { openAdSchForm(null); });
 
-      var aact = e.target.closest('[data-aact]');
-      if (aact) {
-        var aid = aact.dataset.aid;
-        var item = (S.ads || []).filter(function (x) { return x.id === aid; })[0];
-        if (aact.dataset.aact === 'edit' && item) return openAdForm(item);
-        if (aact.dataset.aact === 'del') return deleteAd(aid);
-        return;
-      }
+    $('btnAdImg').addEventListener('click', function () { $('adFile').click(); });
+    $('adFile').addEventListener('change', function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
+          insertAtCursor($('adContent'), '\n![图片](' + url + ')\n');
+        });
+      };
+      reader.readAsDataURL(f);
+      this.value = '';
+    });
 
-      var abadd = e.target.closest('[data-abadd]');
-      if (abadd) { openAdBranchForm(abadd.dataset.abadd, null); return; }
-
-      var abact = e.target.closest('[data-abact]');
-      if (abact) {
-        var adid = abact.dataset.aid, bid = abact.dataset.bid;
-        var arr = S.adBranches[adid] || [];
-        var br = arr.filter(function (x) { return x.id === bid; })[0];
-        if (abact.dataset.abact === 'edit' && br) return openAdBranchForm(adid, br);
-        if (abact.dataset.abact === 'del') return deleteAdBranch(bid, adid);
-      }
+    $('adSchList').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-sact]');
+      var host = b && b.closest('[data-sid]');
+      if (!host) return;
+      var item = (S.adSch || []).filter(function (x) { return x.id === host.dataset.sid; })[0];
+      if (b.dataset.sact === 'edit' && item) return openAdSchForm(item);
+      if (b.dataset.sact === 'del') return deleteAdSch(host.dataset.sid);
     });
 
     $('permFold').addEventListener('click', function () {
@@ -3706,15 +3563,6 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
         }
         return;
       }
-
-      var ad = e.target.closest('[data-ad]');
-      if (ad && currentMod === 'more') { openAdProject(ad.dataset.ad); return; }
-
-      var adb = e.target.closest('[data-adbranch]');
-      if (adb && currentMod === 'more') { moreState.adProjectId = adCache.project && adCache.project.id; openAdBranch(adb.dataset.adbranch); return; }
-
-      var adt = e.target.closest('[data-adtier]');
-      if (adt && currentMod === 'more') { askAdPay(adt.dataset.adtier); return; }
 
       var dbg = e.target.closest('[data-debug]');
       if (dbg && currentMod === 'cube') { renderCubeDebugProject(dbg.dataset.debug); return; }
