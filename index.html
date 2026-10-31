@@ -228,6 +228,27 @@ body.s-down #downBar{display:block}
 .status-card.on b{color:var(--red)}
 @media(max-width:640px){ .status-grid{grid-template-columns:1fr} }
 
+/* 站内信 / 反馈状态 */
+.mail-btn{position:relative;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;
+  height:32px;min-width:38px;border-radius:999px;font-size:15px;padding:0 10px;line-height:1}
+.mail-btn:hover{background:rgba(255,255,255,.26)}
+.mail-dot{position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:999px;
+  background:#fff;color:var(--red);font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(0,0,0,.06)}
+.st-new{color:#9B0C24;background:#FDF0F2;border-color:#F6D5DA}
+.st-doing{color:#8A6100;background:#FDF6E3;border-color:#F2E3B8}
+.st-done{color:#146C33;background:#EBF9F0;border-color:#CFEEDB}
+.fb-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.fb-head .who{font-size:13.5px;font-weight:600;color:var(--ink)}
+.fb-head .time{margin-left:auto;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.fb-body{font-size:13.5px;line-height:1.75;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
+.fb-replies{margin-top:10px;border-top:1px dashed #EEF0F3;padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.fb-reply{background:#FAFBFC;border:1px solid #F1F2F5;border-radius:8px;padding:8px 10px;font-size:13px;color:var(--ink2)}
+.fb-reply b{color:var(--ink);font-size:12.5px;margin-right:6px}
+.pick-row{display:flex;align-items:center;gap:10px;padding:7px 2px;border-bottom:1px solid #F5F6F8;font-size:13.5px;color:var(--ink2)}
+.pick-row:last-child{border-bottom:none}
+.pick-row input{width:16px;height:16px;accent-color:var(--red)}
+
 /* 魔方模块 */
 .cube-stack{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:10px auto 0}
 .cube-opt{display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;border-radius:16px;border:1px solid var(--line);
@@ -331,6 +352,7 @@ body.s-down #downBar{display:block}
         <small id="brandSub">2026级5班 · 班级服务平台</small>
       </div>
       <span class="chip"><span class="dot" id="userDot">我</span><span id="userName">同学</span></span>
+      <button class="mail-btn" id="btnMail" type="button" title="站内信">✉<span class="mail-dot" id="mailDot" hidden></span></button>
       <button class="btn-logout" id="btnLogout" type="button">退出</button>
     </div>
   </header>
@@ -359,9 +381,12 @@ body.s-down #downBar{display:block}
   <main class="wrap" id="adminPanel" hidden>
     <div class="tabs">
       <button class="tab active" data-tab="users" type="button">用户管理</button>
+      <button class="tab" data-tab="identity" type="button">身份管理</button>
       <button class="tab" data-tab="hw" type="button">班级作业</button>
       <button class="tab" data-tab="news" type="button">班级热点</button>
       <button class="tab" data-tab="cube" type="button">魔方教程</button>
+      <button class="tab" data-tab="mail" type="button">邮箱发送</button>
+      <button class="tab" data-tab="feedback" type="button">反馈管理</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
       <button class="tab" data-tab="status" type="button">平台状态</button>
       <button class="tab" data-tab="more" type="button">更多</button>
@@ -467,9 +492,68 @@ body.s-down #downBar{display:block}
           <button type="button" data-cf="3">三阶</button>
           <button type="button" data-cf="4">四阶</button>
           <button type="button" data-cf="5">五阶</button>
+          <button type="button" data-cf="high">高阶</button>
+          <button type="button" data-cf="all">全阶</button>
         </div>
         <div id="cubeList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
       </div>
+    </section>
+
+    <!-- 身份管理 -->
+    <section id="tab-identity" hidden>
+      <div class="panel-head">
+        <div><h2>身份管理</h2><div class="hint">点右边的身份直接改；高级用户登录会看到专属标识</div></div>
+        <span class="hint" id="identityCount"></span>
+      </div>
+      <div class="card"><div class="news" id="identityList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- 邮箱发送 -->
+    <section id="tab-mail" hidden>
+      <div class="panel-head">
+        <div><h2>邮箱发送</h2><div class="hint">站内信箱，学生右上角的信封里能看到</div></div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <label class="field"><span>标题（可不填）</span>
+          <input class="input" id="mailSubject" maxlength="60" placeholder="例如：关于下周月考"></label>
+        <label class="field"><span>内容<em>*</em></span>
+          <textarea class="textarea" id="mailBody" rows="5" placeholder="写给同学的内容"></textarea></label>
+        <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin-bottom:14px">
+          <input type="checkbox" id="mailReply" style="width:16px;height:16px;accent-color:var(--red)"> 允许收到的人回复
+        </label>
+
+        <div class="panel-head" style="margin:0 0 8px">
+          <div class="hint">收件人</div>
+          <div class="chips">
+            <button type="button" class="chip-btn on" id="mailAll">全体</button>
+            <button type="button" class="chip-btn" id="mailPick">指定同学</button>
+          </div>
+        </div>
+        <div id="mailTargets" hidden style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:14px"></div>
+
+        <div style="text-align:right">
+          <button class="btn primary" id="btnSendMail" type="button">发送</button>
+        </div>
+      </div>
+
+      <div class="panel-head"><div><h2 style="font-size:15px">已发送</h2></div><span class="hint" id="mailSentCount"></span></div>
+      <div class="card"><div class="news" id="mailSentList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- 反馈管理 -->
+    <section id="tab-feedback" hidden>
+      <div class="panel-head">
+        <div><h2>反馈管理</h2><div class="hint">学生发的反馈都在这里，可以改状态、回复、删除</div></div>
+        <button class="btn ghost sm" id="btnFbReload" type="button" style="height:32px">刷新</button>
+      </div>
+      <div class="seg" id="fbAdminFilter">
+        <button type="button" data-fs="all" class="on">全部</button>
+        <button type="button" data-fs="new">新</button>
+        <button type="button" data-fs="doing">处理中</button>
+        <button type="button" data-fs="done">已解决</button>
+      </div>
+      <div class="card"><div class="news" id="fbAdminList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
     <!-- 公告 -->
@@ -557,7 +641,7 @@ body.s-down #downBar{display:block}
 
   <div class="actions" id="adminActions" style="display:none">
     <button class="btn ghost" id="btnReset" type="button">重置密码</button>
-    <button class="btn primary" id="btnAdd" type="button">新增用户</button>
+    <button class="btn ghost" id="btnBan" type="button">封号</button>
     <button class="btn danger" id="btnDelete" type="button">删除用户</button>
   </div>
 </div>
@@ -606,7 +690,7 @@ body.s-down #downBar{display:block}
            ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
   }
   function cubeLabel(type) {
-    return ({ '2': '二阶', '3': '三阶', '4': '四阶', '5': '五阶' })[String(type)] || '魔方';
+    return ({ '2': '二阶', '3': '三阶', '4': '四阶', '5': '五阶', 'high': '高阶', 'all': '全阶' })[String(type)] || '魔方';
   }
   /* 把「文字 + ![说明](图片)」渲染成 HTML（先转义，再放图片） */
   function renderRich(text) {
@@ -754,7 +838,9 @@ body.s-down #downBar{display:block}
       if (!d || d.ok === false) {
         var msg = (d && d.error) || '操作失败';
         if (/登录已过期|请重新登录/.test(msg)) onExpired();
-        throw new Error(msg);
+        var err = new Error(msg);
+        err.data = d || null;
+        throw err;
       }
       return d;
     }, function (e) { throw new Error(humanize(e)); });
@@ -849,16 +935,44 @@ body.s-down #downBar{display:block}
       enter(r.profile);
     }, function (e) {
       busy(btn, false);
+      if (e.data && e.data.banned) { showBanNotice(e.data); return; }
       err.textContent = e.message;
     });
   }
 
+  /* 被封号：弹窗写清还有多久 + 原因 */
+  function showBanNotice(d) {
+    var left;
+    if (!d.until) {
+      left = '永久封禁';
+    } else {
+      var ms = new Date(d.until).getTime() - Date.now();
+      if (ms <= 0) { left = '已到期，请重新登录'; }
+      else {
+        var h = Math.floor(ms / 3600000);
+        var m = Math.ceil((ms % 3600000) / 60000);
+        left = (h > 0 ? h + ' 小时 ' : '') + m + ' 分钟后解封';
+      }
+    }
+    var reason = String(d.reason || '').trim();
+
+    modal('账号已被封禁',
+      '<div style="text-align:center;padding:6px 0 2px">' +
+        '<div style="font-size:22px;margin-bottom:10px">🚫</div>' +
+        '<p style="color:var(--ink);font-size:15px;margin-bottom:6px">' + esc(left) + '</p>' +
+        (reason ? '<p style="font-size:13.5px;color:var(--muted)">原因：' + esc(reason) + '</p>' : '') +
+        '<p style="font-size:12.5px;color:var(--muted);margin-top:10px">如有疑问，请联系班级管理员</p>' +
+      '</div>',
+      '<button class="btn ghost" type="button" data-close>知道了</button>', 400);
+  }
+
   function enter(profile) {
     S.me = profile;
+    var name = profile.display_name || profile.username;
     $('loginView').hidden = true;
     $('appView').hidden = false;
-    $('userName').textContent = profile.display_name || profile.username;
-    $('userDot').textContent = (profile.display_name || profile.username || '我').slice(0, 1);
+    $('userName').textContent = name;
+    $('userDot').textContent = (name || '我').slice(0, 1);
 
     if (profile.role === 'admin') {
       $('brandSub').textContent = '2026级5班 · 管理端';
@@ -866,7 +980,9 @@ body.s-down #downBar{display:block}
       $('adminPanel').hidden = false;
       switchTab('users');
     } else {
-      $('brandSub').textContent = '2026级5班 · 班级服务平台';
+      $('brandSub').textContent = profile.role === 'vip'
+        ? '高级用户 · ' + name
+        : '2026级5班 · 班级服务平台';
       $('adminPanel').hidden = true;
       showActions(false);
       $('userPanel').hidden = false;
@@ -874,8 +990,23 @@ body.s-down #downBar{display:block}
       loadNewsBadge();
     }
 
-    if (S.boot && String(S.boot.login_popup || '').trim()) {
+    loadMailBadge();
+
+    // 登录弹窗公告：管理员不弹
+    if (profile.role !== 'admin' && S.boot && String(S.boot.login_popup || '').trim()) {
       setTimeout(function () { showPopupNotice(S.boot.login_popup); }, 260);
+    }
+
+    // 高级用户：欢迎弹窗，5 秒自动关
+    if (profile.role === 'vip') {
+      setTimeout(function () {
+        modal('欢迎',
+          '<div style="text-align:center;padding:10px 0 6px">' +
+            '<div style="font-size:20px;color:var(--red);font-weight:700;letter-spacing:1px">欢迎您 · ' + esc(name) + '</div>' +
+          '</div>',
+          '', 380);
+        setTimeout(closeModal, 5000);
+      }, 400);
     }
   }
 
@@ -917,6 +1048,7 @@ body.s-down #downBar{display:block}
   function closeModule() {
     currentMod = '';
     cubeState.view = 'home';
+    moreState.view = 'info';
     $('modView').hidden = true;
     document.body.style.overflow = '';
     if (!S.me) return;
@@ -930,6 +1062,7 @@ body.s-down #downBar{display:block}
       if (cubeState.view === 'content') return renderCubeTutorials(true);
       if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
     }
+    if (currentMod === 'more' && moreState.view === 'fb') return renderMore();
     closeModule();
   }
 
@@ -942,12 +1075,18 @@ body.s-down #downBar{display:block}
   }
 
   function renderMore() {
+    moreState.view = 'info';
     var me = S.me || {};
     var b = S.boot || {};
     var sp = String(b.sponsors || '').trim();
 
     $('modBody').innerHTML =
       '<div style="max-width:520px;margin:10px auto">' +
+        '<button class="cube-opt" type="button" data-open="fb" style="margin-bottom:14px">' +
+          '<span class="ico">💬</span>' +
+          '<span><b>反馈</b><small>提问题、提建议，管理员会处理</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>' +
         '<div class="card" style="padding:18px">' +
           '<dl class="kv">' +
             '<dt>平台</dt><dd>徐悲鸿中学 · 2026级5班</dd>' +
@@ -959,10 +1098,215 @@ body.s-down #downBar{display:block}
                 '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">赞助商</div>' +
                 '<div class="rich">' + esc(sp) + '</div>' +
               '</div>' : '') +
-        '<div class="empty" style="padding:22px 10px 0">' +
-          '<strong>更多功能建设中</strong>想加什么，告诉管理员就行。' +
-        '</div>' +
       '</div>';
+  }
+
+  /* ================= 反馈（学生端 + 管理端共用） ================= */
+  var moreState = { view: 'info' };
+  var fbFilter = { user: 'all', admin: 'all' };
+
+  function fbLabel(s) { return s === 'new' ? '新' : s === 'doing' ? '处理中' : '已解决'; }
+  function fbClass(s) { return s === 'new' ? 'st-new' : s === 'doing' ? 'st-doing' : 'st-done'; }
+
+  function fbCard(x) {
+    return '<div class="news-item" data-fb="' + esc(x.id) + '" style="cursor:pointer">' +
+      '<div class="fb-head">' +
+        '<span class="who">' + esc(x.author) + '</span>' +
+        '<span class="badge ' + fbClass(x.status) + '">' + fbLabel(x.status) + '</span>' +
+        (x.allow_reply ? '' : '<span class="badge gray" style="height:18px;font-size:11px">已关回复</span>') +
+        '<span class="time">' + fmt(x.created_at) + '</span>' +
+      '</div>' +
+      '<div class="fb-body">' + esc(x.body) + '</div>' +
+      (x.reply_count ? '<div style="margin-top:6px;font-size:12px;color:var(--muted)">' + x.reply_count + ' 条回复</div>' : '') +
+    '</div>';
+  }
+
+  function fbFilterHtml(active, prefix) {
+    return '<div class="seg" id="' + prefix + '">' +
+      [['all', '全部'], ['new', '新'], ['doing', '处理中'], ['done', '已解决']].map(function (p) {
+        return '<button type="button" data-fs="' + p[0] + '" class="' + (active === p[0] ? 'on' : '') + '">' + p[1] + '</button>';
+      }).join('') + '</div>';
+  }
+
+  /* ----- 学生端：更多 → 反馈 ----- */
+  function openFeedback() {
+    moreState.view = 'fb';
+    var body = $('modBody');
+    body.innerHTML =
+      '<div class="panel-head" style="margin-bottom:12px">' +
+        '<div><h2 style="font-size:17px">反馈</h2><div class="hint">大家都能看到，每人每天最多发 3 条</div></div>' +
+        '<button class="btn primary sm" id="fbNew" type="button" style="height:34px;padding:0 16px">＋ 我要反馈</button>' +
+      '</div>' +
+      fbFilterHtml(fbFilter.user, 'fbUserFilter') +
+      '<div id="fbUserList"><div class="loading"><span class="spinner"></span>加载中…</div></div>';
+
+    $('fbNew').addEventListener('click', openFbCompose);
+    $('fbUserFilter').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fs]');
+      if (!b) return;
+      fbFilter.user = b.dataset.fs;
+      Array.prototype.forEach.call($('fbUserFilter').children, function (x) { x.classList.toggle('on', x === b); });
+      loadFbUser();
+    });
+    loadFbUser();
+  }
+
+  function loadFbUser() {
+    var box = $('fbUserList');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_feedback_list', { p_token: S.token, p_status: fbFilter.user }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="empty"><strong>这里还没有反馈</strong>点右上角「我要反馈」发第一条</div>';
+        return;
+      }
+      box.innerHTML = items.map(fbCard).join('');
+      box.onclick = function (e) {
+        var it = e.target.closest('[data-fb]');
+        if (it) openFbDetail(it.dataset.fb, false);
+      };
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openFbCompose() {
+    var m = modal('我要反馈',
+      '<label class="field"><span>说点什么（最多 500 字）</span>' +
+        '<textarea class="textarea" id="fbBody" rows="5" maxlength="500" placeholder="遇到的问题、想加的功能，都可以写"></textarea></label>' +
+      '<p class="hint" style="font-size:12.5px">发出去所有人都能看到，并且会显示你的用户名。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="fbSend" type="button">发布</button>', 480);
+
+    m.querySelector('#fbSend').onclick = function () {
+      var btn = this;
+      var v = m.querySelector('#fbBody').value.trim();
+      if (!v) return toast('写点内容吧', 'err');
+      busy(btn, true, '发布中…');
+      api('api_feedback_add', { p_token: S.token, p_body: v }).then(function () {
+        busy(btn, false); closeModal(); toast('已发布', 'ok');
+        loadFbUser();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  /* ----- 反馈详情（含管理操作） ----- */
+  function openFbDetail(id, isAdmin) {
+    var m = modal('反馈', '<div class="loading"><span class="spinner"></span>加载中…</div>', '', 620);
+    var body = m.querySelector('.modal-body');
+
+    api('api_feedback_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      var f = r.feedback || {};
+      var reps = r.replies || [];
+      var admin = isAdmin || f.is_admin;
+
+      var html =
+        '<div class="fb-head">' +
+          '<span class="who">' + esc(f.author) + '</span>' +
+          '<span class="badge ' + fbClass(f.status) + '">' + fbLabel(f.status) + '</span>' +
+          '<span class="time">' + fmtAbs(f.created_at) + '</span>' +
+        '</div>' +
+        '<div class="fb-body">' + esc(f.body) + '</div>' +
+        (reps.length ? '<div class="fb-replies">' + reps.map(function (x) {
+          return '<div class="fb-reply"><b>' + esc(x.name) + (x.role === 'admin' ? ' · 管理员' : '') + '</b>' +
+            esc(x.body) + '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + fmt(x.created_at) + '</div></div>';
+        }).join('') + '</div>' : '');
+
+      if (admin) {
+        html += '<div style="margin-top:14px;border-top:1px dashed #EEF0F3;padding-top:12px">' +
+          '<div class="hint" style="margin-bottom:6px">改状态</div>' +
+          '<div class="chips" id="fbStatusChips">' +
+            ['new', 'doing', 'done'].map(function (s) {
+              return '<button type="button" class="chip-btn ' + (f.status === s ? 'on' : '') + '" data-setst="' + s + '">' + fbLabel(s) + '</button>';
+            }).join('') +
+          '</div>' +
+          '<label style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink2);margin-top:12px">' +
+            '<input type="checkbox" id="fbAllow" ' + (f.allow_reply ? 'checked' : '') +
+            ' style="width:16px;height:16px;accent-color:var(--red)"> 允许再次回复</label>' +
+          '<div style="text-align:right;margin-top:10px">' +
+            '<button class="btn danger sm" id="fbDel" type="button">删除这条反馈</button></div>' +
+        '</div>';
+      }
+
+      if (f.allow_reply || admin) {
+        html += '<div style="margin-top:14px">' +
+          '<textarea class="textarea" id="fbReplyBody" rows="3" placeholder="' + (admin ? '以管理员身份回复…' : '写回复…') + '"></textarea>' +
+          '<div style="text-align:right;margin-top:8px">' +
+            '<button class="btn primary sm" id="fbReplySend" type="button" style="height:34px;padding:0 16px">回复</button></div>' +
+        '</div>';
+      } else {
+        html += '<p class="hint" style="margin-top:12px">这条反馈已关闭回复。</p>';
+      }
+
+      body.innerHTML = html;
+
+      var send = body.querySelector('#fbReplySend');
+      if (send) {
+        send.onclick = function () {
+          var v = body.querySelector('#fbReplyBody').value.trim();
+          if (!v) return toast('回复不能为空', 'err');
+          busy(send, true, '发送中…');
+          api('api_feedback_reply', { p_token: S.token, p_id: id, p_body: v }).then(function () {
+            busy(send, false); toast('已回复', 'ok'); openFbDetail(id, isAdmin);
+          }, function (e) { busy(send, false); toast(e.message, 'err', 3600); });
+        };
+      }
+
+      if (admin) {
+        var chips = body.querySelector('#fbStatusChips');
+        chips.onclick = function (e) {
+          var b = e.target.closest('[data-setst]');
+          if (!b) return;
+          var st = b.dataset.setst;
+          api('api_admin_feedback_update', {
+            p_token: S.token, p_id: id, p_status: st,
+            p_allow_reply: body.querySelector('#fbAllow').checked
+          }).then(function () {
+            toast('状态已改为「' + fbLabel(st) + '」', 'ok');
+            openFbDetail(id, isAdmin);
+            if ($('fbAdminList')) loadFeedbackAdmin();
+          }, function (e) { toast(e.message, 'err', 3600); });
+        };
+
+        body.querySelector('#fbAllow').onchange = function () {
+          var on = this.checked;
+          api('api_admin_feedback_update', {
+            p_token: S.token, p_id: id, p_status: f.status, p_allow_reply: on
+          }).then(function () {
+            toast(on ? '已允许再次回复' : '已关闭回复', 'ok');
+          }, function (e) { toast(e.message, 'err', 3600); });
+        };
+
+        body.querySelector('#fbDel').onclick = function () {
+          confirmBox('删除反馈', '确定删除这条反馈吗？', '删除后回复也一起没了。', '删除').then(function (yes) {
+            if (!yes) return;
+            api('api_admin_feedback_delete', { p_token: S.token, p_id: id }).then(function () {
+              closeModal(); toast('已删除', 'ok'); loadFeedbackAdmin();
+            }, function (e) { toast(e.message, 'err'); });
+          });
+        };
+      }
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ----- 管理端：反馈管理 ----- */
+  function loadFeedbackAdmin() {
+    var box = $('fbAdminList');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_feedback_list', { p_token: S.token, p_status: fbFilter.admin }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="empty"><strong>这里还没有反馈</strong>学生发反馈后会出现在这里</div>';
+        return;
+      }
+      box.innerHTML = items.map(fbCard).join('');
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
   }
 
   /* ================= 魔方（学生端） ================= */
@@ -1017,7 +1361,7 @@ body.s-down #downBar{display:block}
     body.innerHTML =
       '<div class="seg">' +
         '<button type="button" data-type="top" class="' + (cubeState.type === 'top' ? 'on' : '') + '">置顶</button>' +
-        ['2', '3', '4', '5'].map(function (k) {
+        ['2', '3', '4', '5', 'high', 'all'].map(function (k) {
           return '<button type="button" data-type="' + k + '" class="' + (k === cubeState.type ? 'on' : '') + '">' +
             cubeLabel(k) + '教程</button>';
         }).join('') +
@@ -1143,7 +1487,7 @@ body.s-down #downBar{display:block}
 
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'hw', 'news', 'cube', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'mail', 'feedback', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -1151,9 +1495,12 @@ body.s-down #downBar{display:block}
     });
     showActions(name === 'users');
     if (name === 'users') loadUsers();
+    if (name === 'identity') loadIdentity();
     if (name === 'hw') loadHwAdmin();
     if (name === 'news') loadNews();
     if (name === 'cube') loadCubeAdmin();
+    if (name === 'mail') loadMailTab();
+    if (name === 'feedback') loadFeedbackAdmin();
     if (name === 'notice') loadNoticeAdmin();
     if (name === 'status') loadStatusAdmin();
     if (name === 'more') loadMoreAdmin();
@@ -1191,12 +1538,20 @@ body.s-down #downBar{display:block}
     }
     body.innerHTML = S.users.map(function (u) {
       var me = S.me && u.id === S.me.id;
+      var banTxt = '';
+      if (u.banned) {
+        banTxt = '<span class="badge st-new" style="height:18px;font-size:11px">' +
+          (u.banned_until ? '封禁至 ' + fmtAbs(u.banned_until) : '永久封禁') + '</span>';
+      }
+      var roleTxt = u.role === 'admin' ? '管理员' : u.role === 'vip' ? '高级' : '';
       return '<tr data-id="' + esc(u.id) + '" class="' + (u.id === S.sel ? 'sel' : '') + '">' +
         '<td><span class="pick">✓</span></td>' +
         '<td><span class="name"><span class="avatar">' + esc((u.display_name || u.username || '?').slice(0, 1)) + '</span>' +
           esc(u.display_name || '未命名') +
           (me ? ' <span class="badge gray" style="height:18px;font-size:11px">我</span>' : '') +
+          (roleTxt ? ' <span class="badge ' + (u.role === 'admin' ? 'red' : 'gold') + '" style="height:18px;font-size:11px">' + roleTxt + '</span>' : '') +
           (u.status === 'disabled' ? ' <span class="badge gray" style="height:18px;font-size:11px">已停用</span>' : '') +
+          (banTxt ? ' ' + banTxt : '') +
         '</span></td>' +
         '<td style="font-family:ui-monospace,Consolas,monospace;font-size:13px">' + esc(u.username) + '</td>' +
         '<td style="text-align:right;font-size:12.5px;color:var(--muted)">' + fmt(u.last_login_at) + '</td>' +
@@ -1299,6 +1654,289 @@ body.s-down #downBar{display:block}
         toast('已删除', 'ok'); S.sel = ''; loadUsers();
       }, function (e) { toast(e.message, 'err'); });
     });
+  }
+
+  /* ---------- 管理端：封号 ---------- */
+  function openBanModal() {
+    var list = S.users.filter(function (u) { return !(S.me && u.id === S.me.id); });
+    if (!list.length) return toast('没有可操作的账号', 'err');
+
+    var m = modal('封号',
+      '<div class="hint" style="margin-bottom:8px">勾选要处理的账号，可以多选</div>' +
+      '<div style="max-height:200px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 12px;margin-bottom:14px">' +
+        list.map(function (u) {
+          return '<label class="pick-row"><input type="checkbox" value="' + esc(u.id) + '">' +
+            '<span>' + esc(u.display_name || u.username) +
+            ' <small style="color:var(--muted)">' + esc(u.username) + '</small>' +
+            (u.banned ? ' <span class="badge st-new" style="height:17px;font-size:10.5px">已封禁</span>' : '') +
+            '</span></label>';
+        }).join('') +
+      '</div>' +
+
+      '<div class="chips" style="margin-bottom:10px">' +
+        '<button type="button" class="chip-btn on" id="banPerm">永久</button>' +
+        '<button type="button" class="chip-btn" id="banCustom">自定义</button>' +
+      '</div>' +
+      '<div id="banDur" style="display:none;gap:8px;align-items:center;margin-bottom:14px">' +
+        '<input class="input" id="banDays" type="number" min="0" value="0" style="width:88px"> 天' +
+        '<input class="input" id="banHours" type="number" min="0" max="23" value="1" style="width:88px"> 小时' +
+        '<span class="hint">最少 1 小时</span>' +
+      '</div>' +
+
+      '<label class="field" style="margin-bottom:4px"><span>原因（不填就不显示给本人）</span>' +
+        '<textarea class="textarea" id="banReason" rows="2" placeholder="例如：多次在班级公告下刷屏"></textarea></label>' +
+      '<p class="hint" style="font-size:12.5px">封禁后这个账号立刻掉线，并且无法登录。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn ghost" id="banOff" type="button">解除封禁</button>' +
+      '<button class="btn danger" id="banOn" type="button">确认封禁</button>', 560);
+
+    var perm = true;
+    var permBtn = m.querySelector('#banPerm');
+    var customBtn = m.querySelector('#banCustom');
+    var dur = m.querySelector('#banDur');
+
+    permBtn.onclick = function () {
+      perm = true;
+      permBtn.classList.add('on'); customBtn.classList.remove('on');
+      dur.style.display = 'none';
+    };
+    customBtn.onclick = function () {
+      perm = false;
+      customBtn.classList.add('on'); permBtn.classList.remove('on');
+      dur.style.display = 'flex';
+    };
+
+    function picked() {
+      return Array.prototype.slice.call(m.querySelectorAll('.pick-row input[type=checkbox]'))
+        .filter(function (c) { return c.checked; })
+        .map(function (c) { return c.value; });
+    }
+
+    m.querySelector('#banOff').onclick = function () {
+      var ids = picked();
+      if (!ids.length) return toast('请先勾选账号', 'err');
+      api('api_admin_unban', { p_token: S.token, p_user_ids: ids }).then(function () {
+        closeModal(); toast('已解除封禁', 'ok'); loadUsers();
+      }, function (e) { toast(e.message, 'err'); });
+    };
+
+    m.querySelector('#banOn').onclick = function () {
+      var btn = this;
+      var ids = picked();
+      if (!ids.length) return toast('请先勾选账号', 'err');
+
+      var minutes = null;
+      if (!perm) {
+        var d = parseInt(m.querySelector('#banDays').value, 10) || 0;
+        var h = parseInt(m.querySelector('#banHours').value, 10) || 0;
+        minutes = d * 1440 + h * 60;
+        if (minutes < 60) return toast('封禁时长最少 1 小时', 'err');
+      }
+
+      busy(btn, true, '处理中…');
+      api('api_admin_ban_users', {
+        p_token: S.token, p_user_ids: ids, p_minutes: minutes,
+        p_reason: m.querySelector('#banReason').value.trim()
+      }).then(function (r) {
+        busy(btn, false);
+        closeModal();
+        toast('已封禁 ' + (r.count || ids.length) + ' 个账号', 'ok');
+        loadUsers();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  /* ---------- 管理端：身份 ---------- */
+  function loadIdentity() {
+    $('identityList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_list_users', { p_token: S.token, p_search: '' }).then(function (r) {
+      S.identity = r.users || [];
+      $('identityCount').textContent = '共 ' + S.identity.length + ' 个账号';
+      renderIdentity();
+    }, function (e) {
+      $('identityList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderIdentity() {
+    $('identityList').innerHTML = S.identity.map(function (u) {
+      var me = S.me && u.id === S.me.id;
+      var chips = [['user', '普通'], ['vip', '高级'], ['admin', '管理员']].map(function (p) {
+        return '<button type="button" class="chip-btn ' + (u.role === p[0] ? 'on' : '') + '" data-uid="' + esc(u.id) + '" data-role="' + p[0] + '">' +
+          p[1] + '</button>';
+      }).join('');
+      return '<div class="perm-row">' +
+        '<div class="who">' + esc(u.display_name || '未命名') + '<small>' + esc(u.username) +
+          (me ? ' · 我' : '') + '</small></div>' +
+        '<div class="chips">' + chips + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function changeRole(uid, role) {
+    api('api_admin_set_role', { p_token: S.token, p_id: uid, p_role: role }).then(function () {
+      toast('身份已修改', 'ok');
+      loadIdentity();
+    }, function (e) { toast(e.message, 'err', 3600); });
+  }
+
+  /* ---------- 站内信 ---------- */
+  function loadMailBadge() {
+    api('api_list_mails', { p_token: S.token }).then(function (r) {
+      S.mails = r.items || [];
+      var d = $('mailDot');
+      if (!d) return;
+      if (S.mails.length) {
+        d.textContent = S.mails.length > 99 ? '99+' : String(S.mails.length);
+        d.hidden = false;
+      } else {
+        d.hidden = true;
+      }
+    }, function () {});
+  }
+
+  function openMailbox() {
+    var m = modal('站内信', '<div class="loading"><span class="spinner"></span>加载中…</div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 640);
+    var body = m.querySelector('.modal-body');
+
+    api('api_list_mails', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>没有站内信</strong>管理员发信后会出现在这里</div>';
+        return;
+      }
+      body.innerHTML = items.map(function (x) {
+        var txt = String(x.body || '');
+        return '<div class="news-item" data-mail="' + esc(x.id) + '" style="cursor:pointer">' +
+          '<div class="hd"><h4>' + esc(x.subject || '（无标题）') + '</h4>' +
+            '<span class="time">' + fmt(x.created_at) + '</span></div>' +
+          '<p>' + esc(txt.slice(0, 80)) + (txt.length > 80 ? '…' : '') + '</p>' +
+          '<div style="margin-top:8px;font-size:12px;color:var(--muted)">' +
+            esc(x.created_by || '管理员') + (x.reply_count ? ' · ' + x.reply_count + ' 条回复' : '') +
+          '</div></div>';
+      }).join('');
+
+      body.addEventListener('click', function (e) {
+        var it = e.target.closest('[data-mail]');
+        if (it) openMailDetail(it.dataset.mail);
+      });
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openMailDetail(id) {
+    var m = modal('站内信', '<div class="loading"><span class="spinner"></span>加载中…</div>', '', 620);
+    var body = m.querySelector('.modal-body');
+
+    api('api_mail_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      var mail = r.mail || {};
+      var reps = r.replies || [];
+      body.innerHTML =
+        '<h3 style="font-size:16px;margin-bottom:6px">' + esc(mail.subject || '（无标题）') + '</h3>' +
+        '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">' +
+          esc(mail.created_by || '管理员') + ' · ' + fmtAbs(mail.created_at) + '</div>' +
+        '<div class="rich">' + esc(mail.body) + '</div>' +
+        (reps.length ? '<div class="fb-replies">' + reps.map(function (x) {
+          return '<div class="fb-reply"><b>' + esc(x.name) + '</b>' + esc(x.body) +
+            '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + fmt(x.created_at) + '</div></div>';
+        }).join('') + '</div>' : '') +
+        (mail.allow_reply
+          ? '<div style="margin-top:14px"><textarea class="textarea" id="mailReplyBody" rows="3" placeholder="写回复…"></textarea>' +
+            '<div style="text-align:right;margin-top:8px"><button class="btn primary sm" id="mailReplySend" type="button" style="height:34px;padding:0 16px">回复</button></div></div>'
+          : '<p class="hint" style="margin-top:12px">这封信不允许回复。</p>');
+
+      var sendBtn = body.querySelector('#mailReplySend');
+      if (sendBtn) {
+        sendBtn.onclick = function () {
+          var v = body.querySelector('#mailReplyBody').value.trim();
+          if (!v) return toast('回复不能为空', 'err');
+          busy(sendBtn, true, '发送中…');
+          api('api_reply_mail', { p_token: S.token, p_id: id, p_body: v }).then(function () {
+            busy(sendBtn, false);
+            toast('已回复', 'ok');
+            openMailDetail(id);
+          }, function (e) { busy(sendBtn, false); toast(e.message, 'err'); });
+        };
+      }
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ---------- 管理端：邮箱发送 ---------- */
+  function loadMailTab() {
+    loadMailSent();
+    if (!S.users.length) {
+      api('api_admin_list_users', { p_token: S.token, p_search: '' }).then(function (r) {
+        S.users = r.users || [];
+        renderMailTargets();
+      }, function () {});
+    } else {
+      renderMailTargets();
+    }
+  }
+
+  function renderMailTargets() {
+    var box = $('mailTargets');
+    box.innerHTML = (S.users || []).filter(function (u) { return u.role !== 'admin'; }).map(function (u) {
+      return '<label class="pick-row"><input type="checkbox" value="' + esc(u.id) + '">' +
+        '<span>' + esc(u.display_name || u.username) + ' <small style="color:var(--muted)">' + esc(u.username) + '</small></span></label>';
+    }).join('') || '<div class="hint">还没有学生账号</div>';
+  }
+
+  function loadMailSent() {
+    $('mailSentList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_mail_list', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      $('mailSentCount').textContent = items.length ? '共 ' + items.length + ' 封' : '';
+      if (!items.length) {
+        $('mailSentList').innerHTML = '<div class="empty"><strong>还没发过信</strong>上面写好内容点「发送」</div>';
+        return;
+      }
+      $('mailSentList').innerHTML = items.map(function (x) {
+        return '<div class="news-item" data-mail="' + esc(x.id) + '" style="cursor:pointer">' +
+          '<div class="hd">' +
+            (x.allow_reply ? '<span class="badge green" style="height:18px;font-size:11px">可回复</span>' : '<span class="badge gray" style="height:18px;font-size:11px">不可回复</span>') +
+            '<h4>' + esc(x.subject || '（无标题）') + '</h4>' +
+            '<span class="time">' + fmt(x.created_at) + '</span></div>' +
+          '<p>' + esc(String(x.body || '').slice(0, 90)) + '</p>' +
+          '<div style="margin-top:8px;font-size:12px;color:var(--muted)">' +
+            (x.to_all ? '发给全体' : '发给指定同学') + (x.reply_count ? ' · ' + x.reply_count + ' 条回复' : '') +
+          '</div></div>';
+      }).join('');
+    }, function (e) {
+      $('mailSentList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function sendMail() {
+    var btn = $('btnSendMail');
+    var body = $('mailBody').value.trim();
+    var subject = $('mailSubject').value.trim();
+    var allow = $('mailReply').checked;
+    var toAll = !$('mailPick').classList.contains('on');
+    var ids = [];
+
+    if (!body) return toast('写点内容再发', 'err');
+    if (!toAll) {
+      ids = Array.prototype.slice.call($('mailTargets').querySelectorAll('input[type=checkbox]'))
+        .filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+      if (!ids.length) return toast('请勾选收件人', 'err');
+    }
+
+    busy(btn, true, '发送中…');
+    api('api_admin_send_mail', {
+      p_token: S.token, p_to_all: toAll, p_user_ids: ids,
+      p_subject: subject, p_body: body, p_allow_reply: allow
+    }).then(function () {
+      busy(btn, false);
+      $('mailBody').value = '';
+      $('mailSubject').value = '';
+      toast('已发送', 'ok');
+      loadMailSent();
+    }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
   }
 
   /* ---------- 管理端：公告 ---------- */
@@ -1524,7 +2162,7 @@ body.s-down #downBar{display:block}
       '<label class="field"><span>教程名称<em>*</em></span>' +
         '<input class="input" id="cName" maxlength="30" placeholder="例如：1 或 三阶入门" value="' + esc(item ? item.name : '') + '"></label>' +
       '<label class="field"><span>是几阶<em>*</em></span>' +
-        '<select class="input" id="cType">' + ['2', '3', '4', '5'].map(function (k) {
+        '<select class="input" id="cType">' + ['2', '3', '4', '5', 'high', 'all'].map(function (k) {
           return '<option value="' + k + '"' + (item && String(item.cube_type) === k ? ' selected' : '') + '>' + cubeLabel(k) + '</option>';
         }).join('') + '</select></label>' +
       '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2);margin:0 0 14px">' +
@@ -1722,9 +2360,9 @@ body.s-down #downBar{display:block}
   function bind() {
     $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
     $('btnLogout').addEventListener('click', logout);
-    $('btnAdd').addEventListener('click', openAdd);
     $('btnAdd2').addEventListener('click', openAdd);
     $('btnReset').addEventListener('click', openReset);
+    $('btnBan').addEventListener('click', openBanModal);
     $('btnDelete').addEventListener('click', delUser);
     $('btnReload').addEventListener('click', loadUsers);
     $('btnAddNews').addEventListener('click', function () { openNewsForm(null); });
@@ -1732,6 +2370,41 @@ body.s-down #downBar{display:block}
     $('btnPublishHw').addEventListener('click', publishHw);
     $('btnCubeNew').addEventListener('click', function () { openCubeForm(null); });
     $('btnCubeReload').addEventListener('click', loadCubeAdmin);
+    $('btnMail').addEventListener('click', openMailbox);
+
+    $('identityList').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-role]');
+      if (!b) return;
+      changeRole(b.dataset.uid, b.dataset.role);
+    });
+
+    $('mailAll').addEventListener('click', function () {
+      this.classList.add('on');
+      $('mailPick').classList.remove('on');
+      $('mailTargets').hidden = true;
+    });
+    $('mailPick').addEventListener('click', function () {
+      this.classList.add('on');
+      $('mailAll').classList.remove('on');
+      $('mailTargets').hidden = false;
+    });
+    $('btnSendMail').addEventListener('click', sendMail);
+    $('mailSentList').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-mail]');
+      if (it) openMailDetail(it.dataset.mail);
+    });
+    $('btnFbReload').addEventListener('click', loadFeedbackAdmin);
+    $('fbAdminFilter').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fs]');
+      if (!b) return;
+      fbFilter.admin = b.dataset.fs;
+      Array.prototype.forEach.call($('fbAdminFilter').children, function (x) { x.classList.toggle('on', x === b); });
+      loadFeedbackAdmin();
+    });
+    $('fbAdminList').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-fb]');
+      if (it) openFbDetail(it.dataset.fb, true);
+    });
 
     $('saveNotice1').addEventListener('click', function () { saveNotice('login_notice', 'noticeLogin', this, '登录公告'); });
     $('saveNotice2').addEventListener('click', function () { saveNotice('login_popup', 'noticePopup', this, '弹窗公告'); });
@@ -1779,6 +2452,9 @@ body.s-down #downBar{display:block}
     });
 
     $('modBody').addEventListener('click', function (e) {
+      var op = e.target.closest('[data-open]');
+      if (op && op.dataset.open === 'fb') { openFeedback(); return; }
+
       var go = e.target.closest('[data-cube-go]');
       if (go) {
         if (go.dataset.cubeGo === 'tutorials') renderCubeTutorials();
