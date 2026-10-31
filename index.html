@@ -725,15 +725,37 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
         <div class="row" style="margin-top:-6px;margin-bottom:10px">
           <button class="btn ghost sm" id="btnAdImg" type="button">插入图片</button>
           <input type="file" id="adFile" accept="image/*" style="display:none">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2)">
+            强制看 <input class="input" id="adSeconds" type="number" min="1" max="999" value="5" style="width:88px;height:34px"> 秒
+          </label>
         </div>
         <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">
           <input type="checkbox" id="adForce" checked style="width:16px;height:16px;accent-color:var(--red)"> 登录时强制播放
         </label>
       </div>
 
+      <div class="card" style="padding:16px;margin-bottom:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div><h3 style="font-size:15px">③ 四宫格广告</h3>
+            <div class="hint">点下面四个方块时弹的广告，只在这四个方块上触发</div></div>
+          <button class="btn primary sm" id="btnAd2Save" type="button" style="height:32px;padding:0 14px">保存</button>
+        </div>
+        <textarea class="textarea" id="ad2Content" rows="4" placeholder="点方块时弹出的广告内容，可以插图"></textarea>
+        <div class="row" style="margin-top:-6px;margin-bottom:10px">
+          <button class="btn ghost sm" id="btnAd2Img" type="button">插入图片</button>
+          <input type="file" id="ad2File" accept="image/*" style="display:none">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink2)">
+            强制看 <input class="input" id="ad2Seconds" type="number" min="1" max="999" value="5" style="width:88px;height:34px"> 秒
+          </label>
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">
+          <input type="checkbox" id="ad2On" checked style="width:16px;height:16px;accent-color:var(--red)"> 启用四宫格广告
+        </label>
+      </div>
+
       <div class="card" style="padding:16px">
         <div class="panel-head" style="margin:0 0 10px">
-          <div><h3 style="font-size:15px">③ 设置排期</h3>
+          <div><h3 style="font-size:15px">④ 设置排期</h3>
             <div class="hint">手动一条条加，会按日期排成时间轴给学生看</div></div>
           <button class="btn primary sm" id="btnAdSchNew" type="button" style="height:32px;padding:0 14px">＋ 加一条</button>
         </div>
@@ -1220,36 +1242,49 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     }
   }
 
-  /* 登录后强制看 3 秒广告 */
+  /* 登录后强制看广告：倒计时结束后才出现「关闭」按钮 */
   function showAdThen(cb) {
     api('api_ad_current', { p_token: S.token }).then(function (r) {
-      var ad = r.ad;
-      if (!ad) { cb(); return; }
+      if (!r.ad) { cb(); return; }
+      showAdOverlay(r.ad.content, S.boot && S.boot.ad_seconds, cb);
+    }, function () { cb(); });
+  }
 
-      var mask = document.createElement('div');
-      mask.id = 'adMask';
-      mask.innerHTML =
-        '<div class="ad-box">' +
-          '<div class="ad-top"><span class="t">推广</span><span id="adLeft">3</span> 秒</div>' +
-          '<div class="ad-body"><div class="rich">' + renderRich(ad.content) + '</div></div>' +
-          '<div class="ad-foot">感谢支持班级平台</div>' +
-        '</div>';
-      document.body.appendChild(mask);
-      document.body.style.overflow = 'hidden';
+  function showAdOverlay(content, seconds, cb) {
+    var secs = parseInt(seconds, 10);
+    if (!secs || secs < 1) secs = 5;
 
-      var left = 3;
-      var el = mask.querySelector('#adLeft');
-      var timer = setInterval(function () {
-        left--;
-        if (el) el.textContent = String(Math.max(0, left));
-        if (left <= 0) {
-          clearInterval(timer);
+    var mask = document.createElement('div');
+    mask.id = 'adMask';
+    mask.innerHTML =
+      '<div class="ad-box">' +
+        '<div class="ad-top"><span class="t">推广</span><span id="adLeft">' + secs + '</span> 秒</div>' +
+        '<div class="ad-body"><div class="rich">' + renderRich(content) + '</div></div>' +
+        '<div class="ad-foot">' +
+          '<button class="btn primary" id="adClose" type="button" disabled style="opacity:.45">看完 ' + secs + ' 秒后可关闭</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(mask);
+    document.body.style.overflow = 'hidden';
+
+    var left = secs;
+    var el = mask.querySelector('#adLeft');
+    var btn = mask.querySelector('#adClose');
+    var timer = setInterval(function () {
+      left--;
+      if (el) el.textContent = String(Math.max(0, left));
+      if (left <= 0) {
+        clearInterval(timer);
+        btn.disabled = false;
+        btn.style.opacity = '';
+        btn.textContent = '关闭';
+        btn.onclick = function () {
           if (mask.parentNode) mask.remove();
           document.body.style.overflow = '';
-          cb();
-        }
-      }, 1000);
-    }, function () { cb(); });
+          if (cb) cb();
+        };
+      }
+    }, 1000);
   }
 
   function showVipWelcome(name) {
@@ -1285,6 +1320,18 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     $('username').value = '';
     $('password').value = '';
     showLogin();
+  }
+
+  /* 四宫格点开前先看广告（只在这四个方块上触发） */
+  function openTileWithAd(mod, name) {
+    var content = S.boot ? String(S.boot.ad2_content || '').trim() : '';
+    var on = !S.boot || String(S.boot.ad2_on || '1') !== '0';
+
+    if (content && on) {
+      showAdOverlay(content, S.boot.ad2_seconds, function () { openModule(mod, name); });
+    } else {
+      openModule(mod, name);
+    }
   }
 
   /* ---------- 全屏模块 ---------- */
@@ -3140,6 +3187,10 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     $('adPrice').value = S.boot.ad_price || '';
     $('adContent').value = S.boot.ad_content || '';
     $('adForce').checked = String(S.boot.ad_force || '1') !== '0';
+    $('adSeconds').value = S.boot.ad_seconds || 5;
+    $('ad2Content').value = S.boot.ad2_content || '';
+    $('ad2Seconds').value = S.boot.ad2_seconds || 5;
+    $('ad2On').checked = String(S.boot.ad2_on || '1') !== '0';
     loadAdSchedule();
   }
 
@@ -3155,12 +3206,30 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     busy(btn, true, '保存中…');
     Promise.all([
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_content', p_value: $('adContent').value }),
-      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_force', p_value: $('adForce').checked ? '1' : '0' })
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_force', p_value: $('adForce').checked ? '1' : '0' }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_seconds', p_value: String($('adSeconds').value || 5) })
     ]).then(function () {
       busy(btn, false);
       return bootInfo();
     }).then(function () {
-      toast('广告已保存', 'ok');
+      toast('登录广告已保存', 'ok');
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message, 'err', 3600);
+    });
+  }
+
+  function saveAd2(btn) {
+    busy(btn, true, '保存中…');
+    Promise.all([
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_content', p_value: $('ad2Content').value }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_on', p_value: $('ad2On').checked ? '1' : '0' }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_seconds', p_value: String($('ad2Seconds').value || 5) })
+    ]).then(function () {
+      busy(btn, false);
+      return bootInfo();
+    }).then(function () {
+      toast('四宫格广告已保存', 'ok');
     }, function (e) {
       busy(btn, false);
       toast(e.message, 'err', 3600);
@@ -3397,6 +3466,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
     $('btnAdPriceSave').addEventListener('click', function () { saveAdPrice(this); });
     $('btnAdContentSave').addEventListener('click', function () { saveAdContent(this); });
+    $('btnAd2Save').addEventListener('click', function () { saveAd2(this); });
     $('btnAdSchNew').addEventListener('click', function () { openAdSchForm(null); });
 
     $('btnAdImg').addEventListener('click', function () { $('adFile').click(); });
@@ -3408,6 +3478,21 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
         compressImage(reader.result, function (url) {
           if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
           insertAtCursor($('adContent'), '\n![图片](' + url + ')\n');
+        });
+      };
+      reader.readAsDataURL(f);
+      this.value = '';
+    });
+
+    $('btnAd2Img').addEventListener('click', function () { $('ad2File').click(); });
+    $('ad2File').addEventListener('change', function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
+          insertAtCursor($('ad2Content'), '\n![图片](' + url + ')\n');
         });
       };
       reader.readAsDataURL(f);
@@ -3651,10 +3736,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
     Array.prototype.forEach.call(document.querySelectorAll('.tile'), function (t) {
       t.addEventListener('click', function () {
-        openModule(t.dataset.mod, t.dataset.name);
-        // 进模块后去掉角标（提示"有内容"的职责已经完成）
-        var d = $('newsDot');
-        if (d) d.classList.remove('show');
+        openTileWithAd(t.dataset.mod, t.dataset.name);
       });
     });
 
