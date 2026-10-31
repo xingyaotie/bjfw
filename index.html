@@ -1013,9 +1013,12 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   /* ---------- 接口 ---------- */
   function humanize(e) {
     var m = (e && e.message) || '';
-    if (/PGRST202|does not exist/i.test(m)) return '数据库还没初始化，请先执行 sql/001_init.sql';
+    if (/PGRST202|could not find the function|schema cache/i.test(m)) {
+      return '数据库缺少这个功能：请把最新的 SQL 文件在 Supabase 里跑一遍';
+    }
     if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return '连不上数据库，请检查网络';
     if (/JWT|apikey/i.test(m)) return '密钥不正确，请检查 config';
+    if (/permission denied/i.test(m)) return '没有权限，请确认 SQL 已经完整执行';
     return m || '操作失败';
   }
   function onExpired() {
@@ -1187,6 +1190,16 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       loadNewsBadge();
     }
 
+    // 黑金主题只属于会员：非会员登录时清掉，避免换账号还留着黑金
+    if (profile.role !== 'vip') {
+      document.body.classList.remove('theme-gold');
+      try { localStorage.removeItem('xbh_theme'); } catch (e) {}
+    } else {
+      try {
+        if (localStorage.getItem('xbh_theme') === 'gold') document.body.classList.add('theme-gold');
+      } catch (e) {}
+    }
+
     loadMailBadge();
 
     var welcome = function () {
@@ -1264,6 +1277,8 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     S.token = ''; S.me = null;
     clearSession();
     closeModule();
+    document.body.classList.remove('theme-gold');
+    try { localStorage.removeItem('xbh_theme'); } catch (e) {}
     if (db && t) api('api_logout', { p_token: t }).catch(function () {});
     $('appView').hidden = true;
     $('loginView').hidden = false;
@@ -3022,8 +3037,9 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
             (list.length
               ? '<div class="timeline">' + list.map(function (s) {
                   return '<div class="tl-item">' +
-                    '<div class="tl-date">' + esc(s.when_date || '待定') + '</div>' +
-                    '<div class="tl-text">' + esc(s.label) + '</div>' +
+                    '<div class="tl-date">' + esc(s.start_date || '待定') + ' → ' + esc(s.end_date || '待定') + '</div>' +
+                    '<div class="tl-text">' + esc(s.title) + '</div>' +
+                    '<div class="tl-meta">上架 ' + esc(s.start_date || '—') + ' · 下架 ' + esc(s.end_date || '—') + '</div>' +
                   '</div>';
                 }).join('') + '</div>'
               : '<div class="empty" style="padding:14px 0"><strong>还没有排期</strong>管理员添加后会显示在这里</div>') +
@@ -3169,8 +3185,10 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     }
     box.innerHTML = S.adSch.map(function (s) {
       return '<div class="perm-row" data-sid="' + esc(s.id) + '">' +
-        '<div class="who" style="width:108px;flex:none">' + esc(s.when_date || '待定') + '</div>' +
-        '<div style="flex:1;min-width:0;font-size:13.5px;color:var(--ink2)">' + esc(s.label) + '</div>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:13.5px;color:var(--ink);font-weight:600">' + esc(s.title) + '</div>' +
+          '<div class="hint" style="font-size:12px">上架 ' + esc(s.start_date || '待定') + ' → 下架 ' + esc(s.end_date || '待定') + '</div>' +
+        '</div>' +
         '<button type="button" class="link" data-sact="edit">编辑</button>' +
         '<button type="button" class="link danger" data-sact="del">删除</button>' +
       '</div>';
@@ -3180,24 +3198,31 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   function openAdSchForm(item) {
     var edit = !!item;
     var m = modal(edit ? '修改排期' : '加一条排期',
-      '<label class="field"><span>日期</span>' +
-        '<input class="input" id="schDate" type="date" value="' + esc(item && item.when_date ? String(item.when_date).slice(0, 10) : '') + '"></label>' +
-      '<label class="field"><span>内容<em>*</em></span>' +
-        '<input class="input" id="schLabel" maxlength="200" placeholder="例如：9月30日 某某文具店下架" value="' + esc(item ? item.label : '') + '"></label>',
+      '<label class="field"><span>广告名称<em>*</em></span>' +
+        '<input class="input" id="schTitle" maxlength="60" placeholder="例如：某某文具店" value="' + esc(item ? item.title : '') + '"></label>' +
+      '<div class="row" style="margin-bottom:6px">' +
+        '<label class="field" style="flex:1"><span>上架日期</span>' +
+          '<input class="input" id="schStart" type="date" value="' + esc(item && item.start_date ? String(item.start_date).slice(0, 10) : '') + '"></label>' +
+        '<label class="field" style="flex:1"><span>下架日期</span>' +
+          '<input class="input" id="schEnd" type="date" value="' + esc(item && item.end_date ? String(item.end_date).slice(0, 10) : '') + '"></label>' +
+      '</div>' +
+      '<p class="hint" style="font-size:12.5px">学生端的排期会按上架日期排成时间轴。</p>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
       '<button class="btn primary" id="schOk" type="button">' + (edit ? '保存' : '添加') + '</button>', 480);
 
-    m.querySelector('#schLabel').focus();
+    m.querySelector('#schTitle').focus();
     m.querySelector('#schOk').onclick = function () {
       var btn = this;
-      var lb = m.querySelector('#schLabel').value.trim();
-      if (!lb) return toast('写一句话', 'err');
+      var tt = m.querySelector('#schTitle').value.trim();
+      var st = m.querySelector('#schStart').value || null;
+      var en = m.querySelector('#schEnd').value || null;
+      if (!tt) return toast('填一下广告名称', 'err');
+      if (st && en && en < st) return toast('下架日期不能早于上架日期', 'err');
+
       busy(btn, true, '保存中…');
       api('api_admin_ad_schedule_save', {
-        p_token: S.token,
-        p_id: edit ? item.id : null,
-        p_when: m.querySelector('#schDate').value || null,
-        p_label: lb
+        p_token: S.token, p_id: edit ? item.id : null,
+        p_title: tt, p_start: st, p_end: en
       }).then(function () {
         busy(btn, false); closeModal(); toast(edit ? '已保存' : '已添加', 'ok'); loadAdSchedule();
       }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
