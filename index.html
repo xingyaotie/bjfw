@@ -309,7 +309,8 @@ body.theme-gold .marquee.on-dark{ background:rgba(212,160,23,.14); border-color:
 body.theme-gold .tile{ background:linear-gradient(135deg,#241D12,#12100C); color:#E8C46A;
   border:1px solid #3A3122; box-shadow:0 10px 30px rgba(0,0,0,.55); }
 body.theme-gold .tile:hover{ box-shadow:0 14px 34px rgba(212,160,23,.22); }
-body.theme-gold .ad-top{ background:linear-gradient(135deg,#2A2113,#171208); color:#E8C46A; }
+body.theme-gold .ovl-top{ background:linear-gradient(135deg,#2A2113,#171208); color:#E8C46A; }
+body.theme-gold #xbhOvl .ovl-box{ background:#1B1710; color:#E8C46A; }
 body.theme-gold .status-banner{ background:#1B1710; color:#E8C46A; border:1px solid #3A3122; }
 body.theme-gold .cube-card.locked{ background:#151109; border-color:#241E13; }
 body.theme-gold .cube-card.locked .t,
@@ -330,16 +331,16 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
 .member-head b{font-size:15px;letter-spacing:1px}
 .member-head small{display:block;margin-top:4px;font-size:12.5px;color:#9A7B2E}
 
-/* 强制广告 */
-#adMask{position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.72);display:flex;
+/* 全屏提示层（类名不含 ad，避免被广告拦截插件误杀） */
+#xbhOvl{position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.72);display:flex;
   align-items:center;justify-content:center;padding:18px}
-#adMask .ad-box{width:100%;max-width:520px;background:#fff;border-radius:16px;overflow:hidden;
+#xbhOvl .ovl-box{width:100%;max-width:520px;background:#fff;border-radius:16px;overflow:hidden;
   box-shadow:0 30px 80px rgba(0,0,0,.5)}
-#adMask .ad-top{background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;
+#xbhOvl .ovl-top{background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;
   padding:10px 16px;font-size:13px;display:flex;align-items:center;gap:8px}
-#adMask .ad-top .t{flex:1;letter-spacing:1px}
-#adMask .ad-body{padding:18px;max-height:60vh;overflow:auto}
-#adMask .ad-foot{padding:10px 16px 14px;text-align:center;font-size:12.5px;color:var(--muted)}
+#xbhOvl .ovl-top .t{flex:1;letter-spacing:1px}
+#xbhOvl .ovl-body{padding:18px;max-height:60vh;overflow:auto}
+#xbhOvl .ovl-foot{padding:12px 16px 16px;text-align:center}
 
 /* 广告排期时间轴 */
 .timeline{position:relative;padding-left:6px}
@@ -465,7 +466,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     <div class="marquee on-card" id="homeNotice" hidden><span id="homeNoticeText"></span></div>
     <div class="grid">
       <div class="tile" data-mod="news" data-name="班级热点">班级热点</div>
-      <div class="tile" data-mod="homework" data-name="班级作业">班级作业</div>
+      <div class="tile" data-mod="homework" data-name="班级事项">班级事项</div>
       <div class="tile" data-mod="cube" data-name="魔方">魔方</div>
       <div class="tile" data-mod="more" data-name="更多">更多</div>
     </div>
@@ -485,7 +486,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     <div class="tabs">
       <button class="tab active" data-tab="users" type="button">用户管理</button>
       <button class="tab" data-tab="identity" type="button">身份管理</button>
-      <button class="tab" data-tab="hw" type="button">班级作业</button>
+      <button class="tab" data-tab="hw" type="button">班级事项</button>
       <button class="tab" data-tab="news" type="button">班级热点</button>
       <button class="tab" data-tab="cube" type="button">魔方教程</button>
       <button class="tab" data-tab="debug" type="button">魔方调试</button>
@@ -533,25 +534,51 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     <section id="tab-hw" hidden>
       <div class="panel-head">
         <div>
-          <h2>班级作业</h2>
-          <div class="hint">写清楚要求和截止时间，发布后学生在「班级作业」里能看到</div>
+          <h2>班级事项</h2>
+          <div class="hint">作业和课表都在这里，学生点「班级事项」也能看到</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold open" id="hwFold" type="button" aria-label="展开或收起">▸</button>
+            <div>
+              <h3 style="font-size:15px">① 班级作业</h3>
+              <div class="hint">发布作业，学生点「班级事项 → 班级作业」看</div>
+            </div>
+          </div>
+          <span class="hint" id="hwCount"></span>
+        </div>
+
+        <div id="hwWrap" style="margin-top:14px">
+          <label class="field" style="margin-bottom:10px"><span>作业内容</span>
+            <textarea class="textarea" id="hwInput" rows="4" placeholder="例如：数学 练习册 P32–P35，明天早读前交。英语背诵 Unit 3 课文。"></textarea>
+          </label>
+          <div style="display:flex;justify-content:flex-end">
+            <button class="btn primary" id="btnPublishHw" type="button">发布作业</button>
+          </div>
+
+          <div class="panel-head" style="margin:16px 0 8px">
+            <div><h2 style="font-size:14px">已发布的作业</h2></div>
+          </div>
+          <div class="news" id="hwAdminList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
         </div>
       </div>
 
       <div class="card" style="padding:16px">
-        <label class="field" style="margin-bottom:10px"><span>作业内容</span>
-          <textarea class="textarea" id="hwInput" rows="5" placeholder="例如：数学 练习册 P32–P35，明天早读前交。英语背诵 Unit 3 课文。"></textarea>
-        </label>
-        <div style="display:flex;justify-content:flex-end">
-          <button class="btn primary" id="btnPublishHw" type="button">发布作业</button>
+        <div class="panel-head" style="margin:0 0 10px">
+          <div>
+            <h3 style="font-size:15px">② 班级课表</h3>
+            <div class="hint">按节次加行；每天的课不一样也没关系，格子可以空着</div>
+          </div>
+          <button class="btn primary sm" id="btnTtAdd" type="button" style="height:32px;padding:0 14px">＋ 添加一行</button>
+        </div>
+        <div id="ttBox"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+        <div style="text-align:right;margin-top:12px">
+          <button class="btn primary" id="btnTtSave" type="button">保存课表</button>
         </div>
       </div>
-
-      <div class="panel-head" style="margin-top:22px">
-        <div><h2 style="font-size:15px">已发布的作业</h2></div>
-        <span class="hint" id="hwCount"></span>
-      </div>
-      <div class="card"><div class="news" id="hwAdminList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
     <!-- 班级热点 -->
@@ -751,6 +778,11 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
         <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">
           <input type="checkbox" id="ad2On" checked style="width:16px;height:16px;accent-color:var(--red)"> 启用四宫格广告
         </label>
+        <div class="chips" style="margin-top:12px">
+          <span class="hint" style="align-self:center;margin-right:4px">显示频率</span>
+          <button type="button" class="chip-btn on" id="ad2Once">每次登录只弹一次</button>
+          <button type="button" class="chip-btn" id="ad2Always">每次点方块都弹</button>
+        </div>
       </div>
 
       <div class="card" style="padding:16px">
@@ -879,7 +911,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
             cube: [], cubeAll: [], cubeAny: false, permUsers: [], cubeFilter: '', permKw: '',
             boot: null, permOpen: {}, debug: [], debugOpen: {}, debugBranches: {},
-            members: [], ads: [], adOpen: {}, adBranches: {}, adSch: [] };
+            members: [], ads: [], adOpen: {}, adBranches: {}, adSch: [], ad2Shown: false, tt: [] };
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -1188,6 +1220,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
   function enter(profile) {
     S.me = profile;
+    S.ad2Shown = false;
     var name = profile.display_name || profile.username;
     $('loginView').hidden = true;
     $('appView').hidden = false;
@@ -1254,23 +1287,46 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     var secs = parseInt(seconds, 10);
     if (!secs || secs < 1) secs = 5;
 
+    var done = false;
+    var prevOverflow = document.body.style.overflow;
+    function finish() {
+      if (done) return;
+      done = true;
+      if (mask && mask.parentNode) mask.remove();
+      document.body.style.overflow = prevOverflow || '';
+      if (cb) { var f = cb; cb = null; f(); }
+    }
+
     var mask = document.createElement('div');
-    mask.id = 'adMask';
+    mask.id = 'xbhOvl';
     mask.innerHTML =
-      '<div class="ad-box">' +
-        '<div class="ad-top"><span class="t">推广</span><span id="adLeft">' + secs + '</span> 秒</div>' +
-        '<div class="ad-body"><div class="rich">' + renderRich(content) + '</div></div>' +
-        '<div class="ad-foot">' +
-          '<button class="btn primary" id="adClose" type="button" disabled style="opacity:.45">看完 ' + secs + ' 秒后可关闭</button>' +
+      '<div class="ovl-box">' +
+        '<div class="ovl-top"><span class="t">推广</span><span id="ovlLeft">' + secs + '</span> 秒</div>' +
+        '<div class="ovl-body"><div class="rich">' + renderRich(content) + '</div></div>' +
+        '<div class="ovl-foot">' +
+          '<button class="btn primary" id="ovlClose" type="button" disabled style="opacity:.45">看完 ' + secs + ' 秒后可关闭</button>' +
         '</div>' +
       '</div>';
+
     document.body.appendChild(mask);
     document.body.style.overflow = 'hidden';
 
+    // 被广告拦截插件隐藏/移除时，别把页面卡死：直接跳过
+    setTimeout(function () {
+      if (done) return;
+      var st = window.getComputedStyle ? window.getComputedStyle(mask) : null;
+      var hiddenByCss = st && (st.display === 'none' || st.visibility === 'hidden' || st.opacity === '0');
+      if (!mask.parentNode || hiddenByCss) finish();
+    }, 320);
+
     var left = secs;
-    var el = mask.querySelector('#adLeft');
-    var btn = mask.querySelector('#adClose');
+    var el = mask.querySelector('#ovlLeft');
+    var btn = mask.querySelector('#ovlClose');
+
     var timer = setInterval(function () {
+      if (done) { clearInterval(timer); return; }
+      if (!mask.parentNode) { clearInterval(timer); finish(); return; }
+
       left--;
       if (el) el.textContent = String(Math.max(0, left));
       if (left <= 0) {
@@ -1278,13 +1334,18 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
         btn.disabled = false;
         btn.style.opacity = '';
         btn.textContent = '关闭';
-        btn.onclick = function () {
-          if (mask.parentNode) mask.remove();
-          document.body.style.overflow = '';
-          if (cb) cb();
-        };
+        btn.onclick = finish;
+        mask.addEventListener('click', function (e) { if (e.target === mask) finish(); });
+        document.addEventListener('keydown', escClose);
       }
     }, 1000);
+
+    function escClose(e) {
+      if (e.key === 'Escape' && !btn.disabled) {
+        document.removeEventListener('keydown', escClose);
+        finish();
+      }
+    }
   }
 
   function showVipWelcome(name) {
@@ -1326,8 +1387,10 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   function openTileWithAd(mod, name) {
     var content = S.boot ? String(S.boot.ad2_content || '').trim() : '';
     var on = !S.boot || String(S.boot.ad2_on || '1') !== '0';
+    var once = S.boot && String(S.boot.ad2_mode || 'always') === 'once';
 
-    if (content && on) {
+    if (content && on && !(once && S.ad2Shown)) {
+      if (once) S.ad2Shown = true;
       showAdOverlay(content, S.boot.ad2_seconds, function () { openModule(mod, name); });
     } else {
       openModule(mod, name);
@@ -1340,6 +1403,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   function openModule(mod, name) {
     currentMod = mod;
     if (mod === 'cube') { S.cubeLoaded = false; cubeState = { view: 'home', type: cubeState.type || 'top' }; }
+    if (mod === 'homework') { hwState.view = 'home'; }
     $('modTitle').textContent = name;
     $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     $('userPanel').hidden = true;
@@ -1353,6 +1417,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     currentMod = '';
     cubeState.view = 'home';
     moreState.view = 'info';
+    hwState.view = 'home';
     $('modView').hidden = true;
     document.body.style.overflow = '';
     if (!S.me) return;
@@ -1368,6 +1433,9 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       if (cubeState.view === 'debugProject') return renderCubeDebug();
       if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
     }
+    if (currentMod === 'homework') {
+      if (hwState.view === 'hw' || hwState.view === 'tt') return renderItemsHome();
+    }
     if (currentMod === 'more') {
       if (moreState.view === 'fb') return renderMore();
       if (moreState.view === 'ads') return renderMore();
@@ -1378,9 +1446,76 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   function renderModule() {
     var body = $('modBody');
     if (currentMod === 'news') return renderNewsInModule(body);
-    if (currentMod === 'homework') return renderHomeworkInModule(body);
+    if (currentMod === 'homework') return renderItemsHome();
     if (currentMod === 'cube') return renderCubeHome();
     if (currentMod === 'more') return renderMore();
+  }
+
+  /* ================= 班级事项（作业 + 课表） ================= */
+  var hwState = { view: 'home' };
+
+  function renderItemsHome() {
+    hwState.view = 'home';
+    $('modBody').innerHTML =
+      '<div class="cube-stack">' +
+        '<button class="cube-opt" type="button" data-items="hw">' +
+          '<span class="ico">📘</span>' +
+          '<span><b>班级作业</b><small>看老师布置的作业</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>' +
+        '<button class="cube-opt" type="button" data-items="tt">' +
+          '<span class="ico">🗓</span>' +
+          '<span><b>班级课表</b><small>看本周课程安排</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>' +
+      '</div>';
+  }
+
+  function renderTimetableForUser() {
+    hwState.view = 'tt';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_timetable_get', { p_token: S.token }).then(function (r) {
+      var rows = r.rows || [];
+      if (!rows.length) {
+        body.innerHTML = '<div class="empty" style="padding:50px 20px"><strong>还没有课表</strong>管理员添加后就会显示</div>';
+        return;
+      }
+      body.innerHTML = ttTable(rows, false);
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* 课表表格；editable=true 时渲染输入框 */
+  function ttTable(rows, editable) {
+    var days = ['周一', '周二', '周三', '周四', '周五'];
+
+    var head = '<tr><th style="width:104px">节次</th>' +
+      days.map(function (d) { return '<th>' + d + '</th>'; }).join('') +
+      (editable ? '<th style="width:60px"></th>' : '') + '</tr>';
+
+    var bodyRows = rows.map(function (r) {
+      var cells = r.cells || [];
+      var tds = days.map(function (_, i) {
+        var v = cells[i] == null ? '' : String(cells[i]);
+        return '<td>' + (editable
+          ? '<input class="input" data-tt-cell="' + i + '" style="height:34px;font-size:13px" value="' + esc(v) + '">'
+          : '<span style="font-size:13px;color:var(--ink2)">' + esc(v) + '</span>') + '</td>';
+      }).join('');
+
+      return '<tr data-tt="' + esc(r.id) + '">' +
+        '<td>' + (editable
+          ? '<input class="input" data-tt-label style="height:34px;font-size:13px" value="' + esc(r.label) + '">'
+          : '<b style="font-size:13px;color:var(--ink)">' + esc(r.label) + '</b>') + '</td>' +
+        tds +
+        (editable ? '<td style="text-align:right"><button type="button" class="link danger" data-ttdel="' + esc(r.id) + '">删</button></td>' : '') +
+      '</tr>';
+    }).join('');
+
+    return '<div class="xbh-table-wrap"><table class="xbh-table" style="min-width:' + (editable ? '620px' : '480px') + '">' +
+      '<thead>' + head + '</thead><tbody>' + bodyRows + '</tbody></table></div>';
   }
 
   function renderMore() {
@@ -1863,6 +1998,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
   /* 学生端：作业列表（新的在上面，历史往下排） */
   function renderHomeworkInModule(body) {
+    hwState.view = 'hw';
     api('api_list_homework', { p_token: S.token }).then(function (r) {
       var items = r.items || [];
       if (!items.length) {
@@ -1922,7 +2058,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     showActions(name === 'users');
     if (name === 'users') loadUsers();
     if (name === 'identity') loadIdentity();
-    if (name === 'hw') loadHwAdmin();
+    if (name === 'hw') { loadHwAdmin(); loadTtAdmin(); }
     if (name === 'news') loadNews();
     if (name === 'cube') loadCubeAdmin();
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
@@ -2507,6 +2643,73 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       api('api_admin_delete_homework', { p_token: S.token, p_id: id }).then(function () {
         toast('已删除', 'ok');
         loadHwAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  /* ---------- 管理端：班级课表 ---------- */
+  function loadTtAdmin() {
+    $('ttBox').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_timetable_get', { p_token: S.token }).then(function (r) {
+      S.tt = r.rows || [];
+      renderTtAdmin();
+    }, function (e) {
+      $('ttBox').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderTtAdmin() {
+    if (!S.tt.length) {
+      $('ttBox').innerHTML = '<div class="empty"><strong>还没有课表</strong>点右上角「添加一行」，从第 1 节开始加</div>';
+      return;
+    }
+    $('ttBox').innerHTML = ttTable(S.tt, true);
+  }
+
+  function addTtRow() {
+    api('api_admin_timetable_add', { p_token: S.token, p_label: '' }).then(function () {
+      toast('已添加一行', 'ok');
+      loadTtAdmin();
+    }, function (e) { toast(e.message, 'err'); });
+  }
+
+  function saveTtAll() {
+    var rows = Array.prototype.slice.call($('ttBox').querySelectorAll('tr[data-tt]'));
+    if (!rows.length) return toast('还没有课表', 'err');
+
+    var btn = $('btnTtSave');
+    busy(btn, true, '保存中…');
+
+    var jobs = rows.map(function (tr) {
+      var labelEl = tr.querySelector('[data-tt-label]');
+      var cells = [0, 1, 2, 3, 4].map(function (i) {
+        var el = tr.querySelector('[data-tt-cell="' + i + '"]');
+        return el ? el.value : '';
+      });
+      return api('api_admin_timetable_save', {
+        p_token: S.token,
+        p_id: tr.dataset.tt,
+        p_label: labelEl ? labelEl.value : '',
+        p_cells: cells
+      });
+    });
+
+    Promise.all(jobs).then(function () {
+      busy(btn, false);
+      toast('课表已保存', 'ok');
+      loadTtAdmin();
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message, 'err', 3600);
+    });
+  }
+
+  function deleteTtRow(id) {
+    confirmBox('删除这一节', '确定删掉这行课表吗？', '', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_timetable_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        loadTtAdmin();
       }, function (e) { toast(e.message, 'err'); });
     });
   }
@@ -3191,6 +3394,9 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     $('ad2Content').value = S.boot.ad2_content || '';
     $('ad2Seconds').value = S.boot.ad2_seconds || 5;
     $('ad2On').checked = String(S.boot.ad2_on || '1') !== '0';
+    S.ad2Mode = String(S.boot.ad2_mode || 'always');
+    $('ad2Once').classList.toggle('on', S.ad2Mode === 'once');
+    $('ad2Always').classList.toggle('on', S.ad2Mode === 'always');
     loadAdSchedule();
   }
 
@@ -3224,7 +3430,8 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     Promise.all([
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_content', p_value: $('ad2Content').value }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_on', p_value: $('ad2On').checked ? '1' : '0' }),
-      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_seconds', p_value: String($('ad2Seconds').value || 5) })
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_seconds', p_value: String($('ad2Seconds').value || 5) }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_mode', p_value: S.ad2Mode || 'always' })
     ]).then(function () {
       busy(btn, false);
       return bootInfo();
@@ -3439,8 +3646,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
   /* ---------- 绑定 ---------- */
   function bind() {
-    $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
-    $('btnLogout').addEventListener('click', logout);
+    $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });    $('btnLogout').addEventListener('click', logout);
     $('btnAdd2').addEventListener('click', openAdd);
     $('btnReset').addEventListener('click', openReset);
     $('btnBan').addEventListener('click', openBanModal);
@@ -3449,6 +3655,17 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     $('btnAddNews').addEventListener('click', function () { openNewsForm(null); });
     $('btnChangePwd').addEventListener('click', openChangePwd);
     $('btnPublishHw').addEventListener('click', publishHw);
+    $('btnTtAdd').addEventListener('click', addTtRow);
+    $('btnTtSave').addEventListener('click', saveTtAll);
+    $('hwFold').addEventListener('click', function () {
+      var wrap = $('hwWrap');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('ttBox').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-ttdel]');
+      if (b) deleteTtRow(b.dataset.ttdel);
+    });
     $('btnCubeNew').addEventListener('click', function () { openCubeForm(null); });
     $('btnCubeReload').addEventListener('click', loadCubeAdmin);
     $('btnDebugNew').addEventListener('click', function () { openDebugForm(null); });
@@ -3467,6 +3684,14 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     $('btnAdPriceSave').addEventListener('click', function () { saveAdPrice(this); });
     $('btnAdContentSave').addEventListener('click', function () { saveAdContent(this); });
     $('btnAd2Save').addEventListener('click', function () { saveAd2(this); });
+    $('ad2Once').addEventListener('click', function () {
+      S.ad2Mode = 'once';
+      this.classList.add('on'); $('ad2Always').classList.remove('on');
+    });
+    $('ad2Always').addEventListener('click', function () {
+      S.ad2Mode = 'always';
+      this.classList.add('on'); $('ad2Once').classList.remove('on');
+    });
     $('btnAdSchNew').addEventListener('click', function () { openAdSchForm(null); });
 
     $('btnAdImg').addEventListener('click', function () { $('adFile').click(); });
@@ -3656,6 +3881,13 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     });
 
     $('modBody').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-items]');
+      if (it && currentMod === 'homework') {
+        if (it.dataset.items === 'hw') renderHomeworkInModule($('modBody'));
+        else renderTimetableForUser();
+        return;
+      }
+
       var op = e.target.closest('[data-open]');
       if (op && op.dataset.open === 'fb') { openFeedback(); return; }
       if (op && op.dataset.open === 'ads') { openAds(); return; }
