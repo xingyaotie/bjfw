@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#C8102E">
 <meta name="robots" content="noindex">
-<title>徐悲鸿中学 · 2026级5班 · 班级服务平台</title>
+<title>徐悲鸿中学 · 2026级 · 班级服务平台</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23C8102E'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='serif' font-weight='bold'>徐</text></svg>">
 <style>
 :root{
@@ -363,6 +363,27 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
 body.theme-gold .tl-meta{color:#E8C46A;background:#2E2408;border-color:#5A4413}
 body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(212,160,23,.18)}
 
+/* 广告排期：横向时间轴（彩条横跨排期区间，条里写名称） */
+.ad-tl{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.ad-tl-inner{width:100%}
+.ad-tl-track{position:relative;width:100%}
+.ad-tl-lane{position:relative;height:34px}
+.ad-bar{position:absolute;top:4px;height:26px;min-width:46px;border-radius:6px;color:#fff;
+  font-size:12px;line-height:26px;padding:0 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  box-shadow:0 2px 6px rgba(17,24,39,.18);cursor:default}
+.ad-bar.ended{opacity:.42;box-shadow:none}
+.ad-bar.upcoming{opacity:.72;box-shadow:none;border:1px dashed rgba(255,255,255,.9)}
+.ad-tl-today{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--red);opacity:.5;pointer-events:none}
+.ad-tl-axis{position:relative;display:flex;justify-content:space-between;margin-top:6px;
+  padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+.ad-tl-now{position:absolute;top:-2px;transform:translateX(-50%);background:var(--red);color:#fff;
+  font-size:10.5px;line-height:1.6;padding:0 7px;border-radius:999px;white-space:nowrap}
+.ad-undated{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ad-undated .chip-btn{height:26px;color:var(--ink2)}
+body.theme-gold .ad-tl-axis{border-color:#3A3122;color:#9A7B2E}
+body.theme-gold .ad-tl-now{background:#B8860B;color:#12100C}
+body.theme-gold .ad-tl-today{border-color:#B8860B}
+
 /* 魔方模块 */
 .cube-stack{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:10px auto 0}
 .cube-opt{display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;border-radius:16px;border:1px solid var(--line);
@@ -429,7 +450,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 <div id="loginView">
   <div class="login-top">
     <span class="school">徐悲鸿中学</span>
-    <span class="cls">2026级5班</span>
+    <span class="cls">2026级</span>
   </div>
   <div class="login-main">
     <div class="login-stack">
@@ -463,7 +484,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       <div class="brand-mark">徐</div>
       <div class="brand-text">
         <b>徐悲鸿中学</b>
-        <small id="brandSub">2026级5班 · 班级服务平台</small>
+        <small id="brandSub">2026级 · 班级服务平台</small>
       </div>
       <button class="member-btn" id="btnMember" type="button">会员</button>
       <span class="chip"><span class="dot" id="userDot">我</span><span id="userName">同学</span></span>
@@ -678,6 +699,12 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
         <div><h2>身份管理</h2><div class="hint">点右边的身份直接改；高级用户登录会看到专属标识</div></div>
         <span class="hint" id="identityCount"></span>
       </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="toolbar" style="border-bottom:none">
+          <input class="input" id="identitySearch" type="search" placeholder="搜索用户名 / 登录名" style="height:38px">
+          <button class="btn ghost sm" id="btnIdentityReload" type="button" style="height:38px">刷新</button>
+        </div>
+      </div>
       <div class="card"><div class="news" id="identityList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
@@ -799,8 +826,13 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       <div class="card" style="padding:16px">
         <div class="panel-head" style="margin:0 0 10px">
           <div><h3 style="font-size:15px">④ 设置排期</h3>
-            <div class="hint">手动一条条加，会按日期排成时间轴给学生看</div></div>
+            <div class="hint">每条排期选一个用途，学生端会分成两条时间轴显示</div></div>
           <button class="btn primary sm" id="btnAdSchNew" type="button" style="height:32px;padding:0 14px">＋ 加一条</button>
+        </div>
+        <div class="seg" id="adSchFilter" style="margin-bottom:12px">
+          <button type="button" data-af="" class="on">全部</button>
+          <button type="button" data-af="login">登录广告</button>
+          <button type="button" data-af="cube">四宫格广告</button>
         </div>
         <div id="adSchList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
       </div>
@@ -907,7 +939,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 /* ============================================================
- * 徐悲鸿中学 · 2026级5班 · 班级服务平台（单文件版）
+ * 徐悲鸿中学 · 2026级 · 班级服务平台（单文件版）
  * 登录后按角色自动切换：管理员 → 管理端；其他人 → 用户端
  * ============================================================ */
 (function () {
@@ -1157,7 +1189,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
   function fatal(msg) {
     $('loginView').innerHTML =
-      '<div class="login-top"><span class="school">徐悲鸿中学</span><span class="cls">2026级5班</span></div>' +
+      '<div class="login-top"><span class="school">徐悲鸿中学</span><span class="cls">2026级</span></div>' +
       '<div class="login-main"><div class="login-card">' +
         '<div class="fatal"><strong>站点暂时打不开</strong><p>' + esc(msg) + '</p>' +
         '<p>请检查 Supabase 项目状态和 sql/001_init.sql 是否执行。</p></div>' +
@@ -1231,7 +1263,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     $('userDot').textContent = (name || '我').slice(0, 1);
 
     if (profile.role === 'admin') {
-      $('brandSub').textContent = '2026级5班 · 管理端';
+      $('brandSub').textContent = '2026级 · 管理端';
       $('userPanel').hidden = true;
       $('adminPanel').hidden = false;
       $('btnMember').hidden = true;
@@ -1239,7 +1271,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     } else {
       $('brandSub').textContent = profile.role === 'vip'
         ? '高级用户 · ' + name
-        : '2026级5班 · 班级服务平台';
+        : '2026级 · 班级服务平台';
       $('adminPanel').hidden = true;
       $('btnMember').hidden = false;
       showActions(false);
@@ -1551,7 +1583,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
         '<div class="card" style="padding:18px">' +
           '<dl class="kv">' +
-            '<dt>平台</dt><dd>徐悲鸿中学 · 2026级5班</dd>' +
+            '<dt>平台</dt><dd>徐悲鸿中学 · 2026级</dd>' +
             '<dt>版本</dt><dd>' + esc(b.version || '体验版 v4') + '</dd>' +
             '<dt>我的账号</dt><dd>' + esc(me.display_name || '—') + '（' + esc(me.username || '—') + '）</dd>' +
           '</dl>' +
@@ -2165,7 +2197,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   }
 
   function showCred(title, login, name, pwd) {
-    var text = '徐悲鸿中学 2026级5班 班级服务平台\n登录地址：' + location.href.split('#')[0] +
+    var text = '徐悲鸿中学 2026级 班级服务平台\n登录地址：' + location.href.split('#')[0] +
       '\n登录名：' + login + '\n密码：' + pwd;
     var m = modal(title,
       '<p>把下面的信息发给本人，提醒他登录后在「我的账号」里改密码。</p>' +
@@ -2311,7 +2343,6 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     $('identityList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     api('api_admin_list_users', { p_token: S.token, p_search: '' }).then(function (r) {
       S.identity = r.users || [];
-      $('identityCount').textContent = '共 ' + S.identity.length + ' 个账号';
       renderIdentity();
     }, function (e) {
       $('identityList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
@@ -2319,7 +2350,26 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   }
 
   function renderIdentity() {
-    $('identityList').innerHTML = S.identity.map(function (u) {
+    var all = S.identity || [];
+    var kw = String(S.identityKw || '').trim().toLowerCase();
+    var list = all.filter(function (u) {
+      if (!kw) return true;
+      return String(u.username || '').toLowerCase().indexOf(kw) >= 0 ||
+             String(u.display_name || '').toLowerCase().indexOf(kw) >= 0;
+    });
+
+    $('identityCount').textContent = kw
+      ? '共 ' + all.length + ' 个账号，筛出 ' + list.length + ' 个'
+      : '共 ' + all.length + ' 个账号';
+
+    if (!list.length) {
+      $('identityList').innerHTML = '<div class="empty"><strong>' +
+        (kw ? '没搜到人' : '还没有账号') + '</strong>' +
+        (kw ? '换个关键词试试' : '先去「用户管理」建号') + '</div>';
+      return;
+    }
+
+    $('identityList').innerHTML = list.map(function (u) {
       var me = S.me && u.id === S.me.id;
       var chips = [['user', '普通'], ['vip', '高级'], ['admin', '管理员']].map(function (p) {
         return '<button type="button" class="chip-btn ' + (u.role === p[0] ? 'on' : '') + '" data-uid="' + esc(u.id) + '" data-role="' + p[0] + '">' +
@@ -3272,6 +3322,116 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     return '进行中';
   }
 
+  /* 时间轴配色：每条轮换一种，方便区分相邻项目 */
+  var AD_COLORS = ['#C8102E', '#B8860B', '#1B873F', '#2563EB', '#7C3AED', '#DB2777'];
+
+  /* 'YYYY-MM-DD' → 天数序号（按本地时区算，避免差一天） */
+  function dayNum(v) {
+    if (!v) return null;
+    var d = new Date(String(v).slice(0, 10) + 'T00:00:00');
+    if (isNaN(d)) return null;
+    return Math.round(d.getTime() / 86400000);
+  }
+  function dayLabel(n) {
+    var d = new Date(n * 86400000);
+    return (d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  /* 把一组排期画成横向时间轴：彩条横跨各自区间，条里写名称 */
+  function adTimeline(list) {
+    var dated = [], undated = [];
+
+    list.forEach(function (s, i) {
+      var a = dayNum(s.start_date);
+      var b = dayNum(s.end_date);
+      if (a == null && b == null) { undated.push(s); return; }
+      if (a == null) a = b;
+      if (b == null) b = a;
+      if (b < a) { var t = a; a = b; b = t; }
+      dated.push({ s: s, a: a, b: b, color: AD_COLORS[i % AD_COLORS.length] });
+    });
+
+    var out = '';
+
+    if (dated.length) {
+      var min = dated[0].a, max = dated[0].b;
+      dated.forEach(function (x) { if (x.a < min) min = x.a; if (x.b > max) max = x.b; });
+      if (max === min) { min -= 1; max += 1; }            /* 同一天的排期也给一段宽度 */
+      var span = max - min + 1;
+
+      /* 分道：日期重叠的排期上下错开，不互相压住 */
+      dated.sort(function (p, q) { return p.a - q.a || p.b - q.b; });
+      var laneEnd = [];
+      dated.forEach(function (x) {
+        var put = -1;
+        for (var i = 0; i < laneEnd.length; i++) {
+          if (laneEnd[i] < x.a) { put = i; break; }
+        }
+        if (put < 0) { put = laneEnd.length; laneEnd.push(x.b); } else { laneEnd[put] = x.b; }
+        x.lane = put;
+      });
+
+      var lanes = [];
+      dated.forEach(function (x) { (lanes[x.lane] = lanes[x.lane] || []).push(x); });
+
+      var track = lanes.map(function (arr) {
+        return '<div class="ad-tl-lane">' + arr.map(function (x) {
+          var st = adState(x.s);
+          var cls = st === '已结束' ? ' ended' : st === '未开始' ? ' upcoming' : '';
+          var left = (x.a - min) / span * 100;
+          var w = (x.b - x.a + 1) / span * 100;
+          return '<div class="ad-bar' + cls + '"' +
+            ' style="left:' + left.toFixed(3) + '%;width:' + w.toFixed(3) + '%;background:' + x.color + '"' +
+            ' title="' + esc(x.s.title) + ' · ' + esc(x.s.start_date || '待定') + ' → ' + esc(x.s.end_date || '待定') + '">' +
+            esc(x.s.title) + '</div>';
+        }).join('') + '</div>';
+      }).join('');
+
+      /* 今天的位置：落在区间里才画那条虚线 */
+      var t0 = new Date();
+      t0.setHours(0, 0, 0, 0);
+      var todayN = Math.round(t0.getTime() / 86400000);
+      var nowPct = (todayN >= min && todayN <= max) ? (todayN - min) / span * 100 : null;
+      if (nowPct != null) {
+        track += '<div class="ad-tl-today" style="left:' + nowPct.toFixed(3) + '%"></div>';
+      }
+
+      var minPx = Math.min(2400, Math.max(320, span * 22));
+
+      out += '<div class="ad-tl">' +
+        '<div class="ad-tl-inner" style="min-width:' + minPx + 'px">' +
+          '<div class="ad-tl-track">' + track + '</div>' +
+          '<div class="ad-tl-axis">' +
+            '<span>' + dayLabel(min) + '</span>' +
+            '<span>' + dayLabel(max) + '</span>' +
+            (nowPct != null ? '<span class="ad-tl-now" style="left:' + nowPct.toFixed(3) + '%">今天</span>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    if (undated.length) {
+      out += '<div class="ad-undated">' + undated.map(function (s) {
+        return '<span class="chip-btn">' + esc(s.title) + ' · 待定</span>';
+      }).join('') + '</div>';
+    }
+
+    return out;
+  }
+
+  /* 一条时间轴的卡片 */
+  function adTimelineCard(title, hint, items) {
+    return '<div class="card" style="padding:16px;margin-bottom:14px">' +
+      '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">' +
+        '<div style="font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:1px">' + esc(title) + '</div>' +
+        '<div class="hint" style="font-size:12px">' + esc(hint) + '</div>' +
+      '</div>' +
+      (items.length
+        ? adTimeline(items)
+        : '<div class="empty" style="padding:16px 0"><strong>还没有排期</strong>管理员添加后会显示在这里</div>') +
+    '</div>';
+  }
+
   function openAds() {
     moreState.view = 'ads';
     var body = $('modBody');
@@ -3280,29 +3440,20 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     api('api_ad_page', { p_token: S.token }).then(function (r) {
       var price = String(r.price || '').trim();
       var list = r.schedule || [];
+      /* 老数据没有 scope 字段，一律当登录广告 */
+      var loginAd = list.filter(function (s) { return (s.scope || 'login') !== 'cube'; });
+      var cubeAd = list.filter(function (s) { return s.scope === 'cube'; });
 
       body.innerHTML =
-        '<div style="max-width:560px;margin:0 auto">' +
+        '<div style="max-width:620px;margin:0 auto">' +
           '<div class="card" style="padding:16px;margin-bottom:14px">' +
             '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">广告价格</div>' +
             (price
               ? '<div class="rich">' + esc(price) + '</div>'
               : '<div class="empty" style="padding:12px 0"><strong>暂无价格</strong>管理员还没填</div>') +
           '</div>' +
-
-          '<div class="card" style="padding:16px">' +
-            '<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;letter-spacing:1px">排期</div>' +
-            (list.length
-              ? '<div class="timeline">' + list.map(function (s) {
-                  var st = adState(s);
-                  return '<div class="tl-item">' +
-                    '<div class="tl-date">' + esc(s.start_date || '待定') + ' → ' + esc(s.end_date || '待定') + '</div>' +
-                    '<div class="tl-text">' + esc(s.title) + '</div>' +
-                    (st ? '<div class="tl-meta">' + st + '</div>' : '') +
-                  '</div>';
-                }).join('') + '</div>'
-              : '<div class="empty" style="padding:14px 0"><strong>还没有排期</strong>管理员添加后会显示在这里</div>') +
-          '</div>' +
+          adTimelineCard('登录广告', '登录时播放的那条', loginAd) +
+          adTimelineCard('四宫格广告', '点四个方块时播放的那条', cubeAd) +
         '</div>';
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
@@ -3464,15 +3615,36 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
   function renderAdSchedule() {
     var box = $('adSchList');
-    if (!S.adSch.length) {
-      box.innerHTML = '<div class="empty"><strong>还没有排期</strong>点右上角「加一条」，按日期往下排</div>';
+    var all = S.adSch || [];
+    if (!all.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有排期</strong>点右上角「加一条」，学生端就会按日期排成时间轴</div>';
       return;
     }
-    box.innerHTML = S.adSch.map(function (s) {
+
+    var f = S.adSchFilter || '';
+    var list = all.filter(function (s) {
+      if (!f) return true;
+      return (s.scope || 'login') === f;
+    });
+
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><strong>这个分类下还没有排期</strong>点右上角「加一条」并选中对应的用途</div>';
+      return;
+    }
+
+    box.innerHTML = list.map(function (s) {
+      var scope = s.scope || 'login';
+      var tag = scope === 'cube'
+        ? '<span class="badge gold" style="height:19px;font-size:11px">四宫格广告</span>'
+        : '<span class="badge red" style="height:19px;font-size:11px">登录广告</span>';
+      var st = adState(s);
       return '<div class="perm-row" data-sid="' + esc(s.id) + '">' +
         '<div style="flex:1;min-width:0">' +
-          '<div style="font-size:13.5px;color:var(--ink);font-weight:600">' + esc(s.title) + '</div>' +
-          '<div class="hint" style="font-size:12px">上架 ' + esc(s.start_date || '待定') + ' → 下架 ' + esc(s.end_date || '待定') + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink);font-weight:600">' +
+            tag + esc(s.title) +
+          '</div>' +
+          '<div class="hint" style="font-size:12px">上架 ' + esc(s.start_date || '待定') + ' → 下架 ' + esc(s.end_date || '待定') +
+            (st ? ' · ' + st : '') + '</div>' +
         '</div>' +
         '<button type="button" class="link" data-sact="edit">编辑</button>' +
         '<button type="button" class="link danger" data-sact="del">删除</button>' +
@@ -3482,7 +3654,15 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
 
   function openAdSchForm(item) {
     var edit = !!item;
+    var scope = item ? (item.scope || 'login') : (S.adSchFilter || 'login');
+    if (scope !== 'cube') scope = 'login';
+
     var m = modal(edit ? '修改排期' : '加一条排期',
+      '<label class="field"><span>这条排期是给哪个用的<em>*</em></span>' +
+        '<div class="chips" id="schScope">' +
+          '<button type="button" class="chip-btn' + (scope === 'login' ? ' on' : '') + '" data-scope="login">登录广告</button>' +
+          '<button type="button" class="chip-btn' + (scope === 'cube' ? ' on' : '') + '" data-scope="cube">四宫格广告</button>' +
+        '</div></label>' +
       '<label class="field"><span>广告名称<em>*</em></span>' +
         '<input class="input" id="schTitle" maxlength="60" placeholder="例如：某某文具店" value="' + esc(item ? item.title : '') + '"></label>' +
       '<div class="row" style="margin-bottom:6px">' +
@@ -3491,9 +3671,16 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
         '<label class="field" style="flex:1"><span>下架日期</span>' +
           '<input class="input" id="schEnd" type="date" value="' + esc(item && item.end_date ? String(item.end_date).slice(0, 10) : '') + '"></label>' +
       '</div>' +
-      '<p class="hint" style="font-size:12.5px">学生端的排期会按上架日期排成时间轴。</p>',
+      '<p class="hint" style="font-size:12.5px">学生端「广告推销」里会分成两条时间轴：登录广告一条、四宫格广告一条。</p>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
       '<button class="btn primary" id="schOk" type="button">' + (edit ? '保存' : '添加') + '</button>', 480);
+
+    m.querySelector('#schScope').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-scope]');
+      if (!b) return;
+      scope = b.dataset.scope;
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+    });
 
     m.querySelector('#schTitle').focus();
     m.querySelector('#schOk').onclick = function () {
@@ -3507,9 +3694,11 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       busy(btn, true, '保存中…');
       api('api_admin_ad_schedule_save', {
         p_token: S.token, p_id: edit ? item.id : null,
-        p_title: tt, p_start: st, p_end: en
+        p_title: tt, p_start: st, p_end: en, p_scope: scope
       }).then(function () {
-        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已添加', 'ok'); loadAdSchedule();
+        busy(btn, false); closeModal();
+        toast(edit ? '已保存' : '已添加', 'ok');
+        loadAdSchedule();
       }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
     };
   }
@@ -3626,7 +3815,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       '<dt>用户名</dt><dd>' + esc(p.display_name || '—') + '</dd>' +
       '<dt>登录名</dt><dd>' + esc(p.username || '—') + '</dd>' +
       '<dt>身份</dt><dd><span class="badge red">管理员</span></dd>' +
-      '<dt>班级</dt><dd>' + esc(p.class_name || '2026级5班') + '</dd>' +
+      '<dt>班级</dt><dd>' + esc(p.class_name || '2026级') + '</dd>' +
       '<dt>上次登录</dt><dd>' + esc(fmt(p.last_login_at)) + '</dd>';
   }
 
@@ -3742,6 +3931,16 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       if (b.dataset.sact === 'del') return deleteAdSch(host.dataset.sid);
     });
 
+    $('adSchFilter').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-af]');
+      if (!b) return;
+      S.adSchFilter = b.dataset.af;
+      Array.prototype.forEach.call($('adSchFilter').children, function (x) {
+        x.classList.toggle('on', x === b);
+      });
+      renderAdSchedule();
+    });
+
     $('permFold').addEventListener('click', function () {
       var wrap = $('permWrap');
       wrap.hidden = !wrap.hidden;
@@ -3787,6 +3986,12 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       if (!b) return;
       changeRole(b.dataset.uid, b.dataset.role);
     });
+
+    $('identitySearch').addEventListener('input', debounce(function () {
+      S.identityKw = $('identitySearch').value;
+      renderIdentity();
+    }, 200));
+    $('btnIdentityReload').addEventListener('click', loadIdentity);
 
     $('mailAll').addEventListener('click', function () {
       this.classList.add('on');
