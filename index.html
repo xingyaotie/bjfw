@@ -49,6 +49,12 @@ button{font-family:inherit;cursor:pointer}
   font-size:12px;border:1px solid transparent;white-space:nowrap}
 .badge.red{color:#9B0C24;background:#FDF0F2;border-color:#F6D5DA}
 .badge.gray{color:#5B6270;background:#F3F4F6;border-color:#E5E7EB}
+.badge.gold{color:#8A6100;background:#FDF6E3;border-color:#F2E3B8}
+.badge.green{color:#146C33;background:#EBF9F0;border-color:#CFEEDB}
+
+/* 表格（课表等使用 xbh-table 命名） */
+.xbh-table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.xbh-table{width:100%;border-collapse:collapse;font-size:14px}
 .link{background:none;border:none;padding:0;font-size:13px;color:var(--red)}
 .link:hover{text-decoration:underline}
 .link.muted{color:var(--ink2)}
@@ -302,6 +308,8 @@ body.theme-gold .seg button{ background:#1B1710; border-color:#3A3122; color:#D4
 body.theme-gold .seg button.on{ background:#1B1710; border-color:#B8860B; color:#E8C46A; }
 body.theme-gold .badge.red{ background:#3A2A0A; color:#E8C46A; border-color:#5A4413; }
 body.theme-gold .badge.gray{ background:#241E13; color:#9A7B2E; border-color:#3A3122; }
+body.theme-gold .badge.gold{ background:#2E2408; color:#E8C46A; border-color:#5A4413; }
+body.theme-gold .badge.green{ background:#12260F; color:#9CCF7A; border-color:#2B4423; }
 body.theme-gold .fb-reply{ background:#221C12; border-color:#2E2718; color:#D4B25E; }
 body.theme-gold .fb-head .who{ color:#F0D48A; }
 body.theme-gold .marquee.on-card{ background:#1B1710; border-color:#3A3122; color:#E8C46A; }
@@ -350,6 +358,9 @@ body.theme-gold .member-btn{background:rgba(212,160,23,.18);border-color:#5A4413
   background:var(--red);box-shadow:0 0 0 3px rgba(200,16,46,.14)}
 .tl-date{font-size:12.5px;color:var(--muted);margin-bottom:2px}
 .tl-text{font-size:14px;color:var(--ink);line-height:1.6}
+.tl-meta{display:inline-block;margin-top:5px;padding:1px 8px;border-radius:999px;font-size:11.5px;
+  color:#8A6100;background:#FDF6E3;border:1px solid #F2E3B8}
+body.theme-gold .tl-meta{color:#E8C46A;background:#2E2408;border-color:#5A4413}
 body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(212,160,23,.18)}
 
 /* 魔方模块 */
@@ -905,7 +916,6 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   var URL = 'https://hkmxmkujzikcgrnlrxit.supabase.co';
   var KEY = 'sb_publishable_eK9SJy7QLl9WLpcXKncHmw_U0GTsPVw';
   var SESSION = 'xbh_session_v2';
-  var TTL = 7 * 24 * 3600 * 1000;
 
   var db = null;
   var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
@@ -980,16 +990,9 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   }
 
   /* ---------- 会话 ---------- */
+  /* 只存 token 供刷新后清理；不自动登录，所以没有 loadSession */
   function saveSession(token, profile) {
     try { localStorage.setItem(SESSION, JSON.stringify({ token: token, profile: profile, ts: Date.now() })); } catch (e) {}
-  }
-  function loadSession() {
-    try {
-      var s = JSON.parse(localStorage.getItem(SESSION) || 'null');
-      if (!s || !s.token) return null;
-      if (Date.now() - (s.ts || 0) > TTL) { localStorage.removeItem(SESSION); return null; }
-      return s;
-    } catch (e) { return null; }
   }
   function clearSession() { try { localStorage.removeItem(SESSION); } catch (e) {} }
 
@@ -1242,7 +1245,6 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
       showActions(false);
       $('userPanel').hidden = false;
       renderHomeNotice(S.boot && S.boot.home_notice);
-      loadNewsBadge();
     }
 
     // 黑金主题只属于会员：非会员登录时清掉，避免换账号还留着黑金
@@ -2039,14 +2041,7 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
     });
   }
 
-  function renderTodoInModule(body, name, text) {
-    body.innerHTML = '<div class="empty" style="padding:60px 20px">' +
-      '<strong>「' + esc(name) + '」正在建设</strong>' + esc(text) + '</div>';
-  }
-
   /* ---------- 用户端 ---------- */
-  function loadNewsBadge() { /* 小圆点已去掉，不再需要 */ }
-
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
     ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
@@ -3264,6 +3259,19 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
   }
 
   /* ================= 广告推销（学生端） ================= */
+  /* 广告排期状态：根据今天和排期比 */
+  function adState(s) {
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var st = s.start_date ? new Date(String(s.start_date).slice(0, 10) + 'T00:00:00') : null;
+    var en = s.end_date ? new Date(String(s.end_date).slice(0, 10) + 'T00:00:00') : null;
+
+    if (!st && !en) return '';
+    if (st && today < st) return '未开始';
+    if (en && today > en) return '已结束';
+    return '进行中';
+  }
+
   function openAds() {
     moreState.view = 'ads';
     var body = $('modBody');
@@ -3286,10 +3294,11 @@ body.theme-gold .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(21
             '<div style="font-size:12.5px;color:var(--muted);margin-bottom:12px;letter-spacing:1px">排期</div>' +
             (list.length
               ? '<div class="timeline">' + list.map(function (s) {
+                  var st = adState(s);
                   return '<div class="tl-item">' +
                     '<div class="tl-date">' + esc(s.start_date || '待定') + ' → ' + esc(s.end_date || '待定') + '</div>' +
                     '<div class="tl-text">' + esc(s.title) + '</div>' +
-                    '<div class="tl-meta">上架 ' + esc(s.start_date || '—') + ' · 下架 ' + esc(s.end_date || '—') + '</div>' +
+                    (st ? '<div class="tl-meta">' + st + '</div>' : '') +
                   '</div>';
                 }).join('') + '</div>'
               : '<div class="empty" style="padding:14px 0"><strong>还没有排期</strong>管理员添加后会显示在这里</div>') +
