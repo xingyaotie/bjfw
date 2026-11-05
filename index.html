@@ -325,13 +325,37 @@ body.theme-wujin .btn-logout,
 body.theme-wujin .mail-btn{ background:rgba(212,160,23,.16); border-color:#5A4413; color:#E8C46A; }
 body.theme-wujin .rich{ color:#D4B25E; }
 
-/* ---------- vip 专属配色：只改字体颜色，背景保持白色 ---------- */
-body.theme-danxia{ --ink:#7A2B12; --ink2:#9C4A24; --muted:#B9835F; }
-body.theme-tianlan{ --ink:#123F63; --ink2:#2C6C9E; --muted:#7BA3C2; }
-body.theme-hantan{ --ink:#0E4744; --ink2:#2A706C; --muted:#7CA6A2; }
-body.theme-danxia .core-note,
-body.theme-tianlan .core-note,
-body.theme-hantan .core-note{ color:var(--muted); }
+/* ---------- vip 专属主题：整站换色，方框/底色一起换 ---------- */
+body.theme-danxia{
+  --red:#C2410C; --red-d:#9A3412; --red-l:#EA580C;
+  --ink:#5B1E0A; --ink2:#8A3B1B; --muted:#B07A5E;
+  --line:#F1DCCF; --bg:#FFF7F2; --card:#fff;
+}
+body.theme-tianlan{
+  --red:#1D6FA5; --red-d:#17557F; --red-l:#2E8BC9;
+  --ink:#0E3A57; --ink2:#2A6285; --muted:#7FA3BC;
+  --line:#D7E6F1; --bg:#F4FAFF; --card:#fff;
+}
+body.theme-hantan{
+  --red:#0F6B66; --red-d:#0B524E; --red-l:#158782;
+  --ink:#0B3B38; --ink2:#2A6562; --muted:#7CA6A2;
+  --line:#D5E7E5; --bg:#F3FBF9; --card:#fff;
+}
+body.theme-light{ background:var(--bg); }
+body.theme-light #appView{ background:var(--bg); }
+body.theme-light .card,
+body.theme-light .modal,
+body.theme-light .news-item,
+body.theme-light .cube-card,
+body.theme-light .cube-opt,
+body.theme-light .status-card,
+body.theme-light .member-head{ background:var(--card); border-color:var(--line); }
+body.theme-light .input,
+body.theme-light .textarea{ border-color:var(--line); }
+body.theme-light table th{ background:#FAFBFC; border-color:var(--line); }
+body.theme-light table td{ border-color:#F1F2F5; }
+body.theme-light .perm-row,
+body.theme-light .pro-modal-head{ border-color:var(--line); }
 
 /* 目前Vip 文字标签（不做高亮，就在方框上写字） */
 .mine-tag{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:999px;
@@ -389,26 +413,26 @@ body.theme-wujin .tl-meta{color:#E8C46A;background:#2E2408;border-color:#5A4413}
 body.theme-wujin .tl-item::before{background:#D4A017;box-shadow:0 0 0 3px rgba(212,160,23,.18)}
 
 /* 广告排期：横向时间轴（彩条横跨排期区间，条里写名称） */
-.ad-tl{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-.ad-tl-inner{width:100%}
-.ad-tl-track{position:relative;width:100%}
-.ad-tl-lane{position:relative;height:34px}
-.ad-bar{position:absolute;top:4px;height:26px;min-width:46px;border-radius:6px;color:#fff;
+.promo-tl{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.promo-tl-inner{width:100%}
+.promo-tl-track{position:relative;width:100%}
+.promo-tl-lane{position:relative;height:34px}
+.promo-bar{position:absolute;top:4px;height:26px;min-width:46px;border-radius:6px;color:#fff;
   font-size:12px;line-height:26px;padding:0 9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   box-shadow:0 2px 6px rgba(17,24,39,.18);cursor:pointer;transition:filter .15s}
-.ad-bar:hover{filter:brightness(1.12)}
-.ad-bar.ended{opacity:.42;box-shadow:none}
-.ad-bar.upcoming{opacity:.72;box-shadow:none;border:1px dashed rgba(255,255,255,.9)}
-.ad-tl-today{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--red);opacity:.5;pointer-events:none}
-.ad-tl-axis{position:relative;display:flex;justify-content:space-between;margin-top:6px;
+.promo-bar:hover{filter:brightness(1.12)}
+.promo-bar.ended{opacity:.42;box-shadow:none}
+.promo-bar.upcoming{opacity:.72;box-shadow:none;border:1px dashed rgba(255,255,255,.9)}
+.promo-tl-today{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed var(--red);opacity:.5;pointer-events:none}
+.promo-tl-axis{position:relative;display:flex;justify-content:space-between;margin-top:6px;
   padding-top:8px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted)}
-.ad-tl-now{position:absolute;top:-2px;transform:translateX(-50%);background:var(--red);color:#fff;
+.promo-tl-now{position:absolute;top:-2px;transform:translateX(-50%);background:var(--red);color:#fff;
   font-size:10.5px;line-height:1.6;padding:0 7px;border-radius:999px;white-space:nowrap}
-.ad-undated{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.ad-undated .chip-btn{height:26px;color:var(--ink2)}
-body.theme-wujin .ad-tl-axis{border-color:#3A3122;color:#9A7B2E}
-body.theme-wujin .ad-tl-now{background:#B8860B;color:#12100C}
-body.theme-wujin .ad-tl-today{border-color:#B8860B}
+.promo-undated{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.promo-undated .chip-btn{height:26px;color:var(--ink2)}
+body.theme-wujin .promo-tl-axis{border-color:#3A3122;color:#9A7B2E}
+body.theme-wujin .promo-tl-now{background:#B8860B;color:#12100C}
+body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
 /* 魔方模块 */
 .cube-stack{display:flex;flex-direction:column;gap:14px;max-width:640px;margin:10px auto 0}
@@ -526,7 +550,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
     <div class="grid">
       <div class="tile" data-mod="news" data-name="班级热点">班级热点</div>
       <div class="tile" data-mod="homework" data-name="班级事项">班级事项</div>
-      <div class="tile" data-mod="cube" data-name="魔方">魔方</div>
+      <div class="tile" data-mod="forum" data-name="论坛">论坛</div>
       <div class="tile" data-mod="more" data-name="更多">更多</div>
     </div>
   </main>
@@ -974,7 +998,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
   var db = null;
   var S = { token: '', me: null, users: [], news: [], hw: [], sel: '', kw: '',
             cube: [], cubeAll: [], cubeAny: false, permUsers: [], cubeFilter: '', permKw: '',
-            cubeTypes: [], cubeTypesLoaded: false, memberPlans: [], memberOpen: {},
+            cubeTypes: [], cubeTypesLoaded: false, memberPlans: [], memberOpen: {}, memberUsersOpen: {},
             boot: null, permOpen: {}, debug: [], debugOpen: {}, debugBranches: {},
             members: [], ads: [], adOpen: {}, adBranches: {}, adSch: [], ad2Shown: false, tt: [] };
 
@@ -1505,8 +1529,10 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       if (hwState.view === 'hw' || hwState.view === 'tt') return renderItemsHome();
     }
     if (currentMod === 'more') {
-      if (moreState.view === 'fb') return renderMore();
-      if (moreState.view === 'ads') return renderMore();
+      if (moreState.view === 'fb' || moreState.view === 'promo' || moreState.view === 'ver') return renderMore();
+    }
+    if (currentMod === 'cube') {            /* 魔方现在从「更多」进，返回到更多 */
+      if (cubeState.view === 'home') { currentMod = 'more'; return renderMore(); }
     }
     closeModule();
   }
@@ -1516,6 +1542,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
     if (currentMod === 'news') return renderNewsInModule(body);
     if (currentMod === 'homework') return renderItemsHome();
     if (currentMod === 'cube') return renderCubeHome();
+    if (currentMod === 'forum') return renderForum();
     if (currentMod === 'more') return renderMore();
   }
 
@@ -1586,42 +1613,49 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       '<thead>' + head + '</thead><tbody>' + bodyRows + '</tbody></table></div>';
   }
 
+  function moreBtn(icon, title, desc, open) {
+    return '<button class="cube-opt" type="button" data-open="' + open + '" style="margin-bottom:12px">' +
+      '<span class="ico">' + icon + '</span>' +
+      '<span><b>' + esc(title) + '</b><small>' + esc(desc) + '</small></span>' +
+      '<span class="arrow">›</span>' +
+    '</button>';
+  }
+
   function renderMore() {
     moreState.view = 'info';
+
+    $('modBody').innerHTML =
+      '<div style="max-width:520px;margin:10px auto">' +
+        moreBtn('💬', '反馈', '提问题、提建议，管理员会处理', 'fb') +
+        moreBtn('📣', '推广信息', '价格和档期都在这儿', 'promo') +
+        moreBtn('🧩', '魔方', '教程和调试都在里面', 'cube') +
+        moreBtn('ℹ️', '版本信息', '版本号、更新日志、赞助商、赞赏', 'ver') +
+      '</div>';
+  }
+
+  /* 版本信息：原来散在「更多」里的四块都收在这儿 */
+  function renderVersion() {
+    moreState.view = 'ver';
     var me = S.me || {};
     var b = S.boot || {};
     var sp = String(b.sponsors || '').trim();
     var cl = String(b.changelog || '').trim();
     var ap = String(b.appreciation || '').trim();
-    var isVip = me.role === 'vip';
-    var gold = document.body.classList.contains('theme-wujin');
 
     $('modBody').innerHTML =
       '<div style="max-width:520px;margin:10px auto">' +
-        '<button class="cube-opt" type="button" data-open="fb" style="margin-bottom:12px">' +
-          '<span class="ico">💬</span>' +
-          '<span><b>反馈</b><small>提问题、提建议，管理员会处理</small></span>' +
-          '<span class="arrow">›</span>' +
-        '</button>' +
-
-        '<button class="cube-opt" type="button" data-open="ads" style="margin-bottom:14px">' +
-          '<span class="ico">📣</span>' +
-          '<span><b>广告推销</b><small>看看有哪些同学 / 店铺在推广</small></span>' +
-          '<span class="arrow">›</span>' +
-        '</button>' +
-
-        (ap ? '<div class="card" style="padding:18px;margin-bottom:14px">' +
-                '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">赞赏</div>' +
-                '<div class="rich">' + renderRich(ap) + '</div>' +
-              '</div>' : '') +
-
         '<div class="card" style="padding:18px">' +
           '<dl class="kv">' +
             '<dt>平台</dt><dd>徐悲鸿中学 · 2026级</dd>' +
-            '<dt>版本</dt><dd>' + esc(b.version || '体验版 v4') + '</dd>' +
+            '<dt>版本</dt><dd>' + esc(b.version || '体验版 v5') + '</dd>' +
             '<dt>我的账号</dt><dd>' + esc(me.display_name || '—') + '（' + esc(me.username || '—') + '）</dd>' +
           '</dl>' +
         '</div>' +
+
+        (ap ? '<div class="card" style="padding:18px;margin-top:14px">' +
+                '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">赞赏</div>' +
+                '<div class="rich">' + renderRich(ap) + '</div>' +
+              '</div>' : '') +
 
         (cl ? '<div class="card" style="padding:18px;margin-top:14px">' +
                 '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">更新日志</div>' +
@@ -1635,10 +1669,20 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       '</div>';
   }
 
+  /* 论坛占位（原魔方位置） */
+  function renderForum() {
+    $('modBody').innerHTML =
+      '<div class="empty" style="padding:70px 20px">' +
+        '<strong>论坛即将上线</strong>' +
+        '<div style="font-size:14px;line-height:1.9">该功能将在 <b>2026.11.6 – 11.7</b> 上线，敬请期待</div>' +
+      '</div>';
+  }
+
   function clearThemeClass() {
     ['wujin', 'danxia', 'tianlan', 'hantan'].forEach(function (k) {
       document.body.classList.remove('theme-' + k);
     });
+    document.body.classList.remove('theme-light');
     document.body.classList.remove('snow-bg');
     document.body.classList.remove('snow-bg-1');
     document.body.classList.remove('snow-bg-2');
@@ -3480,7 +3524,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
   }
 
   /* vip专属颜色：只改字色；雪山是背景开关 */
-  var AD_THEMES = [
+  var THEME_LIST = [
     ['red',     '默认红'],
     ['wujin',   '乌金'],
     ['danxia',  '丹霞色'],
@@ -3493,11 +3537,11 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
     var snow = snowVal(S.me && S.me.snow_bg);
     return '<div class="card" style="padding:14px 16px;margin-bottom:14px">' +
       '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">' +
-        '<b style="font-size:13.5px;color:var(--ink)">vip专属颜色</b>' +
-        '<span class="hint" style="font-size:12px">只改字体颜色，背景不变</span>' +
+        '<b style="font-size:13.5px;color:var(--ink)">vip专属主题</b>' +
+        '<span class="hint" style="font-size:12px">整站换色，跟乌金同一个逻辑</span>' +
       '</div>' +
       '<div class="chips">' +
-        AD_THEMES.map(function (t) {
+        THEME_LIST.map(function (t) {
           return '<button type="button" class="chip-btn ' + (cur === t[0] ? 'on' : '') + '" data-theme="' + t[0] + '">' + t[1] + '</button>';
         }).join('') +
       '</div>' +
@@ -3527,6 +3571,8 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
     ['wujin', 'danxia', 'tianlan', 'hantan'].forEach(function (k) {
       document.body.classList.toggle('theme-' + k, theme === k);
     });
+    document.body.classList.toggle('theme-light',
+      theme === 'danxia' || theme === 'tianlan' || theme === 'hantan');
     var sn = snowVal(me.snow_bg);
     document.body.classList.toggle('snow-bg-1', sn === '1');
     document.body.classList.toggle('snow-bg-2', sn === '2');
@@ -3548,7 +3594,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
 
   /* ================= 广告推销（学生端） ================= */
   /* 广告排期状态：根据今天和排期比 */
-  function adState(s) {
+  function promoState(s) {
     var today = new Date();
     today.setHours(0, 0, 0, 0);
     var st = s.start_date ? new Date(String(s.start_date).slice(0, 10) + 'T00:00:00') : null;
@@ -3561,7 +3607,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
   }
 
   /* 时间轴配色：每条轮换一种，方便区分相邻项目 */
-  var AD_COLORS = ['#C8102E', '#B8860B', '#1B873F', '#2563EB', '#7C3AED', '#DB2777'];
+  var PROMO_COLORS = ['#C8102E', '#B8860B', '#1B873F', '#2563EB', '#7C3AED', '#DB2777'];
 
   /* 'YYYY-MM-DD' → 天数序号（按本地时区算，避免差一天） */
   function dayNum(v) {
@@ -3576,7 +3622,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
   }
 
   /* 把一组排期画成横向时间轴：彩条横跨各自区间，条里写名称 */
-  function adTimeline(list) {
+  function promoTimeline(list) {
     var dated = [], undated = [];
 
     list.forEach(function (s, i) {
@@ -3586,7 +3632,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       if (a == null) a = b;
       if (b == null) b = a;
       if (b < a) { var t = a; a = b; b = t; }
-      dated.push({ s: s, a: a, b: b, color: AD_COLORS[i % AD_COLORS.length] });
+      dated.push({ s: s, a: a, b: b, color: PROMO_COLORS[i % PROMO_COLORS.length] });
     });
 
     var out = '';
@@ -3613,13 +3659,13 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       dated.forEach(function (x) { (lanes[x.lane] = lanes[x.lane] || []).push(x); });
 
       var track = lanes.map(function (arr) {
-        return '<div class="ad-tl-lane">' + arr.map(function (x) {
-          var st = adState(x.s);
+        return '<div class="promo-tl-lane">' + arr.map(function (x) {
+          var st = promoState(x.s);
           var cls = st === '已结束' ? ' ended' : st === '未开始' ? ' upcoming' : '';
           var left = (x.a - min) / span * 100;
           var w = (x.b - x.a + 1) / span * 100;
           var dates = esc(x.s.start_date || '待定') + ' → ' + esc(x.s.end_date || '待定');
-          return '<div class="ad-bar' + cls + '" data-bar="1"' +
+          return '<div class="promo-bar' + cls + '" data-bar="1"' +
             ' data-title="' + esc(x.s.title) + '"' +
             ' data-dates="' + dates + '"' +
             ' data-scope="' + esc(x.s.scope === 'cube' ? 'cube' : 'login') + '"' +
@@ -3637,25 +3683,25 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       var todayN = Math.round(t0.getTime() / 86400000);
       var nowPct = (todayN >= min && todayN <= max) ? (todayN - min) / span * 100 : null;
       if (nowPct != null) {
-        track += '<div class="ad-tl-today" style="left:' + nowPct.toFixed(3) + '%"></div>';
+        track += '<div class="promo-tl-today" style="left:' + nowPct.toFixed(3) + '%"></div>';
       }
 
       var minPx = Math.min(2400, Math.max(320, span * 22));
 
-      out += '<div class="ad-tl">' +
-        '<div class="ad-tl-inner" style="min-width:' + minPx + 'px">' +
-          '<div class="ad-tl-track">' + track + '</div>' +
-          '<div class="ad-tl-axis">' +
+      out += '<div class="promo-tl">' +
+        '<div class="promo-tl-inner" style="min-width:' + minPx + 'px">' +
+          '<div class="promo-tl-track">' + track + '</div>' +
+          '<div class="promo-tl-axis">' +
             '<span>' + dayLabel(min) + '</span>' +
             '<span>' + dayLabel(max) + '</span>' +
-            (nowPct != null ? '<span class="ad-tl-now" style="left:' + nowPct.toFixed(3) + '%">今天</span>' : '') +
+            (nowPct != null ? '<span class="promo-tl-now" style="left:' + nowPct.toFixed(3) + '%">今天</span>' : '') +
           '</div>' +
         '</div>' +
       '</div>';
     }
 
     if (undated.length) {
-      out += '<div class="ad-undated">' + undated.map(function (s) {
+      out += '<div class="promo-undated">' + undated.map(function (s) {
         return '<span class="chip-btn">' + esc(s.title) + ' · 待定</span>';
       }).join('') + '</div>';
     }
@@ -3664,14 +3710,14 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
   }
 
   /* 一条时间轴的卡片 */
-  function adTimelineCard(title, hint, items) {
+  function promoTimelineCard(title, hint, items) {
     return '<div class="card" style="padding:16px;margin-bottom:14px">' +
       '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">' +
         '<div style="font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:1px">' + esc(title) + '</div>' +
         '<div class="hint" style="font-size:12px">' + esc(hint) + '</div>' +
       '</div>' +
       (items.length
-        ? adTimeline(items)
+        ? promoTimeline(items)
         : '<div class="empty" style="padding:16px 0"><strong>还没有排期</strong>管理员添加后会显示在这里</div>') +
     '</div>';
   }
@@ -3694,8 +3740,8 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       '<button class="btn ghost" type="button" data-close>关闭</button>', 420);
   }
 
-  function openAds() {
-    moreState.view = 'ads';
+  function openPromo() {
+    moreState.view = 'promo';
     var body = $('modBody');
     body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
 
@@ -3714,8 +3760,8 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
               ? '<div class="rich">' + esc(price) + '</div>'
               : '<div class="empty" style="padding:12px 0"><strong>暂无价格</strong>管理员还没填</div>') +
           '</div>' +
-          adTimelineCard('登录广告', '登录时播放的那条', loginAd) +
-          adTimelineCard('四宫格广告', '点四个方块时播放的那条', cubeAd) +
+          promoTimelineCard('登录广告', '登录时播放的那条', loginAd) +
+          promoTimelineCard('四宫格广告', '点四个方块时播放的那条', cubeAd) +
         '</div>';
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
@@ -3753,8 +3799,27 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
         '</div>';
       }).join('') : '<div class="empty" style="padding:12px"><strong>这个方案还没有权益</strong>点下面加一条</div>';
 
+      var members = p.members || [];
+      var muOpen = !!S.memberUsersOpen[p.id];
+
+      var memHtml = '<div class="perm-row" style="padding:6px 0;border-bottom:1px dashed #EEF0F3">' +
+          '<button type="button" class="fold ' + (muOpen ? 'open' : '') + '" data-mufold="' + esc(p.id) + '" title="看是哪些人">&#9656;</button>' +
+          '<span style="font-size:13px;color:var(--ink2)">' + members.length + ' 人</span>' +
+          '<span class="hint" style="font-size:12px;margin-left:4px">拥有这个方案</span>' +
+        '</div>' +
+        (muOpen
+          ? '<div style="padding:6px 0 10px 22px;font-size:13px;color:var(--ink2);line-height:1.9">' +
+              (members.length
+                ? members.map(function (u) {
+                    return '<div>' + esc(u.name) + ' <span class="hint" style="font-size:11.5px">' + esc(u.username) + '</span></div>';
+                  }).join('')
+                : '<span class="hint">还没有人用这个方案</span>') +
+            '</div>'
+          : '');
+
       if (open) {
-        inner += '<div style="margin-top:10px">' +
+        inner = memHtml + inner +
+          '<div style="margin-top:10px">' +
           '<button type="button" class="btn ghost sm" data-madd="' + esc(p.id) + '">＋ 新建权益</button></div>';
       }
 
@@ -3964,7 +4029,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
       var tag = scope === 'cube'
         ? '<span class="badge gold" style="height:19px;font-size:11px">四宫格广告</span>'
         : '<span class="badge red" style="height:19px;font-size:11px">登录广告</span>';
-      var st = adState(s);
+      var st = promoState(s);
       return '<div class="perm-row" data-sid="' + esc(s.id) + '">' +
         '<div style="flex:1;min-width:0">' +
           '<div style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink);font-weight:600">' +
@@ -4235,6 +4300,14 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
     $('btnMemberNew').addEventListener('click', function () { openMemberPlanForm(null); });
 
     $('memberList').addEventListener('click', function (e) {
+      var ufold = e.target.closest('[data-mufold]');
+      if (ufold) {
+        var uid0 = ufold.dataset.mufold;
+        S.memberUsersOpen[uid0] = !S.memberUsersOpen[uid0];
+        renderMemberAdmin();
+        return;
+      }
+
       var fold = e.target.closest('[data-mfold]');
       if (fold) {
         var pid0 = fold.dataset.mfold;
@@ -4482,7 +4555,7 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
     });
 
     $('modBody').addEventListener('click', function (e) {
-      var adbar = e.target.closest('.ad-bar');
+      var adbar = e.target.closest('.promo-bar');
       if (adbar) { openAdBar(adbar); return; }
 
       var it = e.target.closest('[data-items]');
@@ -4494,7 +4567,9 @@ body.theme-wujin .ad-tl-today{border-color:#B8860B}
 
       var op = e.target.closest('[data-open]');
       if (op && op.dataset.open === 'fb') { openFeedback(); return; }
-      if (op && op.dataset.open === 'ads') { openAds(); return; }
+      if (op && op.dataset.open === 'promo') { openPromo(); return; }
+      if (op && op.dataset.open === 'cube') { openModule('cube', '魔方'); return; }
+      if (op && op.dataset.open === 'ver') { renderVersion(); return; }
 
       if (e.target.closest('[data-theme]')) {
         setPrefs(e.target.closest('[data-theme]').dataset.theme, null);
