@@ -575,6 +575,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       <button class="tab" data-tab="debug" type="button">魔方调试</button>
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
+      <button class="tab" data-tab="forum" type="button">论坛</button>
       <button class="tab" data-tab="member" type="button">会员</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
@@ -799,6 +800,41 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         <button type="button" data-fs="done">已解决</button>
       </div>
       <div class="card"><div class="news" id="fbAdminList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- 论坛 -->
+    <section id="tab-forum" hidden>
+      <div class="panel-head">
+        <div><h2>论坛</h2><div class="hint">第一块看帖删帖，第二块管禁言</div></div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold" id="forumListFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">① 论坛内容</h3>
+              <div class="hint">点开看所有帖子，不合适的可以删</div>
+            </div>
+          </div>
+          <button class="btn ghost sm" id="btnForumReload" type="button" style="height:32px">刷新</button>
+        </div>
+        <div id="forumAdminList" hidden style="margin-top:12px"></div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold" id="muteFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">② 论坛禁言</h3>
+              <div class="hint">勾选人 → 选时长 → 写系统提示（会显示给他本人）</div>
+            </div>
+          </div>
+          <button class="btn ghost sm" id="btnMuteReload" type="button" style="height:32px">刷新</button>
+        </div>
+        <div id="muteBox" hidden style="margin-top:12px"></div>
+      </div>
     </section>
 
     <!-- 会员 -->
@@ -1311,7 +1347,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       '<div style="text-align:center;padding:6px 0 2px">' +
         '<div style="font-size:22px;margin-bottom:10px">🚫</div>' +
         '<p style="color:var(--ink);font-size:15px;margin-bottom:6px">' + esc(left) + '</p>' +
-        (reason ? '<p style="font-size:13.5px;color:var(--muted)">原因：' + esc(reason) + '</p>' : '') +
+        (reason ? '<p style="font-size:13.5px;color:var(--muted)">系统提示：' + esc(reason) + '</p>' : '') +
         '<p style="font-size:12.5px;color:var(--muted);margin-top:10px">如有疑问，请联系班级管理员</p>' +
       '</div>',
       '<button class="btn ghost" type="button" data-close>知道了</button>', 400);
@@ -1629,6 +1665,12 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         moreBtn('💬', '反馈', '提问题、提建议，管理员会处理', 'fb') +
         moreBtn('📣', '推广信息', '价格和档期都在这儿', 'promo') +
         moreBtn('🧩', '魔方', '教程和调试都在里面', 'cube') +
+        '<a class="cube-opt" href="https://xingyaotie.github.io/cjms/xq.html" target="_blank" rel="noopener"' +
+          ' style="margin-bottom:12px;text-decoration:none;color:inherit">' +
+          '<span class="ico">♟</span>' +
+          '<span><b>象棋预约</b><small>找大师下棋、约时间</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</a>' +
         moreBtn('ℹ️', '版本信息', '版本号、更新日志、赞助商、赞赏', 'ver') +
       '</div>';
   }
@@ -1669,13 +1711,235 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       '</div>';
   }
 
-  /* 论坛占位（原魔方位置） */
+  /* ================= 论坛 ================= */
+  function forumPostCard(p, isAdmin) {
+    return '<div class="news-item" data-post="' + esc(p.id) + '">' +
+      '<div class="fb-head">' +
+        '<span class="who">' + esc(p.author) + '</span>' +
+        (p.author_role === 'vip' ? '<span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '') +
+        (p.is_mine ? '<span class="badge gray" style="height:18px;font-size:11px">我</span>' : '') +
+        '<span class="time">' + esc(p.created_at) + '</span>' +
+      '</div>' +
+      '<div class="fb-body">' + esc(p.body) + '</div>' +
+      '<div style="margin-top:8px;display:flex;gap:14px;align-items:center">' +
+        '<button type="button" class="link" data-expand="' + esc(p.id) + '">' +
+          (p.reply_count ? p.reply_count + ' 条跟评' : '跟评') + '</button>' +
+        (isAdmin ? '<button type="button" class="link danger" data-postdel="' + esc(p.id) + '">删除帖子</button>' : '') +
+      '</div>' +
+      '<div data-replies="' + esc(p.id) + '" hidden style="margin-top:10px"></div>' +
+    '</div>';
+  }
+
   function renderForum() {
-    $('modBody').innerHTML =
-      '<div class="empty" style="padding:70px 20px">' +
-        '<strong>论坛即将上线</strong>' +
-        '<div style="font-size:14px;line-height:1.9">该功能将在 <b>2026.11.6 – 11.7</b> 上线，敬请期待</div>' +
-      '</div>';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_forum_list', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      var left = Math.max(0, (r.my_limit || 3) - (r.my_today || 0));
+
+      body.innerHTML =
+        '<div style="max-width:640px;margin:0 auto">' +
+          '<div class="card" style="padding:14px;margin-bottom:14px">' +
+            (r.muted
+              ? '<div class="empty" style="padding:12px 0"><strong>你被禁言了</strong>' + esc(r.muted) + '</div>'
+              : '<textarea class="textarea" id="forumInput" rows="3" maxlength="200"' +
+                  ' placeholder="说点什么… 最多 200 字，今天还能发 ' + left + ' 条"></textarea>' +
+                '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">' +
+                  '<span class="hint" id="forumCount">0 / 200</span>' +
+                  '<button class="btn primary sm" id="forumSend" type="button" style="height:34px;padding:0 18px">发布</button>' +
+                '</div>') +
+          '</div>' +
+          '<div id="forumList">' +
+            (items.length
+              ? items.map(function (x) { return forumPostCard(x, false); }).join('')
+              : '<div class="empty"><strong>还没有帖子</strong>发第一条吧</div>') +
+          '</div>' +
+        '</div>';
+
+      if (r.muted) return;
+
+      var input = $('forumInput');
+      input.addEventListener('input', function () {
+        $('forumCount').textContent = input.value.length + ' / 200';
+      });
+
+      $('forumSend').onclick = function () {
+        var btn = this;
+        var v = input.value;
+        if (!v.trim()) return toast('写点内容吧', 'err');
+        busy(btn, true, '发布中…');
+        api('api_forum_post', { p_token: S.token, p_body: v }).then(function () {
+          busy(btn, false);
+          toast('已发布', 'ok');
+          renderForum();
+        }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
+      };
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function toggleForumReplies(pid, box) {
+    if (!box.hidden) { box.hidden = true; return; }
+    box.hidden = false;
+    box.innerHTML = '<div class="loading" style="padding:10px"><span class="spinner"></span>加载中…</div>';
+
+    api('api_forum_replies', { p_token: S.token, p_post_id: pid }).then(function (r) {
+      var items = r.items || [];
+      box.innerHTML =
+        (items.length
+          ? items.map(function (x) {
+              return '<div class="fb-reply"><b>' + esc(x.author) +
+                (x.author_role === 'vip' ? ' · VIP' : '') + '</b>' + esc(x.body) +
+                '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + esc(x.created_at) + '</div></div>';
+            }).join('')
+          : '<div class="hint">还没有人跟评</div>') +
+        '<div style="margin-top:10px">' +
+          '<textarea class="textarea" data-reply-input="' + esc(pid) + '" rows="2" maxlength="200"' +
+            ' placeholder="跟评（最多 200 字，同一条帖子最多 3 条）"></textarea>' +
+          '<div style="text-align:right;margin-top:6px">' +
+            '<button class="btn primary sm" data-reply-send="' + esc(pid) + '" type="button" style="height:32px">发送</button>' +
+          '</div>' +
+        '</div>';
+
+      var send = box.querySelector('[data-reply-send]');
+      send.onclick = function () {
+        var inp = box.querySelector('[data-reply-input]');
+        var v = inp.value;
+        if (!v.trim()) return toast('写点内容吧', 'err');
+        busy(send, true, '发送中…');
+        api('api_forum_reply', { p_token: S.token, p_post_id: pid, p_body: v }).then(function () {
+          busy(send, false);
+          toast('已跟评', 'ok');
+          renderForum();
+        }, function (e) { busy(send, false); toast(e.message, 'err', 3800); });
+      };
+    }, function (e) {
+      box.innerHTML = '<div class="empty" style="padding:8px">' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ---------- 管理端：论坛 ---------- */
+  function loadForumAdmin() {
+    var box = $('forumAdminList');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_forum_list', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      box.innerHTML = items.length
+        ? items.map(function (x) { return forumPostCard(x, true); }).join('')
+        : '<div class="empty"><strong>论坛还没有帖子</strong></div>';
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function deleteForumPost(id) {
+    confirmBox('删除帖子', '确定删掉这条帖子吗？', '它下面的跟评也会一起删。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_forum_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        loadForumAdmin();
+      }, function (e) { toast(e.message, 'err', 3600); });
+    });
+  }
+
+  /* ---------- 管理端：论坛禁言 ---------- */
+  var mutePerm = true;
+
+  function loadMutePanel() {
+    var box = $('muteBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_users_for_mute', { p_token: S.token }).then(function (r) {
+      var users = r.users || [];
+      box.innerHTML =
+        '<div style="display:flex;gap:2px 14px;flex-wrap:wrap;align-items:center;margin-bottom:10px">' +
+          '<span class="hint">禁言时长</span>' +
+          '<button type="button" class="chip-btn on" id="mutePerm">永久</button>' +
+          '<button type="button" class="chip-btn" id="muteCustom">自定义</button>' +
+          '<span id="muteDur" style="display:none;gap:8px;align-items:center">' +
+            '<input class="input" id="muteDays" type="number" min="0" value="0" style="width:80px;height:34px"> 天 ' +
+            '<input class="input" id="muteHours" type="number" min="0" max="23" value="1" style="width:80px;height:34px"> 小时 ' +
+          '</span>' +
+        '</div>' +
+        '<label class="field" style="margin-bottom:10px"><span>系统提示（会显示给他本人，不填就不显示）</span>' +
+          '<input class="input" id="muteReason" maxlength="200" placeholder="例如：论坛里刷屏，先冷静 1 天"></label>' +
+        '<div style="max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 12px">' +
+          users.map(function (u) {
+            var tag = u.muted
+              ? '<span class="badge st-new" style="height:17px;font-size:10.5px">禁言中</span>'
+              : '';
+            return '<label class="pick-row"><input type="checkbox" value="' + esc(u.id) + '"' +
+              (u.is_me ? ' disabled' : '') + '>' +
+              '<span>' + esc(u.name) +
+                ' <small style="color:var(--muted)">' + esc(u.username) + '</small> ' + tag +
+                (u.is_me ? ' <small style="color:var(--muted)">· 我</small>' : '') +
+              '</span></label>';
+          }).join('') +
+        '</div>' +
+        '<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px">' +
+          '<button class="btn ghost" id="muteOff" type="button">解除禁言</button>' +
+          '<button class="btn danger" id="muteOn" type="button">确认禁言</button>' +
+        '</div>';
+
+      var permBtn = $('mutePerm');
+      var customBtn = $('muteCustom');
+      var dur = $('muteDur');
+
+      permBtn.onclick = function () {
+        mutePerm = true;
+        permBtn.classList.add('on'); customBtn.classList.remove('on');
+        dur.style.display = 'none';
+      };
+      customBtn.onclick = function () {
+        mutePerm = false;
+        customBtn.classList.add('on'); permBtn.classList.remove('on');
+        dur.style.display = 'flex';
+      };
+
+      function picked() {
+        return Array.prototype.slice.call(box.querySelectorAll('input[type=checkbox]'))
+          .filter(function (c) { return c.checked; })
+          .map(function (c) { return c.value; });
+      }
+
+      $('muteOff').onclick = function () {
+        var ids = picked();
+        if (!ids.length) return toast('请先勾选人', 'err');
+        api('api_admin_unmute', { p_token: S.token, p_user_ids: ids }).then(function () {
+          toast('已解除禁言', 'ok'); loadMutePanel();
+        }, function (e) { toast(e.message, 'err', 3600); });
+      };
+
+      $('muteOn').onclick = function () {
+        var btn = this;
+        var ids = picked();
+        if (!ids.length) return toast('请先勾选人', 'err');
+
+        var minutes = null;
+        if (!mutePerm) {
+          var d = parseInt($('muteDays').value, 10) || 0;
+          var h = parseInt($('muteHours').value, 10) || 0;
+          minutes = d * 1440 + h * 60;
+          if (minutes < 60) return toast('禁言时长至少 1 小时', 'err');
+        }
+
+        busy(btn, true, '处理中…');
+        api('api_admin_mute_users', {
+          p_token: S.token, p_user_ids: ids, p_minutes: minutes,
+          p_reason: $('muteReason').value.trim()
+        }).then(function (r) {
+          busy(btn, false);
+          toast('已禁言 ' + (r.count || ids.length) + ' 人', 'ok');
+          loadMutePanel();
+        }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+      };
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
   }
 
   function clearThemeClass() {
@@ -2158,7 +2422,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -2173,6 +2437,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
+    if (name === 'forum') { loadForumAdmin(); loadMutePanel(); }
     if (name === 'member') loadMemberAdmin();
     if (name === 'ad') loadAdAdmin();
     if (name === 'notice') loadNoticeAdmin();
@@ -2357,7 +2622,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         '<span class="hint">最少 1 小时</span>' +
       '</div>' +
 
-      '<label class="field" style="margin-bottom:4px"><span>原因（不填就不显示给本人）</span>' +
+      '<label class="field" style="margin-bottom:4px"><span>系统提示（不填就不显示给本人）</span>' +
         '<textarea class="textarea" id="banReason" rows="2" placeholder="例如：多次在班级公告下刷屏"></textarea></label>' +
       '<p class="hint" style="font-size:12.5px">封禁后这个账号立刻掉线，并且无法登录。</p>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
@@ -4469,6 +4734,28 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       if (it) openMailDetail(it.dataset.mail);
     });
     $('btnFbReload').addEventListener('click', loadFeedbackAdmin);
+
+    $('forumListFold').addEventListener('click', function () {
+      var wrap = $('forumAdminList');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('muteFold').addEventListener('click', function () {
+      var wrap = $('muteBox');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('btnForumReload').addEventListener('click', loadForumAdmin);
+    $('btnMuteReload').addEventListener('click', loadMutePanel);
+    $('forumAdminList').addEventListener('click', function (e) {
+      var del = e.target.closest('[data-postdel]');
+      if (del) return deleteForumPost(del.dataset.postdel);
+      var ex = e.target.closest('[data-expand]');
+      if (ex) {
+        var rb = $('forumAdminList').querySelector('[data-replies="' + ex.dataset.expand + '"]');
+        if (rb) toggleForumReplies(ex.dataset.expand, rb);
+      }
+    });
     $('fbAdminFilter').addEventListener('click', function (e) {
       var b = e.target.closest('[data-fs]');
       if (!b) return;
@@ -4562,6 +4849,13 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       if (it && currentMod === 'homework') {
         if (it.dataset.items === 'hw') renderHomeworkInModule($('modBody'));
         else renderTimetableForUser();
+        return;
+      }
+
+      var exp = e.target.closest('[data-expand]');
+      if (exp && currentMod === 'forum') {
+        var rbox = $('modBody').querySelector('[data-replies="' + exp.dataset.expand + '"]');
+        if (rbox) toggleForumReplies(exp.dataset.expand, rbox);
         return;
       }
 
