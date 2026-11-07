@@ -78,6 +78,15 @@ button{font-family:inherit;cursor:pointer}
 
 /* 可点的人名 */
 .lnk{color:var(--red);cursor:pointer;padding:2px 3px;border-radius:5px;position:relative;z-index:1}
+/* 已读名单里的人名按钮 */
+.rd-btn{border:none;background:none;padding:1px 4px;border-radius:6px;font:inherit;font-size:inherit;
+  color:var(--red);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.rd-btn:hover{background:rgba(200,16,46,.10)}
+.rd-btn:active{transform:scale(.97)}
+.rd-row{display:flex;align-items:center;width:100%;text-align:left;text-decoration:none;
+  padding:9px 10px;margin:2px 0;border-radius:8px;color:var(--ink);font-size:13.5px}
+.rd-row:hover{background:rgba(200,16,46,.08)}
+.rd-row span:first-child{text-decoration:underline;text-underline-offset:2px;color:var(--red)}
 .lnk:hover{background:#FDF0F2}
 .lnk:hover{text-decoration:underline}
 
@@ -2061,19 +2070,27 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   var forumReaders = {};
   var postReaders = {};
 
+  /* 已读的人名：渲染成真正的 <button>，onclick 直接调全局函数 */
+  function readerBtn(x) {
+    if (typeof x === 'string' || !x || !x.id) return esc(typeof x === 'string' ? x : (x && x.name) || '');
+    return '<button type="button" class="rd-btn" onclick="window.__openUser(\'' + esc(x.id) + '\')">' +
+      esc(x.name) + '</button>';
+  }
+
   function readersText(list, pid) {
     var arr = list || [];
-    var head = '<span class="lnk" data-readers-all="' + esc(pid || '') + '">已读</span>：';
-    if (!arr.length) return '已读：还没有人';
+    var allBtn = '<button type="button" class="rd-btn rd-read" onclick="window.__openReaders(\'' +
+      esc(pid || '') + '\')">已读</button>';
+    if (!arr.length) return allBtn + '：还没有人';
 
     var show = arr.slice(0, 3);
-    var names = show.map(function (x) {
-      if (typeof x === 'string') return esc(x);
-      return '<span class="lnk" data-uid="' + esc(x.id) + '">' + esc(x.name) + '</span>';
-    }).join('、');
+    var names = show.map(readerBtn).join('、');
 
-    return head + names + (arr.length > 3 ? ' <span class="lnk" data-readers-all="' + esc(pid || '') + '">等 ' +
-      arr.length + ' 人</span>' : '');
+    return allBtn + '：' + names +
+      (arr.length > 3
+        ? ' <button type="button" class="rd-btn rd-read" onclick="window.__openReaders(\'' +
+            esc(pid || '') + '\')">等 ' + arr.length + ' 人</button>'
+        : '');
   }
 
   /* 看全部已读的人 */
@@ -2085,11 +2102,11 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
           var id = typeof x === 'string' ? '' : x.id;
           var nm = typeof x === 'string' ? x : x.name;
           /* 整行都能点（不只是名字那几个字） */
-          return '<div class="pick-row"' +
-              (id ? ' data-uid="' + esc(id) + '" style="cursor:pointer"' : '') + '>' +
-            (id ? '<span class="lnk">' + esc(nm) + '</span>' : esc(nm)) +
-            (id ? '<span style="margin-left:auto;color:var(--muted);font-size:12px">看主页 ›</span>' : '') +
-          '</div>';
+          if (!id) return '<div class="pick-row">' + esc(nm) + '</div>';
+          return '<button type="button" class="rd-btn rd-row" onclick="window.__openUser(\'' + esc(id) + '\')">' +
+            '<span>' + esc(nm) + '</span>' +
+            '<span style="margin-left:auto;color:var(--muted);font-size:12px">看主页 ›</span>' +
+          '</button>';
         }).join('')
       : '<div class="hint">还没有人已读</div>';
 
@@ -3502,6 +3519,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* 论坛 / 管理端：点名字看主页 */
   function openUserCard(uid) {
+    if (!uid) return;
     var m = modal('个人主页', '<div class="loading"><span class="spinner"></span>加载中…</div>', '', 520);
     var body = m.querySelector('.modal-body');
     api('api_user_profile', { p_token: S.token, p_user_id: uid }).then(function (r) {
@@ -6379,6 +6397,12 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       if ($('modView').hidden === false) closeModule();
     });
   }
+
+  /* 给内联 onclick 用的全局入口（已读名单里的按钮） */
+  window.__openUser = openUserCard;
+  window.__openReaders = function (pid) {
+    openReaders(pid, postReaders[pid] || []);
+  };
 
   /* ---------- go ---------- */
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { bind(); boot(); });
