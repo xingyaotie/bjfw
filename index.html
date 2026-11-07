@@ -1712,6 +1712,12 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   }
 
   /* ================= 论坛 ================= */
+  function readersText(list) {
+    var arr = list || [];
+    if (!arr.length) return '已读：还没有人';
+    return '已读：' + arr.join('、');
+  }
+
   function forumPostCard(p, isAdmin) {
     return '<div class="news-item" data-post="' + esc(p.id) + '">' +
       '<div class="fb-head">' +
@@ -1721,10 +1727,11 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         '<span class="time">' + esc(p.created_at) + '</span>' +
       '</div>' +
       '<div class="fb-body">' + esc(p.body) + '</div>' +
-      '<div style="margin-top:8px;display:flex;gap:14px;align-items:center">' +
+      '<div style="margin-top:8px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">' +
         '<button type="button" class="link" data-expand="' + esc(p.id) + '">' +
           (p.reply_count ? p.reply_count + ' 条跟评' : '跟评') + '</button>' +
         (isAdmin ? '<button type="button" class="link danger" data-postdel="' + esc(p.id) + '">删除帖子</button>' : '') +
+        '<span class="hint" data-readers="' + esc(p.id) + '" style="font-size:12px">' + readersText(p.readers) + '</span>' +
       '</div>' +
       '<div data-replies="' + esc(p.id) + '" hidden style="margin-top:10px"></div>' +
     '</div>';
@@ -1784,6 +1791,12 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     if (!box.hidden) { box.hidden = true; return; }
     box.hidden = false;
     box.innerHTML = '<div class="loading" style="padding:10px"><span class="spinner"></span>加载中…</div>';
+
+    // 打开就算已读（管理员不会记进去）
+    api('api_forum_read', { p_token: S.token, p_post_id: pid }).then(function (r) {
+      var el = document.querySelector('[data-readers="' + pid + '"]');
+      if (el && r && r.readers) el.textContent = readersText(r.readers);
+    }, function () {});
 
     api('api_forum_replies', { p_token: S.token, p_post_id: pid }).then(function (r) {
       var items = r.items || [];
@@ -2939,7 +2952,10 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
             '<span class="time">' + fmt(x.created_at) + '</span></div>' +
           '<p>' + esc(String(x.body || '').slice(0, 90)) + '</p>' +
           '<div style="margin-top:8px;font-size:12px;color:var(--muted)">' +
-            (x.to_all ? '发给全体' : '发给指定同学') + (x.reply_count ? ' · ' + x.reply_count + ' 条回复' : '') +
+            (x.to_all
+              ? '发给全体'
+              : '发给：' + ((x.targets && x.targets.length) ? x.targets.join('、') : '（收件人已删除）')) +
+            (x.reply_count ? ' · ' + x.reply_count + ' 条回复' : '') +
           '</div></div>';
       }).join('');
     }, function (e) {
