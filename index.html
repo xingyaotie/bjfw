@@ -81,25 +81,25 @@ button{font-family:inherit;cursor:pointer}
 .lnk:hover{background:#FDF0F2}
 .lnk:hover{text-decoration:underline}
 
-/* 左下角搜索：按钮和输入框合成一个胶囊（像浏览器地址栏），进模块时平滑收成圆 */
+/* 左下角搜索：灰调，完全跟随主题（--line / --ink2 / --card） */
 #userSearchWrap{position:fixed;left:16px;bottom:16px;z-index:850}
 .search-box{position:relative;display:flex;align-items:center;width:236px;height:44px;
-  border-radius:999px;border:1.5px solid var(--red);background:#fff;
-  box-shadow:0 8px 22px rgba(17,24,39,.13);
-  transition:width .3s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease}
-.search-box:focus-within{box-shadow:0 0 0 3px rgba(200,16,46,.13),0 10px 26px rgba(17,24,39,.13)}
+  border-radius:999px;border:1px solid var(--line);background:var(--card);
+  box-shadow:0 6px 18px rgba(17,24,39,.10);
+  transition:width .3s cubic-bezier(.22,.61,.36,1),border-color .2s ease,box-shadow .2s ease}
+.search-box:focus-within{border-color:var(--muted);box-shadow:0 8px 22px rgba(17,24,39,.14)}
 .search-box input{flex:1;min-width:0;height:100%;border:none;background:transparent;outline:none;
-  padding:0 16px 0 8px;font-size:13.5px;font-family:inherit;color:var(--ink);
+  padding:0 16px 0 6px;font-size:13.5px;font-family:inherit;color:var(--ink);
   transition:opacity .18s ease,padding .3s ease}
-#userSearchBtn{width:34px;height:34px;flex:none;margin-left:5px;margin-right:0;border-radius:50%;border:none;
-  background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;
-  transition:transform .22s cubic-bezier(.34,1.4,.64,1),filter .2s ease}
-#userSearchBtn:hover{transform:scale(1.08);filter:brightness(1.08)}
+.search-box input::placeholder{color:var(--muted)}
+#userSearchBtn{width:34px;height:34px;flex:none;margin-left:5px;border-radius:50%;border:none;
+  background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;padding:0;
+  transition:transform .22s cubic-bezier(.34,1.4,.64,1),color .2s ease,background .2s ease}
+#userSearchBtn:hover{color:var(--ink2);background:rgba(128,128,128,.12);transform:scale(1.04)}
 #userSearchBtn:active{transform:scale(.94)}
 #userSearchWrap.collapsed .search-box{width:44px}
 #userSearchWrap.collapsed .search-box input{opacity:0;padding:0;width:0}
 #pageSuggest{position:absolute;left:0;bottom:calc(100% + 8px);width:270px;max-height:280px}
-body.theme-wujin .search-box{background:#1B1710}
 
 /* 搜索自动补全 */
 .suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:70;background:#fff;
@@ -2091,12 +2091,6 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     var mo = modal('已读的人（' + list.length + '）', body,
       '<button class="btn ghost" type="button" data-close>关闭</button>', 420);
 
-    /* 弹窗里的人名也要能点开主页 */
-    mo.querySelector('.modal-body').addEventListener('click', function (e) {
-      var t = e.target.closest('[data-uid]');
-      if (!t || !t.dataset.uid) return;
-      openUserCard(t.dataset.uid);
-    });
   }
 
   /* 封禁 / 禁言小标签：封号优先，且不带时间 */
@@ -6098,8 +6092,6 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     $('forumAdminList').addEventListener('click', function (e) {
       var rall2 = e.target.closest('[data-readers-all]');
       if (rall2) { openReaders(rall2.dataset.readersAll, []); return; }
-      var whose = e.target.closest('[data-uid]');
-      if (whose && whose.dataset.uid) { openUserCard(whose.dataset.uid); return; }
       var del = e.target.closest('[data-postdel]');
       if (del) return deleteForumPost(del.dataset.postdel);
       var ex = e.target.closest('[data-expand]');
@@ -6193,6 +6185,18 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       if (b.dataset.cube === 'del') deleteCube(id);
     });
 
+    /* 全局兜底：不管在列表、弹窗还是哪，只要带 data-uid 的人名都能点开主页 */
+    document.addEventListener('click', function (e) {
+      var who = e.target.closest('[data-uid]');
+      if (!who) return;
+      // 管理端的按钮（身份切换、权限标签、加减分）也带 data-uid，别误触发主页
+      if (who.closest('button') || who.closest('.chip-btn') || who.closest('[data-medial]')) return;
+      var uid = who.getAttribute('data-uid');
+      if (!uid) return;
+      e.preventDefault();
+      openUserCard(uid);
+    });
+
     $('modBody').addEventListener('click', function (e) {
       var adbar = e.target.closest('.promo-bar');
       if (adbar) { openAdBar(adbar); return; }
@@ -6210,11 +6214,6 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         return;
       }
 
-      var whose = e.target.closest('[data-uid]');
-      if (whose && whose.dataset.uid && (currentMod === 'forum' || currentMod === 'profile')) {
-        openUserCard(whose.dataset.uid);
-        return;
-      }
 
       var mdt = e.target.closest('[data-medal-id]');
       if (mdt) { openMedalDetail(mdt.dataset.medalId); return; }
