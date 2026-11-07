@@ -89,9 +89,9 @@ button{font-family:inherit;cursor:pointer}
   transition:width .3s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease}
 .search-box:focus-within{box-shadow:0 0 0 3px rgba(200,16,46,.13),0 10px 26px rgba(17,24,39,.13)}
 .search-box input{flex:1;min-width:0;height:100%;border:none;background:transparent;outline:none;
-  padding:0 8px 0 18px;font-size:13.5px;font-family:inherit;color:var(--ink);
+  padding:0 16px 0 8px;font-size:13.5px;font-family:inherit;color:var(--ink);
   transition:opacity .18s ease,padding .3s ease}
-#userSearchBtn{width:34px;height:34px;flex:none;margin-right:5px;border-radius:50%;border:none;
+#userSearchBtn{width:34px;height:34px;flex:none;margin-left:5px;margin-right:0;border-radius:50%;border:none;
   background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;
   transition:transform .22s cubic-bezier(.34,1.4,.64,1),filter .2s ease}
 #userSearchBtn:hover{transform:scale(1.08);filter:brightness(1.08)}
@@ -1176,12 +1176,12 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   <div id="userSearchWrap" class="collapsed">
     <div class="search-box">
+      <button id="userSearchBtn" type="button" aria-label="搜索" title="搜索">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M20 20l-4.6-4.6"></path></svg>
+      </button>
       <input id="userSearch" placeholder="搜用户名 / 功能" maxlength="32" autocomplete="off">
       <div id="pageSuggest" class="suggest" hidden></div>
     </div>
-    <button id="userSearchBtn" type="button" aria-label="搜索用户" title="搜索用户">
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M20 20l-4.6-4.6"></path></svg>
-    </button>
   </div>
 
   <div class="actions" id="adminActions" style="display:none">
@@ -1943,26 +1943,39 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* ================= 左下角搜索：页内功能 ================= */
   var PAGE_FEATURES = [
-    { kw: '热门 公告 热点', to: 'news',     name: '班级热点',   desc: '看公告' },
-    { kw: '作业',            to: 'homework', name: '班级作业',   desc: '老师布置的作业' },
-    { kw: '课表 课程',       to: 'timetable',name: '班级课表',   desc: '本周课程安排' },
-    { kw: '论坛 帖子',       to: 'forum',    name: '论坛',       desc: '发帖、跟评' },
-    { kw: '魔方 教程',       to: 'cube',     name: '魔方教程',   desc: '需要管理员授权', cubePerm: true },
-    { kw: '调试 手感',       to: 'debug',    name: '魔方调试',   desc: '找最适合的手感' },
-    { kw: '更多',            to: 'more',     name: '更多',       desc: '版本信息、加盟商' },
-    { kw: '版本 更新日志 赞助 赞赏', to: 'ver', name: '版本信息', desc: '版本号、更新日志' },
-    { kw: '会员 方案 vip',   to: 'member',   name: '会员',       desc: '会员方案与专属主题' },
-    { kw: '反馈 建议',       to: 'fb',       name: '反馈',       desc: '提问题、提建议' },
-    { kw: '广告 推广 档期',  to: 'promo',    name: '推广信息',   desc: '价格和档期' },
-    { kw: '资料 我的 签名',  to: 'profile',  name: '我的资料',   desc: '性别、生日、签名' }
+    { kw: '热点 公告 通知 新闻 消息',        to: 'news',      name: '班级热点',   desc: '看公告' },
+    { kw: '作业 功课 任务',                  to: 'homework',  name: '班级作业',   desc: '老师布置的作业' },
+    { kw: '课表 课程 课程表 时间表 课 安排', to: 'timetable', name: '班级课表',   desc: '本周课程安排' },
+    { kw: '论坛 帖子 社区 讨论 发帖 跟评',   to: 'forum',     name: '论坛',       desc: '发帖、跟评' },
+    { kw: '魔方 教程 教学 公式',             to: 'cube',      name: '魔方教程',   desc: '需要管理员授权', cubePerm: true },
+    { kw: '调试 手感 调教',                  to: 'debug',     name: '魔方调试',   desc: '找最适合的手感' },
+    { kw: '更多 其他 全部',                  to: 'more',      name: '更多',       desc: '版本信息、加盟商' },
+    { kw: '版本 更新 日志 更新日志 赞助 赞助商 赞赏 打赏 关于', to: 'ver', name: '版本信息', desc: '版本号、更新日志' },
+    { kw: '会员 方案 vip 会籍 高级',         to: 'member',    name: '会员',       desc: '会员方案与专属主题' },
+    { kw: '反馈 建议 意见 问题 报错',        to: 'fb',        name: '反馈',       desc: '提问题、提建议' },
+    { kw: '广告 推广 档期 排期 价格 推销',   to: 'promo',     name: '推广信息',   desc: '价格和档期' },
+    { kw: '资料 我的 个人信息 签名 生日 性别', to: 'profile', name: '我的资料',   desc: '性别、生日、签名' }
   ];
 
+  /* 输入里含某个关键词也算命中（比如「课程表」里含「课程」） */
   function matchFeatures(kw) {
     var k = String(kw || '').trim().toLowerCase();
     if (!k) return [];
-    return PAGE_FEATURES.filter(function (f) {
-      return f.name.toLowerCase().indexOf(k) >= 0 || f.kw.toLowerCase().indexOf(k) >= 0;
+
+    var hits = [];
+    PAGE_FEATURES.forEach(function (f) {
+      var hay = (f.name + ' ' + f.kw).toLowerCase();
+      if (hay.indexOf(k) >= 0) { hits.push(f); return; }
+
+      var tokens = f.kw.toLowerCase().split(/\s+/).filter(Boolean).concat([f.name.toLowerCase()]);
+      for (var i = 0; i < tokens.length; i++) {
+        if (k.indexOf(tokens[i]) >= 0) { hits.push(f); return; }
+      }
+
+      // 两个字以上的词做一次包含判断，容忍语序不同
+      if (k.length >= 2 && hay.indexOf(k.slice(0, 2)) >= 0) hits.push(f);
     });
+    return hits;
   }
 
   function hidePageSuggest() {
@@ -2009,6 +2022,19 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     if (!box) return;
     var feats = matchFeatures(kw);
     var html = '';
+
+    /* 加盟商也能搜到（名字或小字命中） */
+    var kL = String(kw || '').trim().toLowerCase();
+    var vendors = (S.vendors || []).filter(function (v) {
+      return v.status !== 'off' &&
+        ((v.name || '').toLowerCase().indexOf(kL) >= 0 || (v.sub || '').toLowerCase().indexOf(kL) >= 0);
+    });
+    if (vendors.length) {
+      html += vendors.slice(0, 3).map(function (v) {
+        return '<div class="sg" data-vend="' + esc(v.url || '') + '">' +
+          '<span>🏬 ' + esc(v.name) + ' <small>' + esc(v.sub || '') + '</small></span></div>';
+      }).join('');
+    }
 
     if (feats.length) {
       html += feats.slice(0, 5).map(function (f) {
@@ -2062,8 +2088,15 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         }).join('')
       : '<div class="hint">还没有人已读</div>';
 
-    modal('已读的人（' + list.length + '）', body,
+    var mo = modal('已读的人（' + list.length + '）', body,
       '<button class="btn ghost" type="button" data-close>关闭</button>', 420);
+
+    /* 弹窗里的人名也要能点开主页 */
+    mo.querySelector('.modal-body').addEventListener('click', function (e) {
+      var t = e.target.closest('[data-uid]');
+      if (!t || !t.dataset.uid) return;
+      openUserCard(t.dataset.uid);
+    });
   }
 
   /* 封禁 / 禁言小标签：封号优先，且不带时间 */
@@ -5745,6 +5778,11 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         if (!kw) { hidePageSuggest(); return; }
 
         pageSuggestTimer = setTimeout(function () {
+          if (!S.vendors) {
+            api('api_vendors', { p_token: S.token }).then(function (vr) {
+              S.vendors = vr.items || [];
+            }, function () { S.vendors = []; });
+          }
           api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
             showPageSuggest(kw, r.items || []);
           }, function () {
@@ -5761,6 +5799,13 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
           hidePageSuggest();
           uSearch.value = '';
           goFeature(f.dataset.feat);
+          return;
+        }
+        var v = e.target.closest('[data-vend]');
+        if (v) {
+          hidePageSuggest();
+          uSearch.value = '';
+          if (v.dataset.vend) window.open(v.dataset.vend, '_blank');
           return;
         }
         var u = e.target.closest('[data-uid]');
