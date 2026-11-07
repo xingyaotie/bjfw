@@ -61,6 +61,52 @@ button{font-family:inherit;cursor:pointer}
 .link.danger{color:#B42318}
 .link[disabled]{color:#B9BEC6;cursor:not-allowed;text-decoration:none}
 
+/* 浮动标签输入框 */
+.float-field{position:relative;margin-bottom:18px}
+.float-input{height:52px;padding:18px 12px 4px;font-size:15px}
+.float-label{position:absolute;left:13px;top:16px;font-size:14px;color:#9AA0A8;pointer-events:none;
+  transition:.16s ease;background:transparent;padding:0 2px}
+.float-input:focus + .float-label,
+.float-input:not(:placeholder-shown) + .float-label{
+  top:6px;font-size:11.5px;color:var(--red)}
+.float-field .eye-btn{position:absolute;right:6px;top:11px;width:38px;height:30px;border:none;
+  background:transparent;font-size:17px;line-height:1;color:#9AA0A8;border-radius:7px}
+.float-field .eye-btn:hover{background:#F3F4F6;color:var(--ink2)}
+
+/* 搜索自动补全 */
+.suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:70;background:#fff;
+  border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(17,24,39,.14);
+  max-height:260px;overflow:auto;padding:4px}
+.suggest .sg{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
+  font-size:13.5px;color:var(--ink);cursor:pointer}
+.suggest .sg:hover{background:#FDF2F4}
+.suggest .sg small{color:var(--muted);font-size:12px}
+
+/* 生日滚动选择 */
+.pk-wrap{display:flex;gap:8px;justify-content:center;margin:6px 0}
+.pk-col{flex:1;max-width:120px;height:190px;overflow-y:auto;scroll-snap-type:y mandatory;
+  border:1px solid var(--line);border-radius:10px;background:#FBFCFD}
+.pk-item{height:38px;line-height:38px;text-align:center;font-size:14px;color:var(--ink2);
+  scroll-snap-align:center;cursor:pointer;border-radius:8px;margin:2px 6px}
+.pk-item:hover{background:#F3F4F6}
+.pk-item.on{background:var(--red);color:#fff;font-weight:600}
+
+/* 个人资料 */
+.pf-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:16px}
+.pf-row .pf-main{flex:1;min-width:0}
+.pf-label{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+.pf-val{font-size:14.5px;color:var(--ink);word-break:break-word;line-height:1.6}
+.pf-hint{font-size:11.5px;color:var(--muted);margin-top:4px}
+.medal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.medal{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+.medal.off{opacity:.45;background:#F7F8FA}
+.medal .mn{font-size:13.5px;font-weight:700;color:var(--ink)}
+.medal .mq{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5}
+.medal .ms{font-size:11.5px;color:var(--red);margin-top:5px}
+body.theme-wujin .suggest{background:#1B1710;border-color:#3A3122}
+body.theme-wujin .suggest .sg:hover{background:#221C12}
+body.theme-wujin .pk-col{background:#1B1710;border-color:#3A3122}
+
 /* 弹窗 */
 .mask{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;
   background:rgba(17,24,39,.45);opacity:0;transition:.2s}
@@ -511,12 +557,15 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         <h1 id="loginTitle">班级服务平台</h1>
         <div class="sub">请输入登录名和密码</div>
         <form id="loginForm" novalidate>
-          <label class="field"><span>登录名</span>
-            <input class="input" id="username" autocomplete="off" placeholder="请输入登录名" maxlength="32">
-          </label>
-          <label class="field"><span>密码</span>
-            <input class="input" id="password" type="password" autocomplete="current-password" placeholder="请输入密码">
-          </label>
+          <div class="float-field">
+            <input class="input float-input" id="username" autocomplete="off" placeholder=" " maxlength="32">
+            <label class="float-label" for="username">登录名</label>
+          </div>
+          <div class="float-field">
+            <input class="input float-input" id="password" type="password" autocomplete="current-password" placeholder=" ">
+            <label class="float-label" for="password">密码</label>
+            <button class="eye-btn" id="btnEye" type="button" aria-label="显示密码">👁</button>
+          </div>
           <div class="err" id="loginErr"></div>
           <button class="btn primary block" id="btnLogin" type="submit">登 录</button>
         </form>
@@ -576,6 +625,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
       <button class="tab" data-tab="forum" type="button">论坛</button>
+      <button class="tab" data-tab="medal" type="button">勋章设置</button>
       <button class="tab" data-tab="member" type="button">会员</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
@@ -598,19 +648,30 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       </div>
       <div class="card">
         <div class="toolbar">
-          <input class="input" id="search" type="search" placeholder="搜索用户名 / 登录名">
+          <div style="position:relative;flex:1 1 220px;min-width:170px">
+            <input class="input" id="search" type="search" placeholder="搜索用户名 / 登录名" style="width:100%">
+            <div id="searchSuggest" class="suggest" hidden></div>
+          </div>
           <button class="btn ghost sm" id="btnReload" type="button" style="height:38px">刷新</button>
         </div>
         <div class="table-wrap">
           <table>
-            <thead><tr><th style="width:40px"></th><th>用户名</th><th>登录名</th><th style="text-align:right">最后登录</th></tr></thead>
-            <tbody id="userBody"><tr><td colspan="4"><div class="loading"><span class="spinner"></span>加载中…</div></td></tr></tbody>
+            <thead><tr><th>用户名</th><th>登录名</th><th style="text-align:right">最后登录</th></tr></thead>
+            <tbody id="userBody"><tr><td colspan="3"><div class="loading"><span class="spinner"></span>加载中…</div></td></tr></tbody>
           </table>
         </div>
         <div class="table-foot">
           <span>密码以 bcrypt 哈希存储，管理员也看不到明文</span>
           <span id="pwdHint">忘记密码可点「重置密码」</span>
         </div>
+      </div>
+
+      <div class="card" id="userDetailCard" hidden style="padding:16px;margin-top:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div><h3 style="font-size:15px">用户资料</h3>
+            <div class="hint">点上面任意一行就能看到这个人的资料和勋章</div></div>
+        </div>
+        <div id="userDetail"></div>
       </div>
     </section>
 
@@ -834,6 +895,67 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
           <button class="btn ghost sm" id="btnMuteReload" type="button" style="height:32px">刷新</button>
         </div>
         <div id="muteBox" hidden style="margin-top:12px"></div>
+      </div>
+    </section>
+
+    <!-- 勋章设置 -->
+    <section id="tab-medal" hidden>
+      <div class="panel-head">
+        <div><h2>勋章设置</h2><div class="hint">上面管谁有/没勋章，下面设计新勋章</div></div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold" id="medalUserFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">① 用户勋章</h3>
+              <div class="hint">点一个人，看他所有勋章（含没拿到的）</div>
+            </div>
+          </div>
+          <button class="btn ghost sm" id="btnMedalReload" type="button" style="height:32px">刷新</button>
+        </div>
+        <div id="medalUserWrap" hidden style="margin-top:12px">
+          <div id="medalUserList" style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 12px"></div>
+          <div id="medalUserBox" style="margin-top:12px"></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold" id="medalFormFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">② 添加勋章</h3>
+              <div class="hint">一次性的手动授予；分阶级的按分数自动升降</div>
+            </div>
+          </div>
+        </div>
+        <div id="medalFormWrap" hidden style="margin-top:12px">
+          <label class="field"><span>勋章名称（显示在最上面的大字）<em>*</em></span>
+            <input class="input" id="mdName" maxlength="20" placeholder="例如：尊贵嘉宾"></label>
+
+          <div class="chips" id="mdKindBox" style="margin-bottom:12px">
+            <button type="button" class="chip-btn on" data-kind="once">一次性</button>
+            <button type="button" class="chip-btn" data-kind="tiered">分阶级</button>
+          </div>
+
+          <label class="field" id="mdReqBox"><span>完成要求（下面那行小字）</span>
+            <input class="input" id="mdReq" maxlength="60" placeholder="例如：曾经（现在）是 VIP 即可获得"></label>
+
+          <div id="mdLevelWrap" hidden>
+            <div class="hint" style="margin-bottom:8px">每一级自己一个名字 + 达到多少分</div>
+            <div id="mdLevels"></div>
+            <button class="btn ghost sm" id="mdLevelAdd" type="button" style="margin-top:8px">＋ 加一级</button>
+          </div>
+
+          <div style="text-align:right;margin-top:14px">
+            <button class="btn primary" id="mdSave" type="button">保存勋章</button>
+          </div>
+
+          <div class="pf-label" style="margin:18px 0 8px">已有勋章</div>
+          <div id="mdList"></div>
+        </div>
       </div>
     </section>
 
@@ -1721,7 +1843,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   function forumPostCard(p, isAdmin) {
     return '<div class="news-item" data-post="' + esc(p.id) + '">' +
       '<div class="fb-head">' +
-        '<span class="who">' + esc(p.author) + '</span>' +
+        '<span class="who" data-uid="' + esc(p.user_id || '') + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' + esc(p.author) + '</span>' +
         (p.author_role === 'vip' ? '<span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '') +
         (p.is_mine ? '<span class="badge gray" style="height:18px;font-size:11px">我</span>' : '') +
         '<span class="time">' + esc(p.created_at) + '</span>' +
@@ -1828,7 +1950,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       box.innerHTML =
         (items.length
           ? items.map(function (x) {
-              return '<div class="fb-reply"><b>' + esc(x.author) +
+              return '<div class="fb-reply"><b data-uid="' + esc(x.user_id || '') + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' + esc(x.author) +
                 (x.author_role === 'vip' ? ' · VIP' : '') + '</b>' + esc(x.body) +
                 '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + esc(x.created_at) + '</div></div>';
             }).join('')
@@ -2460,7 +2582,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'medal', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -2476,6 +2598,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
     if (name === 'forum') { loadForumAdmin(); loadMutePanel(); }
+    if (name === 'medal') loadMedalAdmin();
     if (name === 'member') loadMemberAdmin();
     if (name === 'ad') loadAdAdmin();
     if (name === 'notice') loadNoticeAdmin();
@@ -2493,10 +2616,545 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   }
 
   /* ---------- 管理端：用户 ---------- */
+  /* 管理端搜索自动补全 */
+  function hideSuggest() {
+    var box = $('searchSuggest');
+    if (box) { box.hidden = true; box.innerHTML = ''; }
+  }
+
+  function suggestUsers(kw) {
+    var box = $('searchSuggest');
+    if (!box) return;
+    var pool = S.allUsers && S.allUsers.length ? S.allUsers : (S.users || []);
+    var k = String(kw || '').toLowerCase();
+    var list = pool.filter(function (u) {
+      if (!k) return true;
+      return String(u.username || '').toLowerCase().indexOf(k) >= 0 ||
+             String(u.display_name || '').toLowerCase().indexOf(k) >= 0;
+    }).slice(0, 8);
+
+    if (!list.length) { hideSuggest(); return; }
+
+    box.innerHTML = list.map(function (u) {
+      return '<div class="sg" data-pick="' + esc(u.id) + '" data-name="' + esc(u.username) + '">' +
+        '<span class="avatar" style="width:22px;height:22px;font-size:11px">' +
+          esc((u.display_name || u.username || '?').slice(0, 1)) + '</span>' +
+        '<span>' + esc(u.display_name || '未命名') +
+          ' <small>' + esc(u.username) + '</small></span>' +
+      '</div>';
+    }).join('');
+    box.hidden = false;
+  }
+
+  /* 管理端点用户 → 下方显示资料 + 勋章 */
+  function showUserDetail(uid) {
+    var card = $('userDetailCard');
+    var box = $('userDetail');
+    if (!card || !box) return;
+
+    if (!uid) { card.hidden = true; box.innerHTML = ''; return; }
+    card.hidden = false;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_user_profile', { p_token: S.token, p_user_id: uid }).then(function (r) {
+      box.innerHTML = profileCardHtml(r.user, r.medals, true);
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+
+  /* ================= 个人资料 / 勋章展示 ================= */
+  function genderText(g) {
+    return g === 'male' ? '男' : g === 'female' ? '女' : '';
+  }
+
+  function birthdayText(u) {
+    if (!u.birth_year) return '未设置';
+    var t = u.birth_year + '年';
+    if (u.birth_month) t += u.birth_month + '月';
+    if (u.birth_day) t += u.birth_day + '日';
+    return t;
+  }
+
+  function daysLeft(setAt, days) {
+    if (!setAt) return 0;
+    var end = new Date(setAt).getTime() + days * 86400000;
+    var left = end - Date.now();
+    return left > 0 ? Math.ceil(left / 86400000) : 0;
+  }
+
+  function medalCardHtml(m) {
+    var cls = 'medal' + (m.awarded ? '' : ' off');
+    var extra = '';
+    if (m.kind === 'tiered') {
+      extra = '<div class="ms">' + (m.level > 0 ? '已获得 ' + m.level + ' 级' : '未获得') +
+              ' · 当前 ' + (m.score || 0) + ' 分</div>';
+      var lv = (m.levels || []).map(function (l) {
+        return '<div class="mq">' + esc(l.name) + '：' + l.threshold + ' 分' +
+          (l.requirement ? ' · ' + esc(l.requirement) : '') + '</div>';
+      }).join('');
+      if (lv) extra += lv;
+    } else {
+      extra = '<div class="ms">' + (m.awarded ? '已获得' : '未获得') + '</div>';
+      if (m.requirement) extra += '<div class="mq">' + esc(m.requirement) + '</div>';
+    }
+    return '<div class="' + cls + '">' +
+      '<div class="mn">' + esc(m.name) + '</div>' + extra + '</div>';
+  }
+
+  /* 资料卡片：论坛看别人 / 管理端看用户 都用它 */
+  function profileCardHtml(u, medals, isAdmin) {
+    var g = genderText(u.gender);
+    var vip = u.is_vip ? ' <span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '';
+
+    return '<div class="pf-row">' +
+        '<div class="pf-main">' +
+          '<div class="pf-val" style="font-size:16px;font-weight:700">' + esc(u.name) + vip + '</div>' +
+          (g ? '<div class="pf-hint">性别：' + esc(g) + '</div>' : '') +
+          (u.member_plan_name ? '<div class="pf-hint">会员：' + esc(u.member_plan_name) + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="pf-row"><div class="pf-main">' +
+        '<div class="pf-label">生日</div>' +
+        '<div class="pf-val">' + esc(birthdayText(u)) + '</div>' +
+      '</div></div>' +
+      '<div class="pf-row"><div class="pf-main">' +
+        '<div class="pf-label">个性签名</div>' +
+        '<div class="pf-val">' + (u.bio ? esc(u.bio) : '<span class="hint">还没写</span>') + '</div>' +
+      '</div></div>' +
+      '<div class="pf-label" style="margin-bottom:8px">勋章</div>' +
+      ((medals && medals.length)
+        ? '<div class="medal-grid">' + medals.map(medalCardHtml).join('') + '</div>'
+        : '<div class="hint">还没有设置任何勋章</div>');
+  }
+
+  /* ---------- 用户端：我的资料 ---------- */
+  function openProfileModule() {
+    currentMod = 'profile';
+    $('modTitle').textContent = '我的资料';
+    $('userPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    try { history.pushState({ mod: 'profile' }, '', '#profile'); } catch (e) {}
+    renderProfile();
+  }
+
+  function renderProfile() {
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_user_profile', { p_token: S.token, p_user_id: S.me.id }).then(function (r) {
+      var u = r.user;
+      var medals = r.medals || [];
+      var gLeft = daysLeft(S.me.gender_set_at, 30);
+      var bLeft = daysLeft(S.me.birthday_set_at, 180);
+      var bioLeft = daysLeft(S.me.bio_set_at, 30);
+      var canAddMonth = !u.birth_month;
+      var canAddDay = !u.birth_day;
+
+      body.innerHTML =
+        '<div style="max-width:600px;margin:0 auto">' +
+
+          '<div class="card" style="padding:16px;margin-bottom:14px">' +
+            '<div class="pf-row"><div class="pf-main">' +
+              '<div class="pf-label">名字（不能改）</div>' +
+              '<div class="pf-val" style="font-size:16px;font-weight:700">' + esc(u.name) + '</div>' +
+            '</div></div>' +
+
+            '<div class="pf-row"><div class="pf-main">' +
+              '<div class="pf-label">性别</div>' +
+              '<div class="chips" id="pfGender">' +
+                ['', 'male', 'female'].map(function (k) {
+                  var label = k === '' ? '不选' : (k === 'male' ? '男' : '女');
+                  return '<button type="button" class="chip-btn ' + (u.gender === k ? 'on' : '') +
+                    '" data-g="' + k + '">' + label + '</button>';
+                }).join('') +
+              '</div>' +
+              (gLeft > 0 ? '<div class="pf-hint">还要等 ' + gLeft + ' 天才能再改</div>' : '') +
+            '</div>' +
+            '<button class="btn primary sm" id="pfSaveGender" type="button" style="height:34px;flex:none">保存</button>' +
+            '</div>' +
+
+            '<div class="pf-row"><div class="pf-main">' +
+              '<div class="pf-label">生日</div>' +
+              '<div class="pf-val" id="pfBirthVal">' + esc(birthdayText(u)) + '</div>' +
+              (bLeft > 0 && !canAddMonth
+                ? '<div class="pf-hint">还要等 ' + bLeft + ' 天才能改（补月份/日期随时可以）</div>'
+                : '') +
+            '</div>' +
+            '<div style="display:flex;gap:8px;flex:none">' +
+              '<button class="btn ghost sm" id="pfPickBirth" type="button" style="height:34px">选择</button>' +
+              '<button class="btn primary sm" id="pfSaveBirth" type="button" style="height:34px">保存</button>' +
+            '</div>' +
+            '</div>' +
+
+            '<div class="pf-row"><div class="pf-main">' +
+              '<div class="pf-label">个性签名（最多 60 字）</div>' +
+              '<textarea class="textarea" id="pfBio" rows="3" maxlength="60">' + esc(u.bio || '') + '</textarea>' +
+              (bioLeft > 0 ? '<div class="pf-hint">还要等 ' + bioLeft + ' 天才能再改</div>' : '') +
+            '</div>' +
+            '<button class="btn primary sm" id="pfSaveBio" type="button" style="height:34px;flex:none">保存</button>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="card" style="padding:16px">' +
+            '<div class="pf-label" style="margin-bottom:10px">我的勋章</div>' +
+            (medals.length
+              ? '<div class="medal-grid">' + medals.map(medalCardHtml).join('') + '</div>'
+              : '<div class="hint">还没有设置任何勋章</div>') +
+          '</div>' +
+        '</div>';
+
+      var picked = u.gender;
+      body.querySelector('#pfGender').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-g]');
+        if (!b) return;
+        picked = b.dataset.g;
+        Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      });
+
+      body.querySelector('#pfSaveGender').onclick = function () {
+        var btn = this;
+        busy(btn, true, '保存中…');
+        api('api_profile_set_gender', { p_token: S.token, p_gender: picked }).then(function () {
+          busy(btn, false);
+          toast('性别已保存', 'ok');
+          reloadProfile();
+        }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+      };
+
+      var birthPick = { y: u.birth_year, m: u.birth_month, d: u.birth_day };
+      body.querySelector('#pfPickBirth').onclick = function () {
+        openBirthdayPicker(birthPick, function (v) {
+          birthPick = v;
+          body.querySelector('#pfBirthVal').textContent =
+            v.y ? (v.y + '年' + (v.m ? v.m + '月' : '') + (v.d ? v.d + '日' : '')) : '未设置';
+        });
+      };
+
+      body.querySelector('#pfSaveBirth').onclick = function () {
+        var btn = this;
+        busy(btn, true, '保存中…');
+        api('api_profile_set_birthday', {
+          p_token: S.token, p_year: birthPick.y, p_month: birthPick.m, p_day: birthPick.d
+        }).then(function () {
+          busy(btn, false);
+          toast('生日已保存', 'ok');
+          reloadProfile();
+        }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
+      };
+
+      body.querySelector('#pfSaveBio').onclick = function () {
+        var btn = this;
+        var v = body.querySelector('#pfBio').value;
+        busy(btn, true, '保存中…');
+        api('api_profile_set_bio', { p_token: S.token, p_bio: v }).then(function () {
+          busy(btn, false);
+          toast('签名已保存', 'ok');
+          reloadProfile();
+        }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+      };
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function reloadProfile() {
+    api('api_me', { p_token: S.token }).then(function (r) {
+      if (r && r.profile) S.me = r.profile;
+      renderProfile();
+    }, function () { renderProfile(); });
+  }
+
+  /* 生日滚动选择：年 / 月 / 日，月和年都有「不填」 */
+  function openBirthdayPicker(cur, cb) {
+    var nowYear = new Date().getFullYear();
+    var state = {
+      y: cur && cur.y ? cur.y : null,
+      m: cur && cur.m ? cur.m : null,
+      d: cur && cur.d ? cur.d : null
+    };
+
+    var m = modal('选择生日',
+      '<div class="pk-wrap">' +
+        '<div class="pk-col" id="pkY"></div>' +
+        '<div class="pk-col" id="pkM"></div>' +
+        '<div class="pk-col" id="pkD"></div>' +
+      '</div>' +
+      '<p class="hint" style="text-align:center;font-size:12px">年和月都可以选「不填」；只填年份也可以。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="pkOk" type="button">确定</button>', 420);
+
+    function fillYear() {
+      var box = m.querySelector('#pkY');
+      var html = '<div class="pk-item' + (state.y === null ? ' on' : '') + '" data-y="0">不填</div>';
+      for (var y = nowYear; y >= 2012; y--) {
+        html += '<div class="pk-item' + (state.y === y ? ' on' : '') + '" data-y="' + y + '">' + y + ' 年</div>';
+      }
+      box.innerHTML = html;
+    }
+
+    function fillMonth() {
+      var box = m.querySelector('#pkM');
+      var html = '<div class="pk-item' + (state.m === null ? ' on' : '') + '" data-m="0">不填</div>';
+      for (var i = 1; i <= 12; i++) {
+        html += '<div class="pk-item' + (state.m === i ? ' on' : '') + '" data-m="' + i + '">' + i + ' 月</div>';
+      }
+      box.innerHTML = html;
+    }
+
+    function fillDay() {
+      var box = m.querySelector('#pkD');
+      if (state.m === null) {
+        box.innerHTML = '<div class="pk-item" style="opacity:.4">先选月份</div>';
+        return;
+      }
+      var max = new Date(state.y || 2020, state.m, 0).getDate();
+      var html = '<div class="pk-item' + (state.d === null ? ' on' : '') + '" data-d="0">不填</div>';
+      for (var i = 1; i <= max; i++) {
+        html += '<div class="pk-item' + (state.d === i ? ' on' : '') + '" data-d="' + i + '">' + i + ' 日</div>';
+      }
+      box.innerHTML = html;
+    }
+
+    fillYear(); fillMonth(); fillDay();
+
+    m.querySelector('#pkY').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-y]');
+      if (!it) return;
+      state.y = Number(it.dataset.y) || null;
+      if (!state.y) { state.m = null; state.d = null; }
+      fillYear(); fillMonth(); fillDay();
+    });
+    m.querySelector('#pkM').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-m]');
+      if (!it) return;
+      state.m = Number(it.dataset.m) || null;
+      if (!state.m) state.d = null;
+      fillMonth(); fillDay();
+    });
+    m.querySelector('#pkD').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-d]');
+      if (!it) return;
+      state.d = Number(it.dataset.d) || null;
+      fillDay();
+    });
+
+    m.querySelector('#pkOk').onclick = function () {
+      if (state.y === null && (state.m || state.d)) {
+        state.m = null; state.d = null;
+      }
+      closeModal();
+      cb({ y: state.y, m: state.m, d: state.d });
+    };
+  }
+
+
+  /* ================= 管理端：勋章设置 ================= */
+  function loadMedalAdmin() {
+    renderMedalUsers();
+    loadMedalList();
+    if (!document.querySelector('#mdLevels [data-lv-row]')) mdAddLevel(null);
+  }
+
+  function renderMedalUsers() {
+    var box = $('medalUserList');
+    if (!box) return;
+    var pool = S.allUsers && S.allUsers.length ? S.allUsers : (S.users || []);
+    if (!pool.length) {
+      box.innerHTML = '<div class="hint" style="padding:8px">还没有账号</div>';
+      return;
+    }
+    box.innerHTML = pool.map(function (u) {
+      return '<div class="pick-row" data-meduser="' + esc(u.id) + '" style="cursor:pointer">' +
+        '<span>' + esc(u.display_name || u.username) +
+        ' <small style="color:var(--muted)">' + esc(u.username) + '</small></span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function showMedalUser(uid) {
+    var box = $('medalUserBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_user_profile', { p_token: S.token, p_user_id: uid }).then(function (r) {
+      var medals = r.medals || [];
+      box.innerHTML =
+        '<div style="font-size:14px;font-weight:700;margin-bottom:8px">' + esc(r.user.name) +
+          (r.user.is_vip ? ' <span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '') +
+        '</div>' +
+        (medals.length
+          ? '<div class="medal-grid">' + medals.map(function (m) {
+              var ctrl = '';
+              if (m.kind === 'once') {
+                ctrl = '<button type="button" class="btn ghost sm" data-medtoggle="' + esc(m.id) + '"' +
+                  ' data-uid="' + esc(uid) + '" style="height:28px;margin-top:8px">' +
+                  (m.awarded ? '撤销' : '授予') + '</button>';
+              } else {
+                ctrl = '<div style="display:flex;gap:6px;align-items:center;margin-top:8px">' +
+                  '<button type="button" class="btn ghost sm" data-meddelta="-1" data-medid="' + esc(m.id) + '"' +
+                    ' data-uid="' + esc(uid) + '" style="height:28px">−1</button>' +
+                  '<span style="font-size:13px;color:var(--ink)">' + (m.score || 0) + ' 分</span>' +
+                  '<button type="button" class="btn ghost sm" data-meddelta="1" data-medid="' + esc(m.id) + '"' +
+                    ' data-uid="' + esc(uid) + '" style="height:28px">+1</button>' +
+                '</div>';
+              }
+              return '<div class="medal' + (m.awarded ? '' : ' off') + '">' +
+                '<div class="mn">' + esc(m.name) + '</div>' +
+                (m.kind === 'tiered'
+                  ? '<div class="ms">' + (m.level > 0 ? '已获得 ' + m.level + ' 级' : '未获得') + '</div>'
+                  : '<div class="ms">' + (m.awarded ? '已获得' : '未获得') + '</div>') +
+                ctrl +
+              '</div>';
+            }).join('') + '</div>'
+          : '<div class="hint">还没有设置任何勋章</div>');
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function loadMedalList() {
+    var box = $('mdList');
+    if (!box) return;
+    api('api_admin_medals', { p_token: S.token }).then(function (r) {
+      S.medals = r.items || [];
+      if (!S.medals.length) {
+        box.innerHTML = '<div class="hint">还没有勋章，上面填一个吧</div>';
+        return;
+      }
+      box.innerHTML = S.medals.map(function (m) {
+        return '<div class="perm-row" style="padding:8px 0">' +
+          '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(m.name) +
+            '<small>' + (m.kind === 'once' ? '一次性' : '分阶级 · ' + (m.levels || []).length + ' 级') + '</small></div>' +
+          '<button type="button" class="link" data-mededit="' + esc(m.id) + '">编辑</button>' +
+          '<button type="button" class="link danger" data-meddel="' + esc(m.id) + '">删除</button>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  var mdKind = 'once';
+  var mdEditing = null;
+
+  function mdLevelRow(lv, idx) {
+    lv = lv || {};
+    return '<div class="row" data-lv-row style="margin-bottom:8px;align-items:center">' +
+      '<span style="width:40px;flex:none;font-size:13px;color:var(--muted)">' + (idx + 1) + '级</span>' +
+      '<input class="input" data-lv-name placeholder="这一级的名字" value="' + esc(lv.name || '') + '" style="min-width:90px">' +
+      '<input class="input" data-lv-th type="number" min="0" placeholder="分数" value="' + (lv.threshold != null ? lv.threshold : '') + '" style="max-width:90px">' +
+      '<input class="input" data-lv-req placeholder="这一级的要求（可不填）" value="' + esc(lv.requirement || '') + '" style="min-width:90px">' +
+      '<button type="button" class="btn ghost sm" data-lv-del style="height:40px;flex:none">删</button>' +
+    '</div>';
+  }
+
+  function mdAddLevel(lv) {
+    var box = $('mdLevels');
+    if (!box) return;
+    var n = box.querySelectorAll('[data-lv-row]').length;
+    var div = document.createElement('div');
+    div.innerHTML = mdLevelRow(lv, n);
+    box.appendChild(div.firstChild);
+  }
+
+  function mdRenumber() {
+    var rows = $('mdLevels').querySelectorAll('[data-lv-row]');
+    Array.prototype.forEach.call(rows, function (r, i) {
+      r.querySelector('span').textContent = (i + 1) + '级';
+    });
+  }
+
+  function mdResetForm() {
+    mdEditing = null;
+    $('mdName').value = '';
+    $('mdReq').value = '';
+    mdKind = 'once';
+    Array.prototype.forEach.call($('mdKindBox').children, function (x) {
+      x.classList.toggle('on', x.dataset.kind === 'once');
+    });
+    $('mdLevelWrap').hidden = true;
+    $('mdLevels').innerHTML = '';
+    $('mdSave').textContent = '保存勋章';
+    mdAddLevel(null);
+  }
+
+  function mdSave() {
+    var btn = $('mdSave');
+    var name = $('mdName').value.trim();
+    if (!name) return toast('填一下勋章名称', 'err');
+
+    var levels = [];
+    if (mdKind === 'tiered') {
+      Array.prototype.forEach.call($('mdLevels').querySelectorAll('[data-lv-row]'), function (r, i) {
+        var nm = r.querySelector('[data-lv-name]').value.trim();
+        if (!nm) return;
+        levels.push({
+          level: i + 1,
+          name: nm,
+          threshold: Number(r.querySelector('[data-lv-th]').value) || 0,
+          requirement: r.querySelector('[data-lv-req]').value.trim()
+        });
+      });
+      if (!levels.length) return toast('分阶级至少要填一级', 'err');
+    }
+
+    busy(btn, true, '保存中…');
+    api('api_admin_medal_save', {
+      p_token: S.token,
+      p_id: mdEditing,
+      p_name: name,
+      p_kind: mdKind,
+      p_requirement: $('mdReq').value.trim(),
+      p_levels: levels
+    }).then(function () {
+      busy(btn, false);
+      toast('已保存', 'ok');
+      mdResetForm();
+      loadMedalList();
+    }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+  }
+
+  function mdEdit(id) {
+    var m = (S.medals || []).filter(function (x) { return x.id === id; })[0];
+    if (!m) return;
+    mdEditing = m.id;
+    $('mdName').value = m.name;
+    $('mdReq').value = m.requirement || '';
+    mdKind = m.kind;
+    Array.prototype.forEach.call($('mdKindBox').children, function (x) {
+      x.classList.toggle('on', x.dataset.kind === mdKind);
+    });
+    $('mdLevelWrap').hidden = (mdKind !== 'tiered');
+    $('mdLevels').innerHTML = '';
+    if (mdKind === 'tiered') {
+      (m.levels || []).forEach(function (l) { mdAddLevel(l); });
+    } else {
+      mdAddLevel(null);
+    }
+    $('mdSave').textContent = '保存修改';
+    $('medalFormWrap').hidden = false;
+    $('medalFormFold').classList.add('open');
+  }
+
+  /* 论坛 / 管理端：点名字看主页 */
+  function openUserCard(uid) {
+    var m = modal('个人主页', '<div class="loading"><span class="spinner"></span>加载中…</div>', '', 520);
+    var body = m.querySelector('.modal-body');
+    api('api_user_profile', { p_token: S.token, p_user_id: uid }).then(function (r) {
+      body.innerHTML = profileCardHtml(r.user, r.medals, false);
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
   function loadUsers() {
     $('userBody').innerHTML = '<tr><td colspan="4"><div class="loading"><span class="spinner"></span>加载中…</div></td></tr>';
     api('api_admin_list_users', { p_token: S.token, p_search: S.kw }).then(function (r) {
       S.users = r.users || [];
+      if (!S.kw) S.allUsers = S.users;
       $('userCount').textContent = '共 ' + (r.total || 0) + ' 个账号';
       renderUsers();
     }, function (e) {
@@ -2508,7 +3166,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     var body = $('userBody');
     if (!S.users.length) {
       S.sel = '';
-      body.innerHTML = '<tr><td colspan="4"><div class="empty"><strong>' +
+      body.innerHTML = '<tr><td colspan="3"><div class="empty"><strong>' +
         (S.kw ? '没有搜到匹配的账号' : '还没有账号') + '</strong>' +
         (S.kw ? '换个关键词试试' : '点右下角「新增用户」建第一个账号') + '</div></td></tr>';
       return;
@@ -2522,7 +3180,6 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       }
       var roleTxt = u.role === 'admin' ? '管理员' : u.role === 'vip' ? '高级' : '';
       return '<tr data-id="' + esc(u.id) + '" class="' + (u.id === S.sel ? 'sel' : '') + '">' +
-        '<td><span class="pick">✓</span></td>' +
         '<td><span class="name"><span class="avatar">' + esc((u.display_name || u.username || '?').slice(0, 1)) + '</span>' +
           esc(u.display_name || '未命名') +
           (me ? ' <span class="badge gray" style="height:18px;font-size:11px">我</span>' : '') +
@@ -4571,7 +5228,15 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* ---------- 绑定 ---------- */
   function bind() {
-    $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });    $('btnLogout').addEventListener('click', logout);
+    $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
+    $('btnEye').addEventListener('click', function () {
+      var pw = $('password');
+      var show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      this.textContent = show ? '🙈' : '👁';
+      this.setAttribute('aria-label', show ? '隐藏密码' : '显示密码');
+      pw.focus();
+    });    $('btnLogout').addEventListener('click', logout);
     $('btnAdd2').addEventListener('click', openAdd);
     $('btnReset').addEventListener('click', openReset);
     $('btnBan').addEventListener('click', openBanModal);
@@ -4596,6 +5261,8 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     $('btnCubeTypes').addEventListener('click', openCubeTypes);
     $('btnDebugNew').addEventListener('click', function () { openDebugForm(null); });
     $('btnMember').addEventListener('click', openMemberModule);
+    $('userName').addEventListener('click', function () { if (S.me && S.me.id) openProfileModule(); });
+    $('userName').style.cursor = 'pointer';
     $('btnFirstAid').addEventListener('click', openFirstAid);
     $('mePrefs').addEventListener('click', function (e) {
       var th = e.target.closest('[data-theme]');
@@ -4788,7 +5455,85 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     });
     $('btnForumReload').addEventListener('click', loadForumAdmin);
     $('btnMuteReload').addEventListener('click', loadMutePanel);
+
+    /* ---------- 勋章设置 ---------- */
+    $('medalUserFold').addEventListener('click', function () {
+      var wrap = $('medalUserWrap');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('medalFormFold').addEventListener('click', function () {
+      var wrap = $('medalFormWrap');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('btnMedalReload').addEventListener('click', loadMedalAdmin);
+
+    $('medalUserList').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-meduser]');
+      if (it) showMedalUser(it.dataset.meduser);
+    });
+
+    $('medalUserBox').addEventListener('click', function (e) {
+      var tg = e.target.closest('[data-medtoggle]');
+      if (tg) {
+        api('api_admin_medal_toggle', {
+          p_token: S.token, p_user_id: tg.dataset.uid, p_medal_id: tg.dataset.medtoggle
+        }).then(function (r) {
+          toast(r.awarded ? '已授予' : '已撤销', 'ok');
+          showMedalUser(tg.dataset.uid);
+        }, function (err) { toast(err.message, 'err', 3600); });
+        return;
+      }
+      var dl = e.target.closest('[data-meddelta]');
+      if (dl) {
+        api('api_admin_medal_score', {
+          p_token: S.token, p_user_id: dl.dataset.uid,
+          p_medal_id: dl.dataset.medid, p_delta: Number(dl.dataset.meddelta)
+        }).then(function (r) {
+          toast('现在 ' + r.score + ' 分，' + (r.level > 0 ? r.level + ' 级' : '未获得'), 'ok', 2600);
+          showMedalUser(dl.dataset.uid);
+        }, function (err) { toast(err.message, 'err', 3600); });
+      }
+    });
+
+    $('mdKindBox').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-kind]');
+      if (!b) return;
+      mdKind = b.dataset.kind;
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      $('mdLevelWrap').hidden = (mdKind !== 'tiered');
+    });
+    $('mdLevelAdd').addEventListener('click', function () { mdAddLevel(null); });
+    $('mdLevels').addEventListener('click', function (e) {
+      var d = e.target.closest('[data-lv-del]');
+      if (!d) return;
+      var row = d.closest('[data-lv-row]');
+      if ($('mdLevels').querySelectorAll('[data-lv-row]').length > 1) row.remove();
+      else {
+        row.querySelector('[data-lv-name]').value = '';
+        row.querySelector('[data-lv-th]').value = '';
+        row.querySelector('[data-lv-req]').value = '';
+      }
+      mdRenumber();
+    });
+    $('mdSave').addEventListener('click', mdSave);
+    $('mdList').addEventListener('click', function (e) {
+      var ed = e.target.closest('[data-mededit]');
+      if (ed) return mdEdit(ed.dataset.mededit);
+      var del = e.target.closest('[data-meddel]');
+      if (del) {
+        confirmBox('删除勋章', '删除后所有人身上的这个勋章也会一起没掉。', '', '删除').then(function (yes) {
+          if (!yes) return;
+          api('api_admin_medal_delete', { p_token: S.token, p_id: del.dataset.meddel }).then(function () {
+            toast('已删除', 'ok'); loadMedalList();
+          }, function (err) { toast(err.message, 'err', 3600); });
+        });
+      }
+    });
     $('forumAdminList').addEventListener('click', function (e) {
+      var whose = e.target.closest('[data-uid]');
+      if (whose && whose.dataset.uid) { openUserCard(whose.dataset.uid); return; }
       var del = e.target.closest('[data-postdel]');
       if (del) return deleteForumPost(del.dataset.postdel);
       var ex = e.target.closest('[data-expand]');
@@ -4893,6 +5638,12 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         return;
       }
 
+      var whose = e.target.closest('[data-uid]');
+      if (whose && whose.dataset.uid && (currentMod === 'forum' || currentMod === 'profile')) {
+        openUserCard(whose.dataset.uid);
+        return;
+      }
+
       var exp = e.target.closest('[data-expand]');
       if (exp && currentMod === 'forum') {
         var rbox = $('modBody').querySelector('[data-replies="' + exp.dataset.expand + '"]');
@@ -4968,6 +5719,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       if (!tr) return;
       S.sel = (S.sel === tr.dataset.id) ? '' : tr.dataset.id;
       renderUsers();
+      showUserDetail(S.sel);
     });
 
     $('newsList').addEventListener('click', function (e) {
@@ -5002,11 +5754,27 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       if ($('modView').hidden === false) closeModule();
     });
 
-    $('search').addEventListener('input', debounce(function () {
-      S.kw = $('search').value.trim();
+    var searchEl = $('search');
+    searchEl.addEventListener('input', function () {
+      var kw = searchEl.value.trim();
+      S.kw = kw;
       S.sel = '';
       loadUsers();
-    }, 300));
+      suggestUsers(kw);
+    });
+    searchEl.addEventListener('focus', function () { suggestUsers($('search').value.trim()); });
+    $('searchSuggest').addEventListener('click', function (e) {
+      var it = e.target.closest('[data-pick]');
+      if (!it) return;
+      searchEl.value = it.dataset.name || '';
+      S.kw = searchEl.value;
+      S.sel = it.dataset.pick;
+      loadUsers();
+      hideSuggest();
+    });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('#searchSuggest') && !e.target.closest('#search')) hideSuggest();
+    });
 
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
