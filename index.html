@@ -1416,7 +1416,9 @@ window.__supaReady = new Promise(function (resolve) {
     if (/PGRST202|could not find the function|schema cache/i.test(m)) {
       return '数据库缺少这个功能：请把最新的 SQL 文件在 Supabase 里跑一遍';
     }
-    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return '连不上数据库，请检查网络';
+    if (/Failed to fetch|NetworkError|Load failed|Network request failed|TypeError|aborted/i.test(m)) {
+      return '连不上数据库：当前网络挡了 supabase 的域名。换 WiFi / 换浏览器（微信里点右上角「在浏览器打开」）后再试';
+    }
     if (/JWT|apikey/i.test(m)) return '密钥不正确，请检查 config';
     if (/permission denied/i.test(m)) return '没有权限，请确认 SQL 已经完整执行';
     return m || '操作失败';
@@ -1544,7 +1546,35 @@ window.__supaReady = new Promise(function (resolve) {
     }, function (e) {
       busy(btn, false);
       if (e.data && e.data.banned) { showBanNotice(e.data); return; }
+
+      if (/连不上数据库/.test(e.message)) {
+        err.innerHTML = esc(e.message) +
+          '<br><a href="#" id="netCheck" style="font-size:12.5px;color:var(--red)">点这里检查网络</a>';
+        var nc = $('netCheck');
+        if (nc) nc.onclick = function (ev) { ev.preventDefault(); netSelfCheck(); };
+        return;
+      }
       err.textContent = e.message;
+    });
+  }
+
+  /* 网络自检：直接打 Supabase 的 REST 根路径，看能不能通 */
+  function netSelfCheck() {
+    toast('正在检查…');
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 8000);
+
+    fetch(URL + '/rest/v1/', {
+      method: 'GET',
+      headers: { apikey: KEY, Authorization: 'Bearer ' + KEY },
+      signal: ctrl ? ctrl.signal : undefined,
+      cache: 'no-store'
+    }).then(function (res) {
+      clearTimeout(timer);
+      toast('网络能连上数据库（HTTP ' + res.status + '），可能是刚才断了一下，再登录试试', 'ok', 4000);
+    }, function (e) {
+      clearTimeout(timer);
+      toast('确实连不上数据库：当前网络访问不了 supabase。换 WiFi / 换浏览器 / 用流量试试', 'err', 5000);
     });
   }
 
