@@ -2059,6 +2059,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* ================= 论坛 ================= */
   var forumReaders = {};
+  var postReaders = {};
 
   function readersText(list, pid) {
     var arr = list || [];
@@ -2077,13 +2078,17 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* 看全部已读的人 */
   function openReaders(pid, fallbackNames) {
-    var list = forumReaders[pid] || fallbackNames || [];
+    var cached = forumReaders[pid];
+    var list = (cached && cached.length) ? cached : (fallbackNames || []);
     var body = list.length
       ? list.map(function (x) {
           var id = typeof x === 'string' ? '' : x.id;
           var nm = typeof x === 'string' ? x : x.name;
-          return '<div class="pick-row">' +
-            (id ? '<span class="lnk" data-uid="' + esc(id) + '">' + esc(nm) + '</span>' : esc(nm)) +
+          /* 整行都能点（不只是名字那几个字） */
+          return '<div class="pick-row"' +
+              (id ? ' data-uid="' + esc(id) + '" style="cursor:pointer"' : '') + '>' +
+            (id ? '<span class="lnk">' + esc(nm) + '</span>' : esc(nm)) +
+            (id ? '<span style="margin-left:auto;color:var(--muted);font-size:12px">看主页 ›</span>' : '') +
           '</div>';
         }).join('')
       : '<div class="hint">还没有人已读</div>';
@@ -2091,6 +2096,18 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     var mo = modal('已读的人（' + list.length + '）', body,
       '<button class="btn ghost" type="button" data-close>关闭</button>', 420);
 
+    /* 双重保险：每一行、以及行里的文字，都单独绑一次点击。
+       不依赖事件冒泡，点哪都能开。 */
+    Array.prototype.forEach.call(mo.querySelectorAll('[data-uid]'), function (el) {
+      var uid = el.getAttribute('data-uid');
+      if (!uid) return;
+      el.style.cursor = 'pointer';
+      el.onclick = function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        openUserCard(uid);
+      };
+    });
   }
 
   /* 封禁 / 禁言小标签：封号优先，且不带时间 */
@@ -2110,6 +2127,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   }
 
   function forumPostCard(p, isAdmin) {
+    postReaders[p.id] = p.readers || [];
     return '<div class="news-item" data-post="' + esc(p.id) + '">' +
       '<div class="fb-head">' +
         '<span class="who" data-uid="' + esc(p.user_id || '') + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' + esc(p.author) + '</span>' +
@@ -6091,7 +6109,11 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     });
     $('forumAdminList').addEventListener('click', function (e) {
       var rall2 = e.target.closest('[data-readers-all]');
-      if (rall2) { openReaders(rall2.dataset.readersAll, []); return; }
+      if (rall2) {
+        var rp2 = rall2.dataset.readersAll;
+        openReaders(rp2, postReaders[rp2] || []);
+        return;
+      }
       var del = e.target.closest('[data-postdel]');
       if (del) return deleteForumPost(del.dataset.postdel);
       var ex = e.target.closest('[data-expand]');
@@ -6210,7 +6232,8 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
       var rall = e.target.closest('[data-readers-all]');
       if (rall) {
-        openReaders(rall.dataset.readersAll, []);
+        var rp = rall.dataset.readersAll;
+        openReaders(rp, postReaders[rp] || []);
         return;
       }
 
