@@ -2072,9 +2072,11 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* 已读的人名：渲染成真正的 <button>，onclick 直接调全局函数 */
   function readerBtn(x) {
-    if (typeof x === 'string' || !x || !x.id) return esc(typeof x === 'string' ? x : (x && x.name) || '');
-    return '<button type="button" class="rd-btn" onclick="window.__openUser(\'' + esc(x.id) + '\')">' +
-      esc(x.name) + '</button>';
+    var id = x && x.id;
+    var nm = typeof x === 'string' ? x : (x && x.name) || '';
+    if (!id) return esc(nm);            // 实在没有 id 才退化成文字
+    return '<button type="button" class="rd-btn" onclick="window.__openUser(\'' + esc(id) + '\')">' +
+      esc(nm) + '</button>';
   }
 
   function readersText(list, pid) {
@@ -2209,9 +2211,13 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     api('api_forum_read_many', { p_token: S.token, p_ids: ids }).then(function (r) {
       var map = (r && r.readers) || {};
       Object.keys(map).forEach(function (pid) {
-        forumReaders[pid] = map[pid] || [];
+        var list = map[pid] || [];
+        // 旧版接口返回的是 ["张三"] 这种字符串，会把按钮刷成纯文本 —— 直接忽略
+        if (list.length && typeof list[0] === 'string') return;
+
+        forumReaders[pid] = list;
         var el = document.querySelector('[data-readers="' + pid + '"]');
-        if (el) el.innerHTML = readersText(map[pid], pid);
+        if (el) el.innerHTML = readersText(list, pid);
       });
     }, function () {});
   }
