@@ -1747,44 +1747,74 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
       body.innerHTML =
         '<div style="max-width:640px;margin:0 auto">' +
-          '<div class="card" style="padding:14px;margin-bottom:14px">' +
-            (r.muted
-              ? '<div class="empty" style="padding:12px 0"><strong>你被禁言了</strong>' + esc(r.muted) + '</div>'
-              : '<textarea class="textarea" id="forumInput" rows="3" maxlength="200"' +
-                  ' placeholder="说点什么… 最多 200 字，今天还能发 ' + left + ' 条"></textarea>' +
-                '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">' +
-                  '<span class="hint" id="forumCount">0 / 200</span>' +
-                  '<button class="btn primary sm" id="forumSend" type="button" style="height:34px;padding:0 18px">发布</button>' +
-                '</div>') +
+          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
+            '<div>' +
+              '<div style="font-size:17px;font-weight:700;color:var(--ink);letter-spacing:1px">论坛</div>' +
+              '<div class="hint" style="font-size:12px">' +
+                (r.muted ? '你被禁言了' : '今天还能发 ' + left + ' 条') +
+              '</div>' +
+            '</div>' +
+            '<button class="btn primary sm" id="forumNew" type="button" style="margin-left:auto;height:36px;padding:0 18px"' +
+              (r.muted ? ' disabled' : '') + '>＋ 发帖</button>' +
           '</div>' +
           '<div id="forumList">' +
             (items.length
               ? items.map(function (x) { return forumPostCard(x, false); }).join('')
-              : '<div class="empty"><strong>还没有帖子</strong>发第一条吧</div>') +
+              : '<div class="empty"><strong>还没有帖子</strong>点右上角「发帖」发第一条</div>') +
           '</div>' +
         '</div>';
 
+      // 进到这个页面就算「看过了」：一次把这一屏的帖子都标成已读
+      markForumRead(items);
+
       if (r.muted) return;
 
-      var input = $('forumInput');
-      input.addEventListener('input', function () {
-        $('forumCount').textContent = input.value.length + ' / 200';
-      });
-
-      $('forumSend').onclick = function () {
-        var btn = this;
-        var v = input.value;
-        if (!v.trim()) return toast('写点内容吧', 'err');
-        busy(btn, true, '发布中…');
-        api('api_forum_post', { p_token: S.token, p_body: v }).then(function () {
-          busy(btn, false);
-          toast('已发布', 'ok');
-          renderForum();
-        }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
-      };
+      $('forumNew').onclick = function () { openForumCompose(left); };
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
+  }
+
+  /* 看见即已读：批量标记 + 刷新每一行已读名单 */
+  function markForumRead(items) {
+    var ids = (items || []).map(function (x) { return x.id; });
+    if (!ids.length) return;
+    api('api_forum_read_many', { p_token: S.token, p_ids: ids }).then(function (r) {
+      var map = (r && r.readers) || {};
+      Object.keys(map).forEach(function (pid) {
+        var el = document.querySelector('[data-readers="' + pid + '"]');
+        if (el) el.textContent = readersText(map[pid]);
+      });
+    }, function () {});
+  }
+
+  function openForumCompose(left) {
+    var m = modal('发帖',
+      '<label class="field"><span>内容（最多 200 字）</span>' +
+        '<textarea class="textarea" id="forumBody" rows="5" maxlength="200" placeholder="说点什么…"></textarea>' +
+        '<span class="hint" id="forumCount" style="font-size:12px">0 / 200</span></label>' +
+      '<p class="hint" style="font-size:12.5px">今天还能发 ' + left + ' 条；连续空行不要超过 2 行。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="forumSend" type="button">发布</button>', 480);
+
+    var ta = m.querySelector('#forumBody');
+    ta.addEventListener('input', function () {
+      m.querySelector('#forumCount').textContent = ta.value.length + ' / 200';
+    });
+    ta.focus();
+
+    m.querySelector('#forumSend').onclick = function () {
+      var btn = this;
+      var v = ta.value;
+      if (!v.trim()) return toast('写点内容吧', 'err');
+      busy(btn, true, '发布中…');
+      api('api_forum_post', { p_token: S.token, p_body: v }).then(function () {
+        busy(btn, false);
+        closeModal();
+        toast('已发布', 'ok');
+        renderForum();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
+    };
   }
 
   function toggleForumReplies(pid, box) {
@@ -1792,11 +1822,6 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     box.hidden = false;
     box.innerHTML = '<div class="loading" style="padding:10px"><span class="spinner"></span>加载中…</div>';
 
-    // 打开就算已读（管理员不会记进去）
-    api('api_forum_read', { p_token: S.token, p_post_id: pid }).then(function (r) {
-      var el = document.querySelector('[data-readers="' + pid + '"]');
-      if (el && r && r.readers) el.textContent = readersText(r.readers);
-    }, function () {});
 
     api('api_forum_replies', { p_token: S.token, p_post_id: pid }).then(function (r) {
       var items = r.items || [];
