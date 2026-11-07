@@ -81,23 +81,25 @@ button{font-family:inherit;cursor:pointer}
 .lnk:hover{background:#FDF0F2}
 .lnk:hover{text-decoration:underline}
 
-/* 左下角找用户：首页是胶囊输入框 + 右侧搜索按钮，进模块时输入框平滑收起 */
-#userSearchWrap{position:fixed;left:16px;bottom:16px;z-index:850;display:flex;align-items:center;gap:8px}
-.search-field{width:186px;opacity:1;transform:translateX(0);
-  transition:width .3s cubic-bezier(.22,.61,.36,1),opacity .2s ease .05s,transform .3s cubic-bezier(.22,.61,.36,1)}
-#userSearch{width:186px;height:42px;border-radius:999px;border:1.5px solid var(--red);
-  background:#fff;padding:0 18px;font-size:13.5px;box-shadow:0 8px 22px rgba(17,24,39,.12)}
-#userSearch:focus{box-shadow:0 0 0 3px rgba(200,16,46,.14),0 8px 22px rgba(17,24,39,.12)}
-#userSearchBtn{width:46px;height:46px;flex:none;border-radius:50%;border:1.5px solid var(--red);
-  background:#fff;color:var(--red);display:flex;align-items:center;justify-content:center;padding:0;
-  box-shadow:0 8px 22px rgba(17,24,39,.14);
-  transition:transform .28s cubic-bezier(.34,1.56,.64,1),box-shadow .2s ease,background .2s ease}
-#userSearchBtn:hover{transform:scale(1.06);box-shadow:0 10px 26px rgba(200,16,46,.22)}
+/* 左下角搜索：按钮和输入框合成一个胶囊（像浏览器地址栏），进模块时平滑收成圆 */
+#userSearchWrap{position:fixed;left:16px;bottom:16px;z-index:850}
+.search-box{position:relative;display:flex;align-items:center;width:236px;height:44px;
+  border-radius:999px;border:1.5px solid var(--red);background:#fff;
+  box-shadow:0 8px 22px rgba(17,24,39,.13);
+  transition:width .3s cubic-bezier(.22,.61,.36,1),box-shadow .2s ease}
+.search-box:focus-within{box-shadow:0 0 0 3px rgba(200,16,46,.13),0 10px 26px rgba(17,24,39,.13)}
+.search-box input{flex:1;min-width:0;height:100%;border:none;background:transparent;outline:none;
+  padding:0 8px 0 18px;font-size:13.5px;font-family:inherit;color:var(--ink);
+  transition:opacity .18s ease,padding .3s ease}
+#userSearchBtn{width:34px;height:34px;flex:none;margin-right:5px;border-radius:50%;border:none;
+  background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;
+  transition:transform .22s cubic-bezier(.34,1.4,.64,1),filter .2s ease}
+#userSearchBtn:hover{transform:scale(1.08);filter:brightness(1.08)}
 #userSearchBtn:active{transform:scale(.94)}
-#userSearchWrap.collapsed .search-field{width:0;opacity:0;transform:translateX(14px);
-  transition:width .28s cubic-bezier(.22,.61,.36,1),opacity .16s ease,transform .28s cubic-bezier(.22,.61,.36,1)}
-body.theme-wujin #userSearchBtn,
-body.theme-wujin #userSearch{background:#1B1710}
+#userSearchWrap.collapsed .search-box{width:44px}
+#userSearchWrap.collapsed .search-box input{opacity:0;padding:0;width:0}
+#pageSuggest{position:absolute;left:0;bottom:calc(100% + 8px);width:270px;max-height:280px}
+body.theme-wujin .search-box{background:#1B1710}
 
 /* 搜索自动补全 */
 .suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:70;background:#fff;
@@ -651,6 +653,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
       <button class="tab" data-tab="forum" type="button">论坛</button>
       <button class="tab" data-tab="medal" type="button">勋章设置</button>
+      <button class="tab" data-tab="vendor" type="button">加盟商</button>
       <button class="tab" data-tab="member" type="button">会员</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
@@ -986,6 +989,17 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       </div>
     </section>
 
+    <!-- 加盟商 -->
+    <section id="tab-vendor" hidden>
+      <div class="panel-head">
+        <div><h2>加盟商</h2><div class="hint">这里加的会显示在学生端「更多 → 加盟商平台」</div></div>
+        <button class="btn primary sm" id="btnVendorNew" type="button" style="height:32px;padding:0 14px">＋ 新增加盟商</button>
+      </div>
+      <div class="card"><div class="news" id="vendorAdminList">
+        <div class="loading"><span class="spinner"></span>加载中…</div>
+      </div></div>
+    </section>
+
     <!-- 会员 -->
     <section id="tab-member" hidden>
       <div class="panel-head">
@@ -1161,8 +1175,9 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   </main>
 
   <div id="userSearchWrap" class="collapsed">
-    <div class="search-field">
-      <input class="input" id="userSearch" placeholder="搜用户名" maxlength="32" autocomplete="off">
+    <div class="search-box">
+      <input id="userSearch" placeholder="搜用户名 / 功能" maxlength="32" autocomplete="off">
+      <div id="pageSuggest" class="suggest" hidden></div>
     </div>
     <button id="userSearchBtn" type="button" aria-label="搜索用户" title="搜索用户">
       <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M20 20l-4.6-4.6"></path></svg>
@@ -1842,17 +1857,55 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         moreBtn('💬', '反馈', '提问题、提建议，管理员会处理', 'fb') +
         moreBtn('📣', '推广信息', '价格和档期都在这儿', 'promo') +
         moreBtn('🧩', '魔方', '教程和调试都在里面', 'cube') +
-        '<a class="cube-opt" href="https://xingyaotie.github.io/cjms/xq.html" target="_blank" rel="noopener"' +
-          ' style="margin-bottom:12px;text-decoration:none;color:inherit">' +
-          '<span class="ico">♟</span>' +
-          '<span><b>象棋预约</b><small>找大师下棋、约时间</small></span>' +
-          '<span class="arrow">›</span>' +
-        '</a>' +
         moreBtn('ℹ️', '版本信息', '版本号、更新日志、赞助商、赞赏', 'ver') +
+
+        '<div style="display:flex;align-items:center;gap:10px;margin:20px 0 14px">' +
+          '<div style="flex:1;height:1px;background:var(--line)"></div>' +
+          '<span style="font-size:12px;color:var(--muted);letter-spacing:2px">加盟商平台</span>' +
+          '<div style="flex:1;height:1px;background:var(--line)"></div>' +
+        '</div>' +
+        '<div id="vendorList"><div class="loading" style="padding:12px"><span class="spinner"></span>加载中…</div></div>' +
       '</div>';
+
+    loadVendors();
   }
 
   /* 版本信息：原来散在「更多」里的四块都收在这儿 */
+  function loadVendors() {
+    var box = $('vendorList');
+    if (!box) return;
+
+    api('api_vendors', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="hint" style="text-align:center;padding:8px">暂时没有加盟商</div>';
+        return;
+      }
+      box.innerHTML = items.map(function (v) {
+        var ico = '<span class="ico">🏬</span>';
+        var body = '<span><b>' + esc(v.name) + '</b>' +
+          (v.sub ? '<small>' + esc(v.sub) + '</small>' : '') + '</span>';
+
+        if (v.status === 'run') {
+          return '<a class="cube-opt" href="' + esc(v.url) + '" target="_blank" rel="noopener"' +
+            ' style="margin-bottom:12px;text-decoration:none;color:inherit">' +
+            ico + body + '<span class="arrow">›</span></a>';
+        }
+        if (v.status === 'soon') {
+          return '<div class="cube-opt" style="margin-bottom:12px;opacity:.62;cursor:not-allowed">' +
+            ico + body +
+            '<span class="badge" style="margin-left:auto;height:20px;font-size:11px;' +
+              'color:#8A6100;background:#FDF6E3;border-color:#F2E3B8">即将上架</span></div>';
+        }
+        return '<div class="cube-opt" style="margin-bottom:12px;opacity:.45;cursor:not-allowed">' +
+          ico + body +
+          '<span class="badge gray" style="margin-left:auto;height:20px;font-size:11px">已停运</span></div>';
+      }).join('');
+    }, function (e) {
+      box.innerHTML = '<div class="hint" style="text-align:center;padding:8px">' + esc(e.message) + '</div>';
+    });
+  }
+
   function renderVersion() {
     moreState.view = 'ver';
     var me = S.me || {};
@@ -1888,24 +1941,142 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       '</div>';
   }
 
+  /* ================= 左下角搜索：页内功能 ================= */
+  var PAGE_FEATURES = [
+    { kw: '热门 公告 热点', to: 'news',     name: '班级热点',   desc: '看公告' },
+    { kw: '作业',            to: 'homework', name: '班级作业',   desc: '老师布置的作业' },
+    { kw: '课表 课程',       to: 'timetable',name: '班级课表',   desc: '本周课程安排' },
+    { kw: '论坛 帖子',       to: 'forum',    name: '论坛',       desc: '发帖、跟评' },
+    { kw: '魔方 教程',       to: 'cube',     name: '魔方教程',   desc: '需要管理员授权', cubePerm: true },
+    { kw: '调试 手感',       to: 'debug',    name: '魔方调试',   desc: '找最适合的手感' },
+    { kw: '更多',            to: 'more',     name: '更多',       desc: '版本信息、加盟商' },
+    { kw: '版本 更新日志 赞助 赞赏', to: 'ver', name: '版本信息', desc: '版本号、更新日志' },
+    { kw: '会员 方案 vip',   to: 'member',   name: '会员',       desc: '会员方案与专属主题' },
+    { kw: '反馈 建议',       to: 'fb',       name: '反馈',       desc: '提问题、提建议' },
+    { kw: '广告 推广 档期',  to: 'promo',    name: '推广信息',   desc: '价格和档期' },
+    { kw: '资料 我的 签名',  to: 'profile',  name: '我的资料',   desc: '性别、生日、签名' }
+  ];
+
+  function matchFeatures(kw) {
+    var k = String(kw || '').trim().toLowerCase();
+    if (!k) return [];
+    return PAGE_FEATURES.filter(function (f) {
+      return f.name.toLowerCase().indexOf(k) >= 0 || f.kw.toLowerCase().indexOf(k) >= 0;
+    });
+  }
+
+  function hidePageSuggest() {
+    var box = $('pageSuggest');
+    if (box) { box.hidden = true; box.innerHTML = ''; }
+  }
+
+  /* 进魔方教程前必须确认有授权 */
+  function goFeature(to) {
+    var open = function () {
+      if (to === 'news') return openModule('news', '班级热点');
+      if (to === 'homework') return openModule('homework', '班级事项');
+      if (to === 'timetable') { openModule('homework', '班级事项'); return renderTimetableForUser(); }
+      if (to === 'forum') return openModule('forum', '论坛');
+      if (to === 'cube') return openModule('cube', '魔方');
+      if (to === 'debug') { openModule('cube', '魔方'); return renderCubeDebug(); }
+      if (to === 'more') return openModule('more', '更多');
+      if (to === 'ver') { openModule('more', '更多'); return renderVersion(); }
+      if (to === 'member') return openMemberModule();
+      if (to === 'fb') { openModule('more', '更多'); return openFeedback(); }
+      if (to === 'promo') { openModule('more', '更多'); return openPromo(); }
+      if (to === 'profile') return openProfileModule();
+    };
+
+    if (to !== 'cube') { open(); return; }
+
+    api('api_cube_my_tutorials', { p_token: S.token }).then(function (r) {
+      if (!r || !r.has_any) {
+        toast('你还没有魔方教程的权限，请联系管理员开通', 'err', 3600);
+        return;
+      }
+      S.cubeAll = r.items || [];
+      S.cubeAny = true;
+      S.cubeLoaded = true;
+      open();
+    }, function (e) { toast(e.message, 'err', 3200); });
+  }
+
+  /* 输入时给建议：先功能，再用户 */
+  var pageSuggestTimer = null;
+
+  function showPageSuggest(kw, users) {
+    var box = $('pageSuggest');
+    if (!box) return;
+    var feats = matchFeatures(kw);
+    var html = '';
+
+    if (feats.length) {
+      html += feats.slice(0, 5).map(function (f) {
+        return '<div class="sg" data-feat="' + f.to + '">' +
+          '<span>' + esc(f.name) + ' <small>' + esc(f.desc) + '</small></span></div>';
+      }).join('');
+    }
+
+    if (users && users.length) {
+      html += users.slice(0, 5).map(function (u) {
+        return '<div class="sg" data-uid="' + esc(u.id) + '">' +
+          '<span class="avatar" style="width:22px;height:22px;font-size:11px">' +
+            esc(String(u.name || '?').slice(0, 1)) + '</span>' +
+          '<span>' + esc(u.name) + (u.is_vip ? ' <small>VIP</small>' : '') + '</span></div>';
+      }).join('');
+    }
+
+    if (!html) { hidePageSuggest(); return; }
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
   /* ================= 论坛 ================= */
-  function readersText(list) {
+  var forumReaders = {};
+
+  function readersText(list, pid) {
     var arr = list || [];
+    var head = '<span class="lnk" data-readers-all="' + esc(pid || '') + '">已读</span>：';
     if (!arr.length) return '已读：还没有人';
-    return '已读：' + arr.map(function (x) {
+
+    var show = arr.slice(0, 3);
+    var names = show.map(function (x) {
       if (typeof x === 'string') return esc(x);
       return '<span class="lnk" data-uid="' + esc(x.id) + '">' + esc(x.name) + '</span>';
     }).join('、');
+
+    return head + names + (arr.length > 3 ? ' <span class="lnk" data-readers-all="' + esc(pid || '') + '">等 ' +
+      arr.length + ' 人</span>' : '');
+  }
+
+  /* 看全部已读的人 */
+  function openReaders(pid, fallbackNames) {
+    var list = forumReaders[pid] || fallbackNames || [];
+    var body = list.length
+      ? list.map(function (x) {
+          var id = typeof x === 'string' ? '' : x.id;
+          var nm = typeof x === 'string' ? x : x.name;
+          return '<div class="pick-row">' +
+            (id ? '<span class="lnk" data-uid="' + esc(id) + '">' + esc(nm) + '</span>' : esc(nm)) +
+          '</div>';
+        }).join('')
+      : '<div class="hint">还没有人已读</div>';
+
+    modal('已读的人（' + list.length + '）', body,
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 420);
   }
 
   /* 封禁 / 禁言小标签：封号优先，且不带时间 */
   function statusTag(banned, bannedForever, muted, mutedForever) {
+    /* 封号：深红实心；禁言：正红实心。两种都醒目，又能一眼分出来 */
     if (banned) {
-      return '<span class="badge st-new" style="height:18px;font-size:11px">' +
+      return '<span class="badge" style="height:18px;font-size:11px;' +
+        'background:#7F0C1D;color:#fff;border-color:#7F0C1D">' +
         (bannedForever ? '已永久封号' : '已被封号') + '</span>';
     }
     if (muted) {
-      return '<span class="badge st-doing" style="height:18px;font-size:11px">' +
+      return '<span class="badge" style="height:18px;font-size:11px;' +
+        'background:#C8102E;color:#fff;border-color:#C8102E">' +
         (mutedForever ? '已永久禁言' : '已被禁言') + '</span>';
     }
     return '';
@@ -1925,7 +2096,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         '<button type="button" class="link" data-expand="' + esc(p.id) + '">' +
           (p.reply_count ? p.reply_count + ' 条跟评' : '跟评') + '</button>' +
         (isAdmin ? '<button type="button" class="link danger" data-postdel="' + esc(p.id) + '">删除帖子</button>' : '') +
-        '<span class="hint" data-readers="' + esc(p.id) + '" style="font-size:12px">' + readersText(p.readers) + '</span>' +
+        '<span class="hint" data-readers="' + esc(p.id) + '" style="font-size:12px">' + readersText(p.readers, p.id) + '</span>' +
       '</div>' +
       '<div data-replies="' + esc(p.id) + '" hidden style="margin-top:10px"></div>' +
     '</div>';
@@ -1976,8 +2147,9 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     api('api_forum_read_many', { p_token: S.token, p_ids: ids }).then(function (r) {
       var map = (r && r.readers) || {};
       Object.keys(map).forEach(function (pid) {
+        forumReaders[pid] = map[pid] || [];
         var el = document.querySelector('[data-readers="' + pid + '"]');
-        if (el) el.innerHTML = readersText(map[pid]);
+        if (el) el.innerHTML = readersText(map[pid], pid);
       });
     }, function () {});
   }
@@ -2655,7 +2827,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'medal', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -2672,6 +2844,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     if (name === 'feedback') loadFeedbackAdmin();
     if (name === 'forum') { loadForumAdmin(); loadMutePanel(); }
     if (name === 'medal') loadMedalAdmin();
+    if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
     if (name === 'ad') loadAdAdmin();
     if (name === 'notice') loadNoticeAdmin();
@@ -2757,6 +2930,73 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     return left > 0 ? Math.ceil(left / 86400000) : 0;
   }
 
+  var currentMedals = [];
+
+  /* 列表里只显示名字 + 是否已获得；详情点了才看 */
+  function medalTileHtml(m) {
+    var state = m.kind === 'tiered'
+      ? (m.level > 0 ? '已获得 ' + m.level + ' 级' : '未获得')
+      : (m.awarded ? '已获得' : '未获得');
+    return '<div class="medal' + (m.awarded ? '' : ' off') + '" data-medal-id="' + esc(m.id) + '"' +
+      ' style="cursor:pointer">' +
+      '<div class="mn">' + esc(m.name) + '</div>' +
+      '<div class="ms">' + state + '</div>' +
+    '</div>';
+  }
+
+  /* 勋章详情：分级的用左右箭头切级 */
+  function openMedalDetail(id) {
+    var m = (currentMedals || []).filter(function (x) { return x.id === id; })[0];
+    if (!m) return;
+
+    var levels = m.levels || [];
+    var idx = 0;
+    if (m.kind === 'tiered' && m.level > 0) {
+      for (var i = 0; i < levels.length; i++) {
+        if (levels[i].level === m.level) { idx = i; break; }
+      }
+    }
+
+    var mo = modal(m.name, '<div id="mdDetail"></div>', '', 440);
+
+    function paint() {
+      var box = mo.querySelector('#mdDetail');
+      var head = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
+        '<span style="font-size:17px;font-weight:700;color:var(--ink)">' + esc(m.name) + '</span>' +
+        (m.awarded ? '<span class="badge red" style="height:19px;font-size:11px">已获得</span>'
+                   : '<span class="badge gray" style="height:19px;font-size:11px">未获得</span>') +
+      '</div>';
+
+      if (m.kind === 'tiered' && levels.length) {
+        var lv = levels[idx];
+        var cur = (m.score || 0) + ' 分';
+        box.innerHTML = head +
+          '<div style="display:flex;align-items:center;gap:8px;justify-content:center;margin:6px 0 10px">' +
+            '<button class="btn ghost sm" id="mdPrev" type="button" style="height:32px"' + (idx === 0 ? ' disabled' : '') + '>‹</button>' +
+            '<div style="text-align:center;min-width:160px">' +
+              '<div style="font-size:15px;font-weight:700;color:var(--ink)">' + esc(lv.name) + '</div>' +
+              '<div class="hint" style="font-size:12px">第 ' + (idx + 1) + ' / ' + levels.length + ' 级 · 需要 ' + lv.threshold + ' 分</div>' +
+            '</div>' +
+            '<button class="btn ghost sm" id="mdNext" type="button" style="height:32px"' + (idx === levels.length - 1 ? ' disabled' : '') + '>›</button>' +
+          '</div>' +
+          (lv.requirement ? '<p class="hint" style="font-size:12.5px;line-height:1.7">' + esc(lv.requirement) + '</p>' : '') +
+          '<p class="hint" style="font-size:12px;text-align:center;margin-top:8px">现在有 ' + cur + '</p>';
+
+        var pv = box.querySelector('#mdPrev');
+        var nx = box.querySelector('#mdNext');
+        if (pv) pv.onclick = function () { if (idx > 0) { idx--; paint(); } };
+        if (nx) nx.onclick = function () { if (idx < levels.length - 1) { idx++; paint(); } };
+      } else {
+        box.innerHTML = head +
+          (m.requirement
+            ? '<p class="hint" style="font-size:13px;line-height:1.75">' + esc(m.requirement) + '</p>'
+            : '<p class="hint" style="font-size:13px">没有写获得要求</p>');
+      }
+    }
+
+    paint();
+  }
+
   function medalCardHtml(m) {
     var cls = 'medal' + (m.awarded ? '' : ' off');
     var extra = '';
@@ -2778,6 +3018,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* 资料卡片：论坛看别人 / 管理端看用户 都用它 */
   function profileCardHtml(u, medals, isAdmin) {
+    currentMedals = medals || [];
     var g = genderText(u.gender);
     var vip = u.is_vip ? ' <span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '';
 
@@ -2799,7 +3040,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       '</div></div>' +
       '<div class="pf-label" style="margin-bottom:8px">勋章</div>' +
       ((medals && medals.length)
-        ? '<div class="medal-grid">' + medals.map(medalCardHtml).join('') + '</div>'
+        ? '<div class="medal-grid">' + medals.map(medalTileHtml).join('') + '</div>'
         : '<div class="hint">还没有设置任何勋章</div>');
   }
 
@@ -2821,6 +3062,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     api('api_user_profile', { p_token: S.token, p_user_id: S.me.id }).then(function (r) {
       var u = r.user;
       var medals = r.medals || [];
+      currentMedals = medals;            // 点击勋章时要能查到
       var gLeft = daysLeft(S.me.gender_set_at, 30);
       var bLeft = daysLeft(S.me.birthday_set_at, 180);
       var bioLeft = daysLeft(S.me.bio_set_at, 30);
@@ -2875,7 +3117,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
           '<div class="card" style="padding:16px">' +
             '<div class="pf-label" style="margin-bottom:10px">我的勋章</div>' +
             (medals.length
-              ? '<div class="medal-grid">' + medals.map(medalCardHtml).join('') + '</div>'
+              ? '<div class="medal-grid">' + medals.map(medalTileHtml).join('') + '</div>'
               : '<div class="hint">还没有设置任何勋章</div>') +
           '</div>' +
         '</div>';
@@ -3219,8 +3461,106 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     var body = m.querySelector('.modal-body');
     api('api_user_profile', { p_token: S.token, p_user_id: uid }).then(function (r) {
       body.innerHTML = profileCardHtml(r.user, r.medals, false);
+      body.addEventListener('click', function (ev) {
+        var t = ev.target.closest('[data-medal-id]');
+        if (t) openMedalDetail(t.dataset.medalId);
+      });
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+
+  /* ================= 管理端：加盟商 ================= */
+  var VENDOR_STATUS = { run: '运行', soon: '即将上架', off: '已停运' };
+
+  function loadVendorAdmin() {
+    var box = $('vendorAdminList');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_vendors', { p_token: S.token }).then(function (r) {
+      S.vendors = r.items || [];
+      if (!S.vendors.length) {
+        box.innerHTML = '<div class="empty"><strong>还没有加盟商</strong>点右上角「新增加盟商」加第一个</div>';
+        return;
+      }
+      box.innerHTML = S.vendors.map(function (v) {
+        var tag = v.status === 'run'
+          ? '<span class="badge st-done" style="height:18px;font-size:11px">运行</span>'
+          : v.status === 'soon'
+            ? '<span class="badge" style="height:18px;font-size:11px;color:#8A6100;background:#FDF6E3;border-color:#F2E3B8">即将上架</span>'
+            : '<span class="badge gray" style="height:18px;font-size:11px">已停运</span>';
+        return '<div class="news-item" data-vid="' + esc(v.id) + '">' +
+          '<div class="hd">' + tag +
+            '<h4>' + esc(v.name) + '</h4>' +
+          '</div>' +
+          (v.sub ? '<p style="margin-bottom:6px">' + esc(v.sub) + '</p>' : '') +
+          (v.url ? '<p style="font-size:12px;color:var(--muted);word-break:break-all">' + esc(v.url) + '</p>' : '') +
+          '<div class="ops">' +
+            '<button class="link" data-vact="edit" type="button">编辑</button>' +
+            '<button class="link danger" data-vact="del" type="button">删除</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openVendorForm(item) {
+    var edit = !!item;
+    var st = edit ? item.status : 'run';
+
+    var m = modal(edit ? '编辑加盟商' : '新增加盟商',
+      '<label class="field"><span>名称<em>*</em></span>' +
+        '<input class="input" id="vdName" maxlength="20" placeholder="例如：象棋预约" value="' + esc(edit ? item.name : '') + '"></label>' +
+      '<label class="field"><span>小字（可选）</span>' +
+        '<input class="input" id="vdSub" maxlength="40" placeholder="例如：找大师下棋、约时间" value="' + esc(edit ? item.sub : '') + '"></label>' +
+      '<label class="field"><span>超链接网址（运行中必填）</span>' +
+        '<input class="input" id="vdUrl" maxlength="300" placeholder="https://" value="' + esc(edit ? item.url : '') + '"></label>' +
+      '<div class="field"><span>状态</span>' +
+        '<div class="chips" id="vdStatus">' +
+          ['run', 'soon', 'off'].map(function (k) {
+            return '<button type="button" class="chip-btn ' + (st === k ? 'on' : '') + '" data-vst="' + k + '">' +
+              VENDOR_STATUS[k] + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<p class="hint" style="font-size:12.5px">即将上架：学生端按钮置灰，写「即将上架」；已停运：显示「已停运」。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="vdOk" type="button">' + (edit ? '保存' : '添加') + '</button>', 500);
+
+    m.querySelector('#vdStatus').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-vst]');
+      if (!b) return;
+      st = b.dataset.vst;
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+    });
+
+    m.querySelector('#vdOk').onclick = function () {
+      var btn = this;
+      var nm = m.querySelector('#vdName').value.trim();
+      if (!nm) return toast('填一下名称', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_vendor_save', {
+        p_token: S.token, p_id: edit ? item.id : null,
+        p_name: nm,
+        p_sub: m.querySelector('#vdSub').value.trim(),
+        p_url: m.querySelector('#vdUrl').value.trim(),
+        p_status: st
+      }).then(function () {
+        busy(btn, false); closeModal(); toast('已保存', 'ok'); loadVendorAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function deleteVendor(id) {
+    confirmBox('删除加盟商', '删除后学生端就看不到这个入口了。', '', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_vendor_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok'); loadVendorAdmin();
+      }, function (e) { toast(e.message, 'err', 3600); });
     });
   }
 
@@ -5336,12 +5676,43 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
       function runUserSearch() {
         var kw = uSearch.value.trim();
-        if (!kw) { toast('先输入用户名', 'err'); uSearch.focus(); return; }
+        if (!kw) { toast('先输入用户名或功能', 'err'); uSearch.focus(); return; }
+        var feats = matchFeatures(kw);
+        if (feats.length) { goFeature(feats[0].to); hidePageSuggest(); uSearch.value = ''; return; }
+        searchUsers(kw);
+      }
+
+      function searchUsers(kw) {
         api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
+          var items = r.items || [];
           uSearch.value = '';
-          openUserCard(r.user_id);
-          if (!$('modView').hidden) collapseSearch();
-        }, function (err) { toast(err.message, 'err', 2600); });
+          hidePageSuggest();
+          if (items.length === 1) {
+            openUserCard(items[0].id);
+            if (!$('modView').hidden) collapseSearch();
+            return;
+          }
+          pickUser(items);
+        }, function (err) {
+          hidePageSuggest();
+          toast(err.message, 'err', 2600);
+        });
+      }
+
+      /* 若干个重名/模糊匹配 → 让用户选一个 */
+      function pickUser(items) {
+        var m = modal('找到 ' + items.length + ' 个人',
+          items.map(function (u) {
+            return '<div class="pick-row"><span class="lnk" data-uid="' + esc(u.id) + '">' +
+              esc(u.name) + (u.is_vip ? '（VIP）' : '') + '</span></div>';
+          }).join(''),
+          '<button class="btn ghost" type="button" data-close>取消</button>', 420);
+        m.querySelector('.modal-body').addEventListener('click', function (e) {
+          var t = e.target.closest('[data-uid]');
+          if (!t) return;
+          closeModal();
+          openUserCard(t.dataset.uid);
+        });
       }
 
       $('userSearchBtn').addEventListener('click', function () {
@@ -5362,8 +5733,42 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
       uSearch.addEventListener('blur', function () {
         setTimeout(function () {
+          hidePageSuggest();
           if (!$('modView').hidden && !uSearch.value.trim()) collapseSearch();
-        }, 120);
+        }, 150);
+      });
+
+      /* 边打边给建议：功能 + 用户 */
+      uSearch.addEventListener('input', function () {
+        var kw = uSearch.value.trim();
+        clearTimeout(pageSuggestTimer);
+        if (!kw) { hidePageSuggest(); return; }
+
+        pageSuggestTimer = setTimeout(function () {
+          api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
+            showPageSuggest(kw, r.items || []);
+          }, function () {
+            showPageSuggest(kw, []);      // 找不到人也先显示功能选项
+          });
+        }, 220);
+      });
+
+      /* 点建议：功能就跳转，人就开主页 */
+      $('pageSuggest').addEventListener('mousedown', function (e) { e.preventDefault(); });
+      $('pageSuggest').addEventListener('click', function (e) {
+        var f = e.target.closest('[data-feat]');
+        if (f) {
+          hidePageSuggest();
+          uSearch.value = '';
+          goFeature(f.dataset.feat);
+          return;
+        }
+        var u = e.target.closest('[data-uid]');
+        if (u) {
+          hidePageSuggest();
+          uSearch.value = '';
+          openUserCard(u.dataset.uid);
+        }
       });
     }
     $('userName').style.cursor = 'pointer';
@@ -5375,6 +5780,16 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       if (e.target.closest('[data-theme-off]')) { setPrefs('red', ''); }
     });
     $('btnMemberNew').addEventListener('click', function () { openMemberPlanForm(null); });
+
+    $('btnVendorNew').addEventListener('click', function () { openVendorForm(null); });
+    $('vendorAdminList').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-vact]');
+      var host = b && b.closest('[data-vid]');
+      if (!host) return;
+      var item = (S.vendors || []).filter(function (x) { return x.id === host.dataset.vid; })[0];
+      if (b.dataset.vact === 'edit' && item) return openVendorForm(item);
+      if (b.dataset.vact === 'del') return deleteVendor(host.dataset.vid);
+    });
 
     $('memberList').addEventListener('click', function (e) {
       var ufold = e.target.closest('[data-mufold]');
@@ -5636,6 +6051,8 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
       }
     });
     $('forumAdminList').addEventListener('click', function (e) {
+      var rall2 = e.target.closest('[data-readers-all]');
+      if (rall2) { openReaders(rall2.dataset.readersAll, []); return; }
       var whose = e.target.closest('[data-uid]');
       if (whose && whose.dataset.uid) { openUserCard(whose.dataset.uid); return; }
       var del = e.target.closest('[data-postdel]');
@@ -5742,11 +6159,20 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         return;
       }
 
+      var rall = e.target.closest('[data-readers-all]');
+      if (rall) {
+        openReaders(rall.dataset.readersAll, []);
+        return;
+      }
+
       var whose = e.target.closest('[data-uid]');
       if (whose && whose.dataset.uid && (currentMod === 'forum' || currentMod === 'profile')) {
         openUserCard(whose.dataset.uid);
         return;
       }
+
+      var mdt = e.target.closest('[data-medal-id]');
+      if (mdt) { openMedalDetail(mdt.dataset.medalId); return; }
 
       var exp = e.target.closest('[data-expand]');
       if (exp && currentMod === 'forum') {
