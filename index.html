@@ -1200,7 +1200,36 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* supabase-js 多源加载：jsdelivr 在国内（尤其微信里）经常打不开，自动换源 */
+window.__supaReady = new Promise(function (resolve) {
+  if (window.supabase) return resolve(true);
+
+  var sources = [
+    './supabase.min.js',                                                     // 自己仓库里的那份，最稳
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+    'https://unpkg.com/@supabase/supabase-js@2',
+    'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js',
+    'https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js'
+  ];
+  var i = 0;
+
+  function next() {
+    if (window.supabase) return resolve(true);
+    if (i >= sources.length) return resolve(false);
+    var el = document.createElement('script');
+    el.src = sources[i++];
+    el.async = true;
+    el.onload = function () { window.supabase ? resolve(true) : next(); };
+    el.onerror = function () { next(); };
+    document.head.appendChild(el);
+  }
+  next();
+
+  /* 最多等 20 秒，别让页面永远白屏 */
+  setTimeout(function () { resolve(!!window.supabase); }, 20000);
+});
+</script>
 <script>
 /* ============================================================
  * 徐悲鸿中学 · 2026级 · 班级服务平台（单文件版）
@@ -1416,7 +1445,18 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
 
   /* ---------- 启动 ---------- */
   function boot() {
-    if (!window.supabase) return fatal('Supabase 脚本没加载成功，检查网络后刷新');
+    var ready = window.__supaReady || Promise.resolve(!!window.supabase);
+
+    ready.then(function (ok) {
+      if (!ok || !window.supabase) {
+        return fatal('数据库脚本没加载成功（CDN 被当前网络挡住了）。请先确认仓库根目录有 ' +
+          'supabase.min.js；再点下面的按钮重新加载，或换个浏览器 / 网络（微信里可以点右上角用浏览器打开）。');
+      }
+      bootWithSupa();
+    });
+  }
+
+  function bootWithSupa() {
     try {
       db = window.supabase.createClient(URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
     } catch (e) { return fatal('连接创建失败：' + e.message); }
@@ -1473,8 +1513,7 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     $('loginView').innerHTML =
       '<div class="login-top"><span class="school">徐悲鸿中学</span><span class="cls">2026级</span></div>' +
       '<div class="login-main"><div class="login-card">' +
-        '<div class="fatal"><strong>站点暂时打不开</strong><p>' + esc(msg) + '</p>' +
-        '<p>请检查 Supabase 项目状态和 sql/001_init.sql 是否执行。</p></div>' +
+        '<div class="fatal"><strong>站点暂时打不开</strong><p>' + esc(msg) + '</p></div>' +
         '<button class="btn primary block" type="button" onclick="location.reload()">重新加载</button>' +
       '</div></div>';
   }
