@@ -1161,6 +1161,20 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         </div>
         <p class="hint" style="margin-top:14px;text-align:center" id="statusHint"></p>
       </div>
+
+      <div class="card" style="padding:16px;margin-top:16px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold" id="atkFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">攻击日志</h3>
+              <div class="hint">每分钟超 120 次会自动停服，这里记录是谁在刷</div>
+            </div>
+          </div>
+          <button class="btn ghost sm" id="btnAtkReload" type="button" style="height:32px">刷新</button>
+        </div>
+        <div id="atkBox" hidden style="margin-top:12px"></div>
+      </div>
     </section>
 
     <!-- 更多 -->
@@ -1257,7 +1271,23 @@ window.__supaReady = new Promise(function (resolve) {
 (function () {
   'use strict';
 
-  var URL = 'https://hkmxmkujzikcgrnlrxit.supabase.co';
+  /* 数据库地址：默认直连 Supabase。
+     挂代理后不用改代码——网址后面加 ?api=https://你的代理地址 即可（记在本机）。
+     清除：?api=reset */
+  var DEFAULT_URL = 'https://hkmxmkujzikcgrnlrxit.supabase.co';
+  var API_KEY_STORE = 'xbh_api_base';
+
+  var URL = (function () {
+    try {
+      var q = new URLSearchParams(location.search).get('api');
+      if (q === 'reset') { localStorage.removeItem(API_KEY_STORE); return DEFAULT_URL; }
+      if (q && /^https:\/\//.test(q)) { localStorage.setItem(API_KEY_STORE, q.replace(/\/+$/, '')); return q.replace(/\/+$/, ''); }
+      var saved = localStorage.getItem(API_KEY_STORE);
+      if (saved && /^https:\/\//.test(saved)) return saved;
+    } catch (e) {}
+    return DEFAULT_URL;
+  })();
+
   var KEY = 'sb_publishable_eK9SJy7QLl9WLpcXKncHmw_U0GTsPVw';
   var SESSION = 'xbh_session_v2';
 
@@ -2264,14 +2294,12 @@ window.__supaReady = new Promise(function (resolve) {
 
   function readersText(list, pid) {
     var arr = list || [];
-    var allBtn = '<button type="button" class="rd-btn rd-read" onclick="window.__openReaders(\'' +
-      esc(pid || '') + '\')">已读</button>';
-    if (!arr.length) return allBtn + '：还没有人';
+    if (!arr.length) return '已读：还没有人';
 
     var show = arr.slice(0, 3);
     var names = show.map(readerBtn).join('、');
 
-    return allBtn + '：' + names +
+    return '已读：' + names +
       (arr.length > 3
         ? ' <button type="button" class="rd-btn rd-read" onclick="window.__openReaders(\'' +
             esc(pid || '') + '\')">等 ' + arr.length + ' 人</button>'
@@ -3099,7 +3127,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'member') loadMemberAdmin();
     if (name === 'ad') loadAdAdmin();
     if (name === 'notice') loadNoticeAdmin();
-    if (name === 'status') loadStatusAdmin();
+    if (name === 'status') { loadStatusAdmin(); loadAttackLog(); }
     if (name === 'more') loadMoreAdmin();
     if (name === 'me') renderMe();
   }
@@ -3583,12 +3611,18 @@ window.__supaReady = new Promise(function (resolve) {
                   ' data-uid="' + esc(uid) + '" style="height:28px;margin-top:8px">' +
                   (m.awarded ? '撤销' : '授予') + '</button>';
               } else {
-                ctrl = '<div style="display:flex;gap:6px;align-items:center;margin-top:8px">' +
+                ctrl = '<div style="display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap">' +
                   '<button type="button" class="btn ghost sm" data-meddelta="-1" data-medid="' + esc(m.id) + '"' +
                     ' data-uid="' + esc(uid) + '" style="height:28px">−1</button>' +
-                  '<span style="font-size:13px;color:var(--ink)">' + (m.score || 0) + ' 分</span>' +
+                  '<span style="font-size:13px;color:var(--ink);min-width:44px;text-align:center">' +
+                    (m.score || 0) + ' 分</span>' +
                   '<button type="button" class="btn ghost sm" data-meddelta="1" data-medid="' + esc(m.id) + '"' +
                     ' data-uid="' + esc(uid) + '" style="height:28px">+1</button>' +
+                  '<input class="input" data-medscore-input="' + esc(m.id) + '" type="number" min="0"' +
+                    ' placeholder="设分" value="' + (m.score || 0) + '"' +
+                    ' style="width:74px;height:28px;font-size:12.5px;padding:0 8px">' +
+                  '<button type="button" class="btn primary sm" data-medset="' + esc(m.id) + '"' +
+                    ' data-uid="' + esc(uid) + '" data-cur="' + (m.score || 0) + '" style="height:28px">设为</button>' +
                 '</div>';
               }
               return '<div class="medal' + (m.awarded ? '' : ' off') + '">' +
@@ -5799,6 +5833,48 @@ window.__supaReady = new Promise(function (resolve) {
     }, function (e) { toast(e.message, 'err', 3600); });
   }
 
+  /* ---------- 攻击日志 ---------- */
+  function loadAttackLog() {
+    var box = $('atkBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_attack_log', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="empty" style="padding:16px"><strong>没有异常记录</strong>目前一切正常</div>';
+        return;
+      }
+      box.innerHTML =
+        '<div style="max-height:280px;overflow:auto">' +
+          items.map(function (x) {
+            return '<div class="perm-row" style="padding:8px 0;align-items:flex-start">' +
+              '<div style="flex:1;min-width:0">' +
+                '<div style="font-size:13px;color:var(--ink)">' + esc(x.note) + '</div>' +
+                '<div class="hint" style="font-size:11.5px">IP ' + esc(x.ip) + ' · ' + esc(x.kind) +
+                  ' · ' + esc(x.at) + '</div>' +
+              '</div>' +
+              '<span class="badge red" style="height:18px;font-size:11px">' + x.cnt + ' 次</span>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        '<div style="text-align:right;margin-top:10px">' +
+          '<button class="btn ghost sm" id="btnAtkClear" type="button" style="height:30px">清空日志</button>' +
+        '</div>';
+
+      $('btnAtkClear').onclick = function () {
+        confirmBox('清空日志', '确定清空所有攻击记录吗？', '', '清空').then(function (yes) {
+          if (!yes) return;
+          api('api_admin_clear_attack_log', { p_token: S.token }).then(function () {
+            toast('已清空', 'ok'); loadAttackLog();
+          }, function (e) { toast(e.message, 'err', 3600); });
+        });
+      };
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
   function loadStatusAdmin() {
     renderStatusUI((S.boot && S.boot.status) || 'run');
     if (!S.boot) bootInfo().then(function (r) { renderStatusUI(r.status); }, function () {});
@@ -6249,6 +6325,13 @@ window.__supaReady = new Promise(function (resolve) {
       var it = e.target.closest('[data-mail]');
       if (it) openMailDetail(it.dataset.mail);
     });
+    $('atkFold').addEventListener('click', function () {
+      var wrap = $('atkBox');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('btnAtkReload').addEventListener('click', loadAttackLog);
+
     $('btnFbReload').addEventListener('click', loadFeedbackAdmin);
 
     $('forumListFold').addEventListener('click', function () {
@@ -6293,6 +6376,24 @@ window.__supaReady = new Promise(function (resolve) {
         }, function (err) { toast(err.message, 'err', 3600); });
         return;
       }
+      var st2 = e.target.closest('[data-medset]');
+      if (st2) {
+        var mid = st2.dataset.medset;
+        var inp = $('medalUserBox').querySelector('[data-medscore-input="' + mid + '"]');
+        var want = parseInt(inp ? inp.value : '', 10);
+        if (isNaN(want) || want < 0) return toast('请输入 0 或正整数', 'err');
+        var cur = parseInt(st2.dataset.cur || '0', 10) || 0;
+        var delta = want - cur;
+        if (delta === 0) return toast('分数没有变化', 'err');
+        api('api_admin_medal_score', {
+          p_token: S.token, p_user_id: st2.dataset.uid, p_medal_id: mid, p_delta: delta
+        }).then(function (r) {
+          toast('已设为 ' + want + ' 分，' + (r.level > 0 ? r.level + ' 级' : '未获得'), 'ok', 2600);
+          showMedalUser(st2.dataset.uid);
+        }, function (err) { toast(err.message, 'err', 3600); });
+        return;
+      }
+
       var dl = e.target.closest('[data-meddelta]');
       if (dl) {
         api('api_admin_medal_score', {
