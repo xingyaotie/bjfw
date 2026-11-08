@@ -76,6 +76,19 @@ button{font-family:inherit;cursor:pointer}
 .s-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);
   display:flex;pointer-events:none}
 
+/* 论坛类别 */
+.forum-cat-head{position:sticky;top:0;z-index:5;background:linear-gradient(135deg,#C0392B,#A5291F);
+  color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 8px 20px rgba(192,57,43,.22)}
+.forum-cat-head .fc-name{font-size:19px;font-weight:700;letter-spacing:2px}
+.forum-cat-head .fc-sub{font-size:12px;color:rgba(255,255,255,.82);margin-top:4px}
+.fc-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:none;background:none;
+  padding:11px 8px;border-bottom:1px solid #F1F2F5;cursor:pointer;font:inherit}
+.fc-row:last-child{border-bottom:none}
+.fc-row:hover{background:#FDF2F4}
+.fc-r-name{font-size:14px;font-weight:600;color:var(--ink)}
+.fc-r-sub{font-size:12px;color:var(--muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fc-r-n{font-size:12px;color:var(--muted)}
+
 /* 可点的人名 */
 .lnk{color:var(--red);cursor:pointer;padding:2px 3px;border-radius:5px;position:relative;z-index:1}
 /* 已读名单里的人名按钮 */
@@ -767,17 +780,38 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         </div>
       </div>
 
-      <div class="card" style="padding:16px">
-        <div class="panel-head" style="margin:0 0 10px">
-          <div>
-            <h3 style="font-size:15px">② 班级课表</h3>
-            <div class="hint">按节次加行；每天的课不一样也没关系，格子可以空着</div>
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold open" id="ttFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">② 班级课表</h3>
+              <div class="hint">按节次加行；每天的课不一样也没关系，格子可以空着</div>
+            </div>
           </div>
           <button class="btn primary sm" id="btnTtAdd" type="button" style="height:32px;padding:0 14px">＋ 添加一行</button>
         </div>
-        <div id="ttBox"><div class="loading"><span class="spinner"></span>加载中…</div></div>
-        <div style="text-align:right;margin-top:12px">
-          <button class="btn primary" id="btnTtSave" type="button">保存课表</button>
+        <div id="ttWrap" style="margin-top:12px">
+          <div id="ttBox"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+          <div style="text-align:right;margin-top:12px">
+            <button class="btn primary" id="btnTtSave" type="button">保存课表</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div>
+            <h3 style="font-size:15px">③ 本周食堂菜单</h3>
+            <div class="hint">可以写字，也可以插图；学生点「班级事项 → 本周食堂菜单」看</div>
+          </div>
+          <button class="btn primary sm" id="btnCanteenSave" type="button" style="height:32px;padding:0 16px">保存菜单</button>
+        </div>
+        <textarea class="textarea" id="canteenInput" rows="8"
+          placeholder="例如：&#10;周一：红烧肉、青菜&#10;周二：番茄炒蛋、排骨汤&#10;（可以点下面插入菜单照片）"></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="btn ghost sm" id="btnCanteenImg" type="button">插入图片</button>
+          <input type="file" id="canteenFile" accept="image/*" style="display:none">
         </div>
       </div>
     </section>
@@ -951,6 +985,23 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
           <button class="btn ghost sm" id="btnMuteReload" type="button" style="height:32px">刷新</button>
         </div>
         <div id="muteBox" hidden style="margin-top:12px"></div>
+      </div>
+
+      <div class="card" style="padding:16px;margin-top:18px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold" id="catFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">③ 论坛类别</h3>
+              <div class="hint">新建区；学生申请的会显示为「待审核」，同意后才会出现</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn ghost sm" id="btnCatReload" type="button" style="height:32px">刷新</button>
+            <button class="btn primary sm" id="btnCatNew" type="button" style="height:32px;padding:0 14px">＋ 新建类别</button>
+          </div>
+        </div>
+        <div id="catBox" hidden style="margin-top:12px"></div>
       </div>
     </section>
 
@@ -1976,7 +2027,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
     }
     if (currentMod === 'homework') {
-      if (hwState.view === 'hw' || hwState.view === 'tt') return renderItemsHome();
+      if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderItemsHome();
     }
     if (currentMod === 'more') {
       if (moreState.view === 'fb' || moreState.view === 'promo' || moreState.view === 'ver') return renderMore();
@@ -2013,6 +2064,11 @@ window.__supaReady = new Promise(function (resolve) {
           '<span><b>班级课表</b><small>看本周课程安排</small></span>' +
           '<span class="arrow">›</span>' +
         '</button>' +
+        '<button class="cube-opt" type="button" data-items="canteen">' +
+          '<span class="ico">🍚</span>' +
+          '<span><b>本周食堂菜单</b><small>看看这几天吃什么</small></span>' +
+          '<span class="arrow">›</span>' +
+        '</button>' +
       '</div>';
   }
 
@@ -2028,6 +2084,28 @@ window.__supaReady = new Promise(function (resolve) {
         return;
       }
       body.innerHTML = ttTable(rows, false);
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* 本周食堂菜单 */
+  function renderCanteen() {
+    hwState.view = 'canteen';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_canteen_get', { p_token: S.token }).then(function (r) {
+      var v = String(r.content || '').trim();
+      if (!v) {
+        body.innerHTML = '<div class="empty" style="padding:50px 20px">' +
+          '<strong>这周的菜单还没出来</strong>管理员发布后就会显示在这里</div>';
+        return;
+      }
+      body.innerHTML =
+        '<div class="card" style="padding:18px;max-width:640px;margin:0 auto">' +
+          '<div class="rich">' + renderRich(v) + '</div>' +
+        '</div>';
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
@@ -2282,6 +2360,8 @@ window.__supaReady = new Promise(function (resolve) {
   /* ================= 论坛 ================= */
   var forumReaders = {};
   var postReaders = {};
+  var forumScope = 'all';        // all / public / 类别 id
+  var forumCats = [];
 
   /* 已读的人名：渲染成真正的 <button>，onclick 直接调全局函数 */
   function readerBtn(x) {
@@ -2360,6 +2440,7 @@ window.__supaReady = new Promise(function (resolve) {
     postReaders[p.id] = p.readers || [];
     return '<div class="news-item" data-post="' + esc(p.id) + '">' +
       '<div class="fb-head">' +
+        (p.cat_name ? '<span class="badge gold" style="height:18px;font-size:11px">' + esc(p.cat_name) + '</span>' : '') +
         '<span class="who" data-uid="' + esc(p.user_id || '') + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' + esc(p.author) + '</span>' +
         (p.author_role === 'vip' ? '<span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '') +
         statusTag(p.author_banned, p.author_banned_forever, p.author_muted, p.author_muted_forever) +
@@ -2381,38 +2462,142 @@ window.__supaReady = new Promise(function (resolve) {
     var body = $('modBody');
     body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
 
-    api('api_forum_list', { p_token: S.token }).then(function (r) {
+    Promise.all([
+      api('api_forum_cats', { p_token: S.token }).then(function (r) { forumCats = r.items || []; return forumCats; },
+        function () { forumCats = []; return []; }),
+      api('api_forum_list', { p_token: S.token, p_scope: forumScope })
+    ]).then(function (res) {
+      var r = res[1];
       var items = r.items || [];
       var left = Math.max(0, (r.my_limit || 3) - (r.my_today || 0));
+      var cat = r.cat;
+
+      var head = '';
+      if (cat) {
+        head =
+          '<div class="forum-cat-head">' +
+            '<div class="fc-name">' + esc(cat.name) + '</div>' +
+            '<div class="fc-sub">' + (cat.sub ? esc(cat.sub) : '') +
+              ' <span style="opacity:.8">· 此贴区由「' + esc(cat.creator) + '」创建</span>' +
+            '</div>' +
+          '</div>';
+      }
 
       body.innerHTML =
         '<div style="max-width:640px;margin:0 auto">' +
-          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">' +
-            '<div>' +
-              '<div style="font-size:17px;font-weight:700;color:var(--ink);letter-spacing:1px">论坛</div>' +
-              '<div class="hint" style="font-size:12px">' +
-                (r.muted ? '你被禁言了' : '今天还能发 ' + left + ' 条') +
-              '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">' +
+            '<div class="seg" style="margin:0">' +
+              '<button type="button" data-fscope="all" class="' + (forumScope === 'all' ? 'on' : '') + '">全部</button>' +
+              '<button type="button" data-fscope="public" class="' + (forumScope === 'public' ? 'on' : '') + '">公共</button>' +
             '</div>' +
-            '<button class="btn primary sm" id="forumNew" type="button" style="margin-left:auto;height:36px;padding:0 18px"' +
+            '<button class="btn ghost sm" id="forumCatsBtn" type="button" style="height:32px">寻找类别</button>' +
+            '<button class="btn primary sm" id="forumNew" type="button" style="margin-left:auto;height:32px;padding:0 16px"' +
               (r.muted ? ' disabled' : '') + '>＋ 发帖</button>' +
           '</div>' +
+          head +
           '<div id="forumList">' +
             (items.length
               ? items.map(function (x) { return forumPostCard(x, false); }).join('')
-              : '<div class="empty"><strong>还没有帖子</strong>点右上角「发帖」发第一条</div>') +
+              : '<div class="empty"><strong>这里还没有帖子</strong>' +
+                  (r.muted ? '你被禁言了' : '点右上角「发帖」发第一条') + '</div>') +
           '</div>' +
+          '<div class="hint" style="text-align:center;margin-top:14px;font-size:12px">' +
+            (r.muted ? '你被禁言了' : '今天还能发 ' + left + ' 条') + '</div>' +
         '</div>';
 
-      // 进到这个页面就算「看过了」：一次把这一屏的帖子都标成已读
       markForumRead(items);
 
-      if (r.muted) return;
+      body.querySelector('.seg').addEventListener('click', function (e) {
+        var b = e.target.closest('[data-fscope]');
+        if (!b) return;
+        forumScope = b.dataset.fscope;
+        renderForum();
+      });
 
-      $('forumNew').onclick = function () { openForumCompose(left); };
+      $('forumCatsBtn').onclick = openForumCats;
+
+      if (!r.muted) $('forumNew').onclick = function () { openForumCompose(left); };
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
+  }
+
+  /* 寻找类别 */
+  function openForumCats() {
+    var m = modal('寻找类别',
+      '<div id="fcList"><div class="loading"><span class="spinner"></span>加载中…</div></div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>' +
+      '<button class="btn primary" id="fcApply" type="button">申请新类别</button>', 480);
+
+    api('api_forum_cats', { p_token: S.token }).then(function (r) {
+      forumCats = r.items || [];
+      var box = m.querySelector('#fcList');
+      if (!forumCats.length) {
+        box.innerHTML = '<div class="hint">还没有任何类别，你可以申请一个</div>';
+        return;
+      }
+      box.innerHTML = forumCats.map(function (c) {
+        return '<button type="button" class="fc-row" data-fcat="' + esc(c.id) + '">' +
+          '<span class="fc-r-name">' + esc(c.name) + '</span>' +
+          '<span class="fc-r-sub">' + esc(c.sub || '') + '</span>' +
+          '<span class="fc-r-n">' + (c.post_count || 0) + '</span>' +
+        '</button>';
+      }).join('');
+      box.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-fcat]');
+        if (!b) return;
+        forumScope = b.dataset.fcat;
+        closeModal();
+        renderForum();
+      });
+    }, function (e) {
+      m.querySelector('#fcList').innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
+    });
+
+    m.querySelector('#fcApply').onclick = function () { closeModal(); openForumCatApply(); };
+  }
+
+  /* 申请新类别（7 天 2 个） */
+  function openForumCatApply() {
+    var m = modal('申请新类别',
+      '<div id="apInfo" class="hint" style="margin-bottom:10px">加载中…</div>' +
+      '<label class="field"><span>类别名称<em>*</em></span>' +
+        '<input class="input" id="apName" maxlength="12" placeholder="例如：桌游区"></label>' +
+      '<label class="field"><span>小字说明</span>' +
+        '<input class="input" id="apSub" maxlength="40" placeholder="例如：一起玩桌游"></label>' +
+      '<div id="apMine"></div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="apSend" type="button">提交申请</button>', 480);
+
+    api('api_forum_my_cats', { p_token: S.token }).then(function (r) {
+      m.querySelector('#apInfo').innerHTML =
+        '7 天内最多申请 2 个，你已申请 <b>' + (r.used || 0) + '</b> / 2；管理员同意后才会出现在「寻找类别」里。';
+
+      var items = r.items || [];
+      m.querySelector('#apMine').innerHTML = items.length
+        ? '<div class="pf-label" style="margin:6px 0 6px">我的申请</div>' + items.map(function (x) {
+            var tag = x.status === 'approved' ? '已通过' : x.status === 'rejected' ? '已被拒绝' : '待审核';
+            var color = x.status === 'approved' ? 'st-done' : x.status === 'rejected' ? 'st-new' : 'st-doing';
+            return '<div class="perm-row" style="padding:7px 0">' +
+              '<div class="who" style="width:auto;flex:1">' + esc(x.name) +
+                '<small>' + esc(x.sub || '') + ' · ' + esc(x.at) + '</small></div>' +
+              '<span class="badge ' + color + '" style="height:18px;font-size:11px">' + tag + '</span>' +
+            '</div>';
+          }).join('')
+        : '';
+    }, function () {});
+
+    m.querySelector('#apSend').onclick = function () {
+      var btn = this;
+      var nm = m.querySelector('#apName').value.trim();
+      if (!nm) return toast('填一下类别名称', 'err');
+      busy(btn, true, '提交中…');
+      api('api_forum_cat_apply', {
+        p_token: S.token, p_name: nm, p_sub: m.querySelector('#apSub').value.trim()
+      }).then(function () {
+        busy(btn, false); closeModal(); toast('已提交，等管理员审核', 'ok', 3200);
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
+    };
   }
 
   /* 看见即已读：批量标记 + 刷新每一行已读名单 */
@@ -2433,14 +2618,35 @@ window.__supaReady = new Promise(function (resolve) {
     }, function () {});
   }
 
+  /* 发帖弹窗（可选类别） */
   function openForumCompose(left) {
+    var opts = forumCats || [];
+    var defCat = (forumScope !== 'all' && forumScope !== 'public') ? forumScope : '';
+
     var m = modal('发帖',
       '<label class="field"><span>内容（最多 200 字）</span>' +
         '<textarea class="textarea" id="forumBody" rows="5" maxlength="200" placeholder="说点什么…"></textarea>' +
         '<span class="hint" id="forumCount" style="font-size:12px">0 / 200</span></label>' +
+      '<div class="field"><span>发到哪个区</span>' +
+        '<div class="chips" id="fpCat">' +
+          '<button type="button" class="chip-btn ' + (defCat === '' ? 'on' : '') + '" data-pcat="">公共</button>' +
+          opts.map(function (c) {
+            return '<button type="button" class="chip-btn ' + (defCat === c.id ? 'on' : '') +
+              '" data-pcat="' + esc(c.id) + '">' + esc(c.name) + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
       '<p class="hint" style="font-size:12.5px">今天还能发 ' + left + ' 条；连续空行不要超过 2 行。</p>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
       '<button class="btn primary" id="forumSend" type="button">发布</button>', 480);
+
+    var pickCat = defCat;
+    m.querySelector('#fpCat').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pcat]');
+      if (!b) return;
+      pickCat = b.dataset.pcat || '';
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+    });
 
     var ta = m.querySelector('#forumBody');
     ta.addEventListener('input', function () {
@@ -2453,7 +2659,7 @@ window.__supaReady = new Promise(function (resolve) {
       var v = ta.value;
       if (!v.trim()) return toast('写点内容吧', 'err');
       busy(btn, true, '发布中…');
-      api('api_forum_post', { p_token: S.token, p_body: v }).then(function () {
+      api('api_forum_post', { p_token: S.token, p_body: v, p_cat_id: pickCat || null }).then(function () {
         busy(btn, false);
         closeModal();
         toast('已发布', 'ok');
@@ -2527,6 +2733,76 @@ window.__supaReady = new Promise(function (resolve) {
         loadForumAdmin();
       }, function (e) { toast(e.message, 'err', 3600); });
     });
+  }
+
+  /* ---------- 管理端：论坛类别 ---------- */
+  function loadForumCatsAdmin() {
+    var box = $('catBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_forum_cats', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="empty" style="padding:16px"><strong>还没有类别</strong>点右上角新建一个</div>';
+        return;
+      }
+      box.innerHTML = items.map(function (c) {
+        var tag = c.status === 'pending'
+          ? '<span class="badge st-doing" style="height:18px;font-size:11px">待审核</span>'
+          : c.status === 'rejected'
+            ? '<span class="badge st-new" style="height:18px;font-size:11px">已拒绝</span>'
+            : '<span class="badge ' + (c.official ? 'red' : 'gold') + '" style="height:18px;font-size:11px">' +
+                (c.official ? '官方' : '学生创建') + '</span>';
+
+        var ops = '';
+        if (c.status === 'pending') {
+          ops = '<button type="button" class="link" data-catyes>同意</button>' +
+                '<button type="button" class="link danger" data-catno>拒绝</button>';
+        } else {
+          ops = '<button type="button" class="link" data-catedit>改名</button>' +
+                '<button type="button" class="link danger" data-catdel>删除</button>';
+        }
+
+        return '<div class="perm-row" style="padding:9px 0" data-cid="' + esc(c.id) + '"' +
+          ' data-name="' + esc(c.name) + '" data-sub="' + esc(c.sub || '') + '">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="display:flex;align-items:center;gap:8px">' + tag +
+              '<b style="font-size:13.5px;color:var(--ink)">' + esc(c.name) + '</b></div>' +
+            '<div class="hint" style="font-size:11.5px">' + esc(c.sub || '') +
+              ' · ' + (c.post_count || 0) + ' 帖 · ' + esc(c.creator) + ' · ' + esc(c.at) + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:12px">' + ops + '</div>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openCatForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '修改类别' : '新建类别',
+      '<label class="field"><span>类别名称<em>*</em></span>' +
+        '<input class="input" id="fcName" maxlength="12" placeholder="例如：食堂区" value="' + esc(edit ? item.name : '') + '"></label>' +
+      '<label class="field"><span>小字说明</span>' +
+        '<input class="input" id="fcSub" maxlength="40" placeholder="例如：今天吃什么" value="' + esc(edit ? item.sub : '') + '"></label>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="fcOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 440);
+
+    m.querySelector('#fcName').focus();
+    m.querySelector('#fcOk').onclick = function () {
+      var btn = this;
+      var nm = m.querySelector('#fcName').value.trim();
+      if (!nm) return toast('填一下类别名称', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_forum_cat_save', {
+        p_token: S.token, p_id: edit ? item.id : null,
+        p_name: nm, p_sub: m.querySelector('#fcSub').value.trim()
+      }).then(function () {
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadForumCatsAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
   }
 
   /* ---------- 管理端：论坛禁言 ---------- */
@@ -3115,13 +3391,13 @@ window.__supaReady = new Promise(function (resolve) {
     showActions(name === 'users');
     if (name === 'users') loadUsers();
     if (name === 'identity') loadIdentity();
-    if (name === 'hw') { loadHwAdmin(); loadTtAdmin(); }
+    if (name === 'hw') { loadHwAdmin(); loadTtAdmin(); loadCanteenAdmin(); }
     if (name === 'news') loadNews();
     if (name === 'cube') loadCubeAdmin();
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
-    if (name === 'forum') { loadForumAdmin(); loadMutePanel(); }
+    if (name === 'forum') { loadForumAdmin(); loadMutePanel(); loadForumCatsAdmin(); }
     if (name === 'medal') loadMedalAdmin();
     if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
@@ -4509,6 +4785,14 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* ---------- 管理端：班级课表 ---------- */
+  function loadCanteenAdmin() {
+    var el = $('canteenInput');
+    if (!el) return;
+    api('api_canteen_get', { p_token: S.token }).then(function (r) {
+      el.value = r.content || '';
+    }, function () {});
+  }
+
   function loadTtAdmin() {
     $('ttBox').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     api('api_timetable_get', { p_token: S.token }).then(function (r) {
@@ -6005,6 +6289,35 @@ window.__supaReady = new Promise(function (resolve) {
     $('btnAddNews').addEventListener('click', function () { openNewsForm(null); });
     $('btnChangePwd').addEventListener('click', openChangePwd);
     $('btnPublishHw').addEventListener('click', publishHw);
+    $('ttFold').addEventListener('click', function () {
+      var wrap = $('ttWrap');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+
+    $('btnCanteenSave').addEventListener('click', function () {
+      var btn = this;
+      busy(btn, true, '保存中…');
+      api('api_admin_canteen_save', { p_token: S.token, p_content: $('canteenInput').value })
+        .then(function () { busy(btn, false); toast('菜单已保存', 'ok'); },
+              function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    });
+
+    $('btnCanteenImg').addEventListener('click', function () { $('canteenFile').click(); });
+    $('canteenFile').addEventListener('change', function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
+          insertAtCursor($('canteenInput'), '\n![图片](' + url + ')\n');
+        });
+      };
+      reader.readAsDataURL(f);
+      this.value = '';
+    });
+
     $('btnTtAdd').addEventListener('click', addTtRow);
     $('btnTtSave').addEventListener('click', saveTtAll);
     $('hwFold').addEventListener('click', function () {
@@ -6347,6 +6660,42 @@ window.__supaReady = new Promise(function (resolve) {
     $('btnForumReload').addEventListener('click', loadForumAdmin);
     $('btnMuteReload').addEventListener('click', loadMutePanel);
 
+    $('catFold').addEventListener('click', function () {
+      var wrap = $('catBox');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('btnCatReload').addEventListener('click', loadForumCatsAdmin);
+    $('btnCatNew').addEventListener('click', function () { openCatForm(null); });
+    $('catBox').addEventListener('click', function (e) {
+      var row = e.target.closest('[data-cid]');
+      if (!row) return;
+      var id = row.dataset.cid;
+      var item = { id: id, name: row.dataset.name, sub: row.dataset.sub };
+
+      if (e.target.closest('[data-catyes]')) {
+        api('api_admin_forum_cat_decide', { p_token: S.token, p_id: id, p_approve: true }).then(function () {
+          toast('已通过', 'ok'); loadForumCatsAdmin();
+        }, function (err) { toast(err.message, 'err', 3600); });
+        return;
+      }
+      if (e.target.closest('[data-catno]')) {
+        api('api_admin_forum_cat_decide', { p_token: S.token, p_id: id, p_approve: false }).then(function () {
+          toast('已拒绝', 'ok'); loadForumCatsAdmin();
+        }, function (err) { toast(err.message, 'err', 3600); });
+        return;
+      }
+      if (e.target.closest('[data-catedit]')) { openCatForm(item); return; }
+      if (e.target.closest('[data-catdel]')) {
+        confirmBox('删除类别', '删除后这个区里的帖子会变成「公共」。', '', '删除').then(function (yes) {
+          if (!yes) return;
+          api('api_admin_forum_cat_delete', { p_token: S.token, p_id: id }).then(function () {
+            toast('已删除', 'ok'); loadForumCatsAdmin();
+          }, function (err) { toast(err.message, 'err', 3600); });
+        });
+      }
+    });
+
     /* ---------- 勋章设置 ---------- */
     $('medalUserFold').addEventListener('click', function () {
       var wrap = $('medalUserWrap');
@@ -6559,6 +6908,7 @@ window.__supaReady = new Promise(function (resolve) {
       var it = e.target.closest('[data-items]');
       if (it && currentMod === 'homework') {
         if (it.dataset.items === 'hw') renderHomeworkInModule($('modBody'));
+        else if (it.dataset.items === 'canteen') renderCanteen();
         else renderTimetableForUser();
         return;
       }
