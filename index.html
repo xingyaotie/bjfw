@@ -76,6 +76,10 @@ button{font-family:inherit;cursor:pointer}
 .s-ico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);
   display:flex;pointer-events:none}
 
+/* 未读红点 */
+.dot-badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;
+  border-radius:999px;background:var(--red);color:#fff;font-size:10.5px;line-height:16px;text-align:center}
+
 /* 论坛类别 */
 .forum-cat-head{position:sticky;top:0;z-index:5;background:linear-gradient(135deg,#C0392B,#A5291F);
   color:#fff;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 8px 20px rgba(192,57,43,.22)}
@@ -825,6 +829,20 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         </div>
         <button class="btn primary sm" id="btnAddNews" type="button" style="height:36px;padding:0 16px">＋ 发布公告</button>
       </div>
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <div class="panel-head" style="margin:0">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0">
+            <button class="fold" id="newsAppFold" type="button" aria-label="展开或收起">&#9656;</button>
+            <div>
+              <h3 style="font-size:15px">投稿申请</h3>
+              <div class="hint">学生投稿的热点；同意后会直接出现在班级热点里</div>
+            </div>
+          </div>
+          <button class="btn ghost sm" id="btnNewsAppReload" type="button" style="height:32px">刷新</button>
+        </div>
+        <div id="newsAppBox" hidden style="margin-top:12px"></div>
+      </div>
+
       <div class="card"><div class="news" id="newsList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
@@ -1144,9 +1162,18 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
         </div>
       </div>
 
+      <div class="card" style="padding:16px;margin-bottom:18px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div><h3 style="font-size:15px">④ 免广告名单</h3>
+            <div class="hint">给某些人关掉广告；两个开关分开，只关一种也行</div></div>
+          <button class="btn ghost sm" id="btnAdFreeReload" type="button" style="height:32px">刷新</button>
+        </div>
+        <div id="adFreeBox"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+      </div>
+
       <div class="card" style="padding:16px">
         <div class="panel-head" style="margin:0 0 10px">
-          <div><h3 style="font-size:15px">④ 设置排期</h3>
+          <div><h3 style="font-size:15px">⑤ 设置排期</h3>
             <div class="hint">每条排期选一个用途，学生端会分成两条时间轴显示</div></div>
           <button class="btn primary sm" id="btnAdSchNew" type="button" style="height:32px;padding:0 14px">＋ 加一条</button>
         </div>
@@ -1854,7 +1881,11 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* 登录后强制看广告：倒计时结束后才出现「关闭」按钮 */
+  function adFreeLogin() { return !!(S.me && S.me.ad_free_login); }
+  function adFreeGrid() { return !!(S.me && S.me.ad_free_grid); }
+
   function showAdThen(cb) {
+    if (adFreeLogin()) { cb(); return; }
     api('api_ad_current', { p_token: S.token }).then(function (r) {
       if (!r.ad) { cb(); return; }
       showAdOverlay(r.ad.content, S.boot && S.boot.ad_seconds, cb);
@@ -1962,6 +1993,7 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* 四宫格点开前先看广告（只在这四个方块上触发） */
   function openTileWithAd(mod, name) {
+    if (adFreeGrid()) { openModule(mod, name); return; }
     var content = S.boot ? String(S.boot.ad2_content || '').trim() : '';
     var on = !S.boot || String(S.boot.ad2_on || '1') !== '0';
     var once = S.boot && String(S.boot.ad2_mode || 'always') === 'once';
@@ -2451,6 +2483,9 @@ window.__supaReady = new Promise(function (resolve) {
       '<div style="margin-top:8px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">' +
         '<button type="button" class="link" data-expand="' + esc(p.id) + '">' +
           (p.reply_count ? p.reply_count + ' 条跟评' : '跟评') + '</button>' +
+        '<button type="button" class="link" data-like="' + esc(p.id) + '" style="' +
+          (p.liked ? 'color:var(--red);font-weight:600' : '') + '">' +
+          (p.liked ? '♥ 已赞 ' : '♡ 点赞 ') + (p.like_count || 0) + '</button>' +
         (isAdmin ? '<button type="button" class="link danger" data-postdel="' + esc(p.id) + '">删除帖子</button>' : '') +
         '<span class="hint" data-readers="' + esc(p.id) + '" style="font-size:12px">' + readersText(p.readers, p.id) + '</span>' +
       '</div>' +
@@ -2491,6 +2526,8 @@ window.__supaReady = new Promise(function (resolve) {
               '<button type="button" data-fscope="public" class="' + (forumScope === 'public' ? 'on' : '') + '">公共</button>' +
             '</div>' +
             '<button class="btn ghost sm" id="forumCatsBtn" type="button" style="height:32px">寻找类别</button>' +
+            '<button class="btn ghost sm" id="forumMsgBtn" type="button" style="height:32px;position:relative">' +
+              '🔔 消息<span id="forumMsgDot" class="dot-badge" hidden></span></button>' +
             '<button class="btn primary sm" id="forumNew" type="button" style="margin-left:auto;height:32px;padding:0 16px"' +
               (r.muted ? ' disabled' : '') + '>＋ 发帖</button>' +
           '</div>' +
@@ -2515,8 +2552,61 @@ window.__supaReady = new Promise(function (resolve) {
       });
 
       $('forumCatsBtn').onclick = openForumCats;
+      $('forumMsgBtn').onclick = openForumLikes;
+      checkForumMsgDot();
 
       if (!r.muted) $('forumNew').onclick = function () { openForumCompose(left); };
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* 论坛消息：谁赞了我的帖子 */
+  var LIKES_SEEN = 'xbh_likes_seen';
+
+  function likesSeenAt() {
+    try { return Number(localStorage.getItem(LIKES_SEEN) || 0); } catch (e) { return 0; }
+  }
+
+  function checkForumMsgDot() {
+    api('api_forum_my_likes', { p_token: S.token }).then(function (r) {
+      var dot = $('forumMsgDot');
+      if (!dot) return;
+      var seen = likesSeenAt();
+      var unread = (r.items || []).filter(function (x) {
+        return new Date(x.at.replace(/-/g, '/')).getTime() > seen;
+      }).length;
+      dot.hidden = unread === 0;
+      if (unread) dot.textContent = unread > 9 ? '9+' : unread;
+    }, function () {});
+  }
+
+  function openForumLikes() {
+    var mo = modal('收到的赞', '<div class="loading"><span class="spinner"></span>加载中…</div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 500);
+    var body = mo.querySelector('.modal-body');
+
+    api('api_forum_my_likes', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      try { localStorage.setItem(LIKES_SEEN, String(Date.now())); } catch (e) {}
+      var dot = $('forumMsgDot');
+      if (dot) dot.hidden = true;
+
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>还没有人赞你</strong>多发点帖子吧</div>';
+        return;
+      }
+      body.innerHTML = items.map(function (x) {
+        return '<div class="perm-row" style="padding:9px 0">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:13.5px;color:var(--ink)">' +
+              '<span class="lnk" data-uid="' + esc(x.from_id) + '">' + esc(x.from_name) + '</span>' +
+              ' 赞了你的「' + esc(x.post_body) + '」</div>' +
+            '<div class="hint" style="font-size:11.5px">' + esc(x.at) + '</div>' +
+          '</div>' +
+          '<span class="badge red" style="height:18px;font-size:11px">♥</span>' +
+        '</div>';
+      }).join('');
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
@@ -3360,23 +3450,96 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
+  /* 列表里只显示标题 + 小字；没小字就取正文第一行 */
+  function newsSubText(n) {
+    var sb = String(n.sub || '').trim();
+    if (sb) return sb;
+    var first = String(n.content || '').split(/\r?\n/)[0].trim();
+    return first;
+  }
+
   function renderNewsInModule(body) {
     api('api_list_announcements', { p_token: S.token }).then(function (r) {
       var items = r.items || [];
-      if (!items.length) {
-        body.innerHTML = '<div class="empty"><strong>暂时没有公告</strong>管理员发布后会出现在这里</div>';
-        return;
-      }
-      body.innerHTML = items.map(function (n) {
-        return '<div class="news-item">' +
-          '<div class="hd">' + (n.pinned ? '<span class="badge red">置顶</span>' : '') +
-            '<h4>' + esc(n.title) + '</h4>' +
-            '<span class="time">' + fmt(n.created_at) + '</span></div>' +
-          '<p>' + esc(n.content) + '</p></div>';
-      }).join('');
+      body.innerHTML =
+        '<div style="display:flex;justify-content:flex-end;margin-bottom:10px">' +
+          '<button class="btn ghost sm" id="newsApplyBtn" type="button" style="height:32px">＋ 投稿</button>' +
+        '</div>' +
+        (items.length ? '' : '<div class="empty"><strong>暂时没有公告</strong>管理员发布后会出现在这里</div>') +
+        items.map(function (n) {
+          var sub = newsSubText(n);
+          return '<div class="news-item" data-news="' + esc(n.id) + '" style="cursor:pointer">' +
+            '<div class="hd">' + (n.pinned ? '<span class="badge red">置顶</span>' : '') +
+              '<h4>' + esc(n.title) + '</h4>' +
+              '<span class="time">' + fmt(n.created_at) + '</span></div>' +
+            (sub ? '<p style="color:var(--muted);font-size:13px;margin-top:4px">' + esc(sub) + '</p>' : '') +
+          '</div>';
+        }).join('');
+
+      $('newsApplyBtn').onclick = openNewsApply;
+      body.addEventListener('click', function (e) {
+        var it = e.target.closest('[data-news]');
+        if (!it) return;
+        var data = items.filter(function (x) { return x.id === it.dataset.news; })[0];
+        if (!data) return;
+        modal(esc(data.title),
+          '<div class="rich">' + esc(data.content) + '</div>' +
+          '<p class="hint" style="margin-top:12px">' + fmtAbs(data.created_at) + ' · ' + esc(data.author || '') + '</p>',
+          '<button class="btn ghost" type="button" data-close>关闭</button>', 520);
+      });
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
+  }
+
+  /* 学生投稿热点（每周 3 次，需审核） */
+  var NEWS_REVIEW_TIP = '审核时间：工作日 20:10–21:30，节假日 10:00–22:00';
+
+  function openNewsApply() {
+    var m = modal('投稿班级热点',
+      '<p class="hint" style="margin-bottom:12px;line-height:1.7">' + NEWS_REVIEW_TIP +
+        '<br>每周最多 3 次，管理员通过后会出现在「班级热点」里。</p>' +
+      '<label class="field"><span>标题<em>*</em></span>' +
+        '<input class="input" id="naTitle" maxlength="40" placeholder="例如：本周五运动会"></label>' +
+      '<label class="field"><span>小字（可选，列表里显示这一行）</span>' +
+        '<input class="input" id="naSub" maxlength="40" placeholder="例如：全班同学注意"></label>' +
+      '<label class="field"><span>正文</span>' +
+        '<textarea class="textarea" id="naBody" rows="5" maxlength="2000" placeholder="想说的内容"></textarea></label>' +
+      '<div id="naMine"></div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="naSend" type="button">提交审核</button>', 520);
+
+    api('api_news_my_applies', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      m.querySelector('#naMine').innerHTML =
+        '<div class="hint" style="margin-top:6px">本周已投稿 ' + (r.used || 0) + ' / 3</div>' +
+        (items.length
+          ? '<div class="pf-label" style="margin:10px 0 6px">我的投稿</div>' + items.slice(0, 6).map(function (x) {
+              var tag = x.status === 'approved' ? '已通过' : x.status === 'rejected' ? '已被拒绝' : '待审核';
+              var color = x.status === 'approved' ? 'st-done' : x.status === 'rejected' ? 'st-new' : 'st-doing';
+              return '<div class="perm-row" style="padding:6px 0">' +
+                '<div class="who" style="width:auto;flex:1">' + esc(x.title) +
+                  '<small>' + esc(x.at) + '</small></div>' +
+                '<span class="badge ' + color + '" style="height:18px;font-size:11px">' + tag + '</span>' +
+              '</div>';
+            }).join('')
+          : '');
+    }, function () {});
+
+    m.querySelector('#naSend').onclick = function () {
+      var btn = this;
+      var t = m.querySelector('#naTitle').value.trim();
+      if (!t) return toast('填一下标题', 'err');
+      busy(btn, true, '提交中…');
+      api('api_news_apply', {
+        p_token: S.token, p_title: t,
+        p_sub: m.querySelector('#naSub').value.trim(),
+        p_content: m.querySelector('#naBody').value.trim()
+      }).then(function () {
+        busy(btn, false); closeModal();
+        toast('已提交，等管理员审核（' + NEWS_REVIEW_TIP.replace('审核时间：', '') + '）', 'ok', 5000);
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
+    };
   }
 
   /* ---------- 用户端 ---------- */
@@ -3392,7 +3555,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'users') loadUsers();
     if (name === 'identity') loadIdentity();
     if (name === 'hw') { loadHwAdmin(); loadTtAdmin(); loadCanteenAdmin(); }
-    if (name === 'news') loadNews();
+    if (name === 'news') { loadNews(); loadNewsApplies(); }
     if (name === 'cube') loadCubeAdmin();
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
     if (name === 'mail') loadMailTab();
@@ -3401,7 +3564,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'medal') loadMedalAdmin();
     if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
-    if (name === 'ad') loadAdAdmin();
+    if (name === 'ad') { loadAdAdmin(); loadAdFreeList(); }
     if (name === 'notice') loadNoticeAdmin();
     if (name === 'status') { loadStatusAdmin(); loadAttackLog(); }
     if (name === 'more') loadMoreAdmin();
@@ -4707,6 +4870,8 @@ window.__supaReady = new Promise(function (resolve) {
     var m = modal(edit ? '编辑公告' : '发布公告',
       '<label class="field"><span>标题<em>*</em></span>' +
         '<input class="input" id="nTitle" maxlength="60" placeholder="如：本周五运动会安排" value="' + esc(item ? item.title : '') + '"></label>' +
+      '<label class="field"><span>小字（列表里显示这一行，可不填）</span>' +
+        '<input class="input" id="nSub" maxlength="40" placeholder="例如：全班同学注意" value="' + esc(item ? item.sub || '' : '') + '"></label>' +
       '<label class="field"><span>正文<em>*</em></span>' +
         '<textarea class="textarea" id="nBody" rows="8" placeholder="纯文本，空行分段">' + esc(item ? item.content : '') + '</textarea></label>' +
       '<label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">' +
@@ -4722,11 +4887,48 @@ window.__supaReady = new Promise(function (resolve) {
       busy(btn, true, '提交中…');
       api('api_admin_save_announcement', {
         p_token: S.token, p_id: edit ? item.id : null,
-        p_title: t, p_content: b, p_pinned: m.querySelector('#nPin').checked
+        p_title: t, p_content: b,
+        p_sub: m.querySelector('#nSub').value.trim(),
+        p_pinned: m.querySelector('#nPin').checked
       }).then(function () {
         busy(btn, false); closeModal(); toast(edit ? '已保存' : '已发布', 'ok'); loadNews();
       }, function (e) { busy(btn, false); toast(e.message, 'err'); });
     };
+  }
+
+  /* ---------- 管理端：热点投稿审核 ---------- */
+  function loadNewsApplies() {
+    var box = $('newsAppBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_news_applies', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="empty" style="padding:14px"><strong>还没有投稿</strong></div>';
+        return;
+      }
+      box.innerHTML = items.map(function (a) {
+        var tag = a.status === 'pending' ? '<span class="badge st-doing" style="height:18px;font-size:11px">待审核</span>'
+          : a.status === 'approved' ? '<span class="badge st-done" style="height:18px;font-size:11px">已通过</span>'
+          : '<span class="badge st-new" style="height:18px;font-size:11px">已拒绝</span>';
+        var ops = a.status === 'pending'
+          ? '<button type="button" class="link" data-nayes>同意</button>' +
+            '<button type="button" class="link danger" data-nano>拒绝</button>' : '';
+        return '<div class="perm-row" style="padding:9px 0;align-items:flex-start" data-naid="' + esc(a.id) + '">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">' + tag +
+              '<b style="font-size:13.5px;color:var(--ink)">' + esc(a.title) + '</b></div>' +
+            (a.sub ? '<div class="hint" style="font-size:12px">' + esc(a.sub) + '</div>' : '') +
+            (a.content ? '<div class="hint" style="font-size:12px;margin-top:2px">' + esc(String(a.content).slice(0, 60)) + '</div>' : '') +
+            '<div class="hint" style="font-size:11.5px">' + esc(a.who) + '（' + esc(a.login) + '）· ' + esc(a.at) + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:12px;flex:none">' + ops + '</div>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
   }
 
   /* ---------- 管理端：班级作业 ---------- */
@@ -5900,6 +6102,30 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* ---------- 管理端：广告推销（价格 / 公布广告 / 排期） ---------- */
+  function loadAdFreeList() {
+    var box = $('adFreeBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_ad_free_list', { p_token: S.token }).then(function (r) {
+      var users = r.items || [];
+      box.innerHTML = '<div style="max-height:320px;overflow:auto">' + users.map(function (u) {
+        return '<div class="perm-row" style="padding:8px 0" data-adu="' + esc(u.id) + '">' +
+          '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(u.name) +
+            '<small>' + esc(u.username) + '</small></div>' +
+          '<label style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)">' +
+            '<input type="checkbox" data-adfree-login' + (u.login_free ? ' checked' : '') +
+            ' style="width:15px;height:15px;accent-color:var(--red)"> 免登录广告</label>' +
+          '<label style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)">' +
+            '<input type="checkbox" data-adfree-grid' + (u.grid_free ? ' checked' : '') +
+            ' style="width:15px;height:15px;accent-color:var(--red)"> 免四宫格广告</label>' +
+        '</div>';
+      }).join('') + '</div>';
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
   function loadAdAdmin() {
     if (!S.boot) { bootInfo().then(loadAdAdmin, function () {}); return; }
     $('adPrice').value = S.boot.ad_price || '';
@@ -6286,6 +6512,29 @@ window.__supaReady = new Promise(function (resolve) {
     $('btnBan').addEventListener('click', openBanModal);
     $('btnDelete').addEventListener('click', delUser);
     $('btnReload').addEventListener('click', loadUsers);
+    $('newsAppFold').addEventListener('click', function () {
+      var wrap = $('newsAppBox');
+      wrap.hidden = !wrap.hidden;
+      this.classList.toggle('open', !wrap.hidden);
+    });
+    $('btnNewsAppReload').addEventListener('click', loadNewsApplies);
+    $('newsAppBox').addEventListener('click', function (e) {
+      var row = e.target.closest('[data-naid]');
+      if (!row) return;
+      var id = row.dataset.naid;
+      if (e.target.closest('[data-nayes]')) {
+        api('api_admin_news_decide', { p_token: S.token, p_id: id, p_approve: true }).then(function () {
+          toast('已通过，已进入班级热点', 'ok'); loadNewsApplies(); loadNews();
+        }, function (err) { toast(err.message, 'err', 3600); });
+        return;
+      }
+      if (e.target.closest('[data-nano]')) {
+        api('api_admin_news_decide', { p_token: S.token, p_id: id, p_approve: false }).then(function () {
+          toast('已拒绝', 'ok'); loadNewsApplies();
+        }, function (err) { toast(err.message, 'err', 3600); });
+      }
+    });
+
     $('btnAddNews').addEventListener('click', function () { openNewsForm(null); });
     $('btnChangePwd').addEventListener('click', openChangePwd);
     $('btnPublishHw').addEventListener('click', publishHw);
@@ -6507,6 +6756,19 @@ window.__supaReady = new Promise(function (resolve) {
         var item = host && (host.items || []).filter(function (x) { return x.id === iid; })[0];
         if (item) return openMemberItemForm(planId, item);
       }
+    });
+
+    $('btnAdFreeReload').addEventListener('click', loadAdFreeList);
+    $('adFreeBox').addEventListener('change', function (e) {
+      var row = e.target.closest('[data-adu]');
+      if (!row) return;
+      var lf = row.querySelector('[data-adfree-login]').checked;
+      var gf = row.querySelector('[data-adfree-grid]').checked;
+      api('api_admin_set_ad_free', {
+        p_token: S.token, p_user_id: row.dataset.adu, p_login: lf, p_grid: gf
+      }).then(function () {
+        toast('已保存', 'ok', 1500);
+      }, function (err) { toast(err.message, 'err', 3000); });
     });
 
     $('btnAdPriceSave').addEventListener('click', function () { saveAdPrice(this); });
@@ -6790,6 +7052,13 @@ window.__supaReady = new Promise(function (resolve) {
       }
     });
     $('forumAdminList').addEventListener('click', function (e) {
+      var lk2 = e.target.closest('[data-like]');
+      if (lk2) {
+        api('api_forum_like', { p_token: S.token, p_post_id: lk2.dataset.like }).then(function (r) {
+          lk2.innerHTML = (r.liked ? '♥ 已赞 ' : '♡ 点赞 ') + r.count;
+        }, function (err) { toast(err.message, 'err', 2600); });
+        return;
+      }
       var rall2 = e.target.closest('[data-readers-all]');
       if (rall2) {
         var rp2 = rall2.dataset.readersAll;
@@ -6926,6 +7195,17 @@ window.__supaReady = new Promise(function (resolve) {
 
       var mdt = e.target.closest('[data-medal-id]');
       if (mdt) { openMedalDetail(mdt.dataset.medalId); return; }
+
+      var like = e.target.closest('[data-like]');
+      if (like) {
+        var pid0 = like.dataset.like;
+        api('api_forum_like', { p_token: S.token, p_post_id: pid0 }).then(function (r) {
+          like.innerHTML = (r.liked ? '♥ 已赞 ' : '♡ 点赞 ') + r.count;
+          like.style.color = r.liked ? 'var(--red)' : '';
+          like.style.fontWeight = r.liked ? '600' : '';
+        }, function (err) { toast(err.message, 'err', 2600); });
+        return;
+      }
 
       var exp = e.target.closest('[data-expand]');
       if (exp && currentMod === 'forum') {
