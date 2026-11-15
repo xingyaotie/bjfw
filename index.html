@@ -2195,13 +2195,30 @@ window.__supaReady = new Promise(function (resolve) {
       else welcome();
     };
 
-    // 强制广告 3 秒 → 公告 → 欢迎
-    if (profile.role === 'admin') {
-      setTimeout(afterNotice, 260);
+    /* 登录后的 广告 → 公告 → 欢迎：App 里等「进入」点完再走 */
+    var afterLogin = function () {
+      if (profile.role === 'admin') {
+        setTimeout(afterNotice, 260);
+      } else {
+        setTimeout(function () { showAdThen(afterNotice); }, 200);
+      }
+    };
+
+    if (IS_APP && window.XkyctpShell && window.XkyctpShell.showEnter) {
+      APP_AFTER_ENTER = afterLogin;
+      try { window.XkyctpShell.showEnter(); } catch (e) { afterLogin(); }
     } else {
-      setTimeout(function () { showAdThen(afterNotice); }, 200);
+      afterLogin();
     }
   }
+
+  /* 原生封面点了「进入」→ 继续登录后的流程 */
+  var APP_AFTER_ENTER = null;
+  window.__appEntered = function () {
+    var fn = APP_AFTER_ENTER;
+    APP_AFTER_ENTER = null;
+    if (fn) fn();
+  };
 
   /* 登录后强制看广告：倒计时结束后才出现「关闭」按钮 */
   function adFreeLogin() { return !!(S.me && S.me.ad_free_login); }
@@ -2537,9 +2554,45 @@ window.__supaReady = new Promise(function (resolve) {
           '<div style="flex:1;height:1px;background:var(--line)"></div>' +
         '</div>' +
         '<div id="vendorList"><div class="loading" style="padding:12px"><span class="spinner"></span>加载中…</div></div>' +
+
+        /* 最下面：安卓安装包 */
+        (IS_APP ? '' :
+          '<div style="display:flex;align-items:center;gap:10px;margin:22px 0 14px">' +
+            '<div style="flex:1;height:1px;background:var(--line)"></div>' +
+            '<span style="font-size:12px;color:var(--muted);letter-spacing:2px">手机 App</span>' +
+            '<div style="flex:1;height:1px;background:var(--line)"></div>' +
+          '</div>' +
+          '<a class="cube-opt" id="apkLink" href="https://xingyaotie.github.io/bjfw/xkyctp.apk" ' +
+             'style="text-decoration:none;margin-bottom:6px">' +
+            '<span class="ico"><svg viewBox="0 0 24 24" width="21" height="21" fill="none" ' +
+              'stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+              '<rect x="6.6" y="2.8" width="10.8" height="18.4" rx="2.4"/>' +
+              '<path d="M12 8v5.6M9.7 11.4 12 13.7l2.3-2.3"/></svg></span>' +
+            '<span><b>安卓版 App</b>' +
+              '<small id="apkVer">装上不用每次登录，打开就能用</small></span>' +
+            '<span class="arrow">↓</span>' +
+          '</a>' +
+          '<div class="hint" style="font-size:11.5px;line-height:1.7;padding:0 4px 4px">' +
+            '点开会下载安装包。第一次装要在系统提示里允许「未知来源」或「继续安装」。' +
+          '</div>') +
       '</div>';
 
     loadVendors();
+    if (!IS_APP) loadApkVersion();
+  }
+
+  /* 「更多」底部那个安装包：版本号从 app_version.json 取，取不到就不写版本 */
+  function loadApkVersion() {
+    var el = $('apkVer');
+    if (!el || !window.fetch) return;
+    fetch('https://xingyaotie.github.io/bjfw/app_version.json', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (j && j.versionName) el.textContent = 'v' + j.versionName + ' · 装上不用每次登录';
+        var a = $('apkLink');
+        if (j && j.url && a) a.href = j.url;
+      })
+      .catch(function () {});
   }
 
   /* 版本信息：原来散在「更多」里的四块都收在这儿 */
