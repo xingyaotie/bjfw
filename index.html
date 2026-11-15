@@ -255,6 +255,49 @@ body.theme-wujin .switch .slider{background:#3A3122}
   background:#fff;color:var(--red);font-size:11.5px;font-weight:700;display:none;align-items:center;justify-content:center;letter-spacing:0}
 .tile .dot.show{display:flex}
 
+/* ===== App 模式（APK）：底部导航 ===== */
+#appTabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:700;
+  background:rgba(255,255,255,.97);border-top:1px solid var(--line);
+  padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -6px 24px rgba(17,24,39,.07)}
+body.app-mode #appTabbar{display:flex}
+#appTabbar button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;
+  gap:4px;padding:7px 0 4px;font-size:11px;letter-spacing:1.5px;color:var(--muted);transition:.15s}
+#appTabbar button .ti{font-size:19px;line-height:1;filter:grayscale(1);opacity:.5}
+#appTabbar button.on{color:var(--red);font-weight:600}
+#appTabbar button.on .ti{filter:none;opacity:1}
+body.app-mode .wrap{padding-bottom:100px}
+body.app-mode #userSearchWrap{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+body.app-mode.app-mod #userSearchWrap{bottom:16px}
+body.app-mode .actions{bottom:86px!important}
+body.app-mode.app-mod .actions{bottom:24px!important}
+body.app-mode .topbar .member-btn,
+body.app-mode .topbar .mail-btn,
+body.app-mode .topbar .btn-logout,
+body.app-mode .topbar .chip{display:none!important}
+
+/* App 模式：我的 */
+.me-wrap{max-width:600px;margin:0 auto}
+.me-hero{display:flex;align-items:center;gap:15px;padding:20px;border-radius:18px;
+  background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;
+  box-shadow:0 14px 34px rgba(200,16,46,.26)}
+.me-avatar{width:58px;height:58px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:700;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.55)}
+.me-hero .nm{font-size:19px;font-weight:700;letter-spacing:1px;line-height:1.3}
+.me-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.me-tag{font-size:11px;letter-spacing:1px;padding:2px 9px;border-radius:999px;
+  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.42)}
+.me-rows{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.me-row{display:flex;align-items:center;gap:13px;width:100%;padding:16px 17px;background:none;border:none;
+  border-bottom:1px solid #F1F2F5;text-align:left;font-size:15px;color:var(--ink);transition:.15s}
+.me-row:last-child{border-bottom:none}
+.me-row:active{background:#FCFCFD}
+.me-row .mi{font-size:17px;width:24px;text-align:center;flex:none}
+.me-row .ms{font-size:12px;color:var(--muted);margin-top:2px}
+.me-row .arrow{margin-left:auto;color:var(--muted);flex:none}
+.me-row.danger{color:var(--red)}
+.me-foot{text-align:center;font-size:11.5px;color:var(--muted);letter-spacing:1px;margin-top:18px}
+
 /* 管理端 */
 .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
 .tab{height:36px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:#fff;
@@ -1292,6 +1335,15 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
     </section>
   </main>
 
+  <!-- App 模式：我的 -->
+  <main class="wrap" id="mePanel" hidden></main>
+
+  <!-- App 模式：底部导航 -->
+  <nav id="appTabbar">
+    <button type="button" data-atab="home" class="on"><span class="ti">🏠</span>首页</button>
+    <button type="button" data-atab="me"><span class="ti">👤</span>我的</button>
+  </nav>
+
   <audio id="bgm" src="./music.m4a" loop preload="none"></audio>
 
   <div id="userSearchWrap" class="collapsed">
@@ -1572,6 +1624,170 @@ window.__supaReady = new Promise(function (resolve) {
     }, function (e) { throw new Error(humanize(e)); });
   }
 
+  /* ================= App 模式（APK） ================= */
+  /* APK 打开时地址带 ?app=1，UA 里也带 xkyctp；两个条件任一成立就进 App 模式，
+     并记进 localStorage，之后刷新也保持。网页版完全不受影响。 */
+  var IS_APP = (function () {
+    try {
+      if (/[?&]app=1(&|$)/.test(String(location.search || '')) ||
+          /xkyctp/i.test(String(navigator.userAgent || ''))) {
+        localStorage.setItem('xbh_app', '1');
+        return true;
+      }
+      return localStorage.getItem('xbh_app') === '1';
+    } catch (e) { return false; }
+  })();
+
+  var APP_TAB = 'home';
+
+  function appInit() {
+    if (!IS_APP) return;
+    document.body.classList.add('app-mode');
+    var tb = $('appTabbar');
+    if (tb) tb.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-atab]');
+      if (b) appTab(b.getAttribute('data-atab'));
+    });
+  }
+
+  function appTab(which) {
+    var prev = APP_TAB;
+    APP_TAB = which === 'me' ? 'me' : 'home';
+
+    /* 我的 也占一条历史记录，安卓返回键能从「我的」回到「首页」 */
+    try {
+      if (APP_TAB === 'me') {
+        if (prev !== 'me' && location.hash !== '#me') history.pushState({ tab: 'me' }, '', '#me');
+      } else if (location.hash === '#me') {
+        history.replaceState(null, '', location.pathname);
+      }
+    } catch (e) {}
+
+    Array.prototype.forEach.call(document.querySelectorAll('#appTabbar [data-atab]'), function (b) {
+      b.classList.toggle('on', b.getAttribute('data-atab') === APP_TAB);
+    });
+
+    /* 切底栏时，把全屏模块一起收掉 */
+    if (currentMod) {
+      currentMod = '';
+      cubeState.view = 'home'; moreState.view = 'info'; hwState.view = 'home';
+      $('modView').hidden = true;
+      document.body.style.overflow = '';
+      document.body.classList.remove('app-mod');
+    }
+
+    if (APP_TAB === 'me') {
+      $('userPanel').hidden = true;
+      $('adminPanel').hidden = true;
+      $('mePanel').hidden = false;
+      renderAppMe();
+    } else {
+      $('mePanel').hidden = true;
+      if (S.me && S.me.role === 'admin') $('adminPanel').hidden = false;
+      else $('userPanel').hidden = false;
+    }
+
+    try { window.scrollTo(0, 0); } catch (e) {}
+  }
+
+  function appMeRow(icon, title, sub, act, cls) {
+    return '<button type="button" class="me-row' + (cls ? ' ' + cls : '') + '" data-meact="' + act + '">' +
+      '<span class="mi">' + icon + '</span>' +
+      '<span style="flex:1;min-width:0">' +
+        '<span>' + esc(title) + '</span>' +
+        (sub ? '<span class="ms" style="display:block">' + esc(sub) + '</span>' : '') +
+      '</span>' +
+      '<span class="arrow">›</span>' +
+    '</button>';
+  }
+
+  /* 「我的」：显示自己的身份 */
+  function renderAppMe() {
+    var me = S.me || {};
+    var name = me.display_name || me.username || '同学';
+    var isAdmin = me.role === 'admin';
+
+    var roleTxt = isAdmin ? '管理员' : (me.role === 'vip' ? '会员' : '学生');
+    var tags = '<span class="me-tag">' + esc(roleTxt) + '</span>';
+    if (!isAdmin && me.member_plan_name) tags += '<span class="me-tag">' + esc(me.member_plan_name) + '</span>';
+    if (me.class_name) tags += '<span class="me-tag">' + esc(me.class_name) + '</span>';
+
+    var unread = (S.mails && S.mails.length) || 0;
+
+    var box = $('mePanel');
+    box.innerHTML =
+      '<div class="me-wrap">' +
+        '<div class="me-hero">' +
+          '<div class="me-avatar">' + esc(String(name).slice(0, 1)) + '</div>' +
+          '<div style="min-width:0">' +
+            '<div class="nm">' + esc(name) + '</div>' +
+            '<div class="me-tags">' + tags + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="me-rows">' +
+          appMeRow('🙍', '我的资料', '性别、生日、签名、勋章', 'profile') +
+          (isAdmin ? '' : appMeRow('💎', '会员', '方案与专属主题', 'member')) +
+          appMeRow('✉️', '信箱', unread ? '有 ' + unread + ' 封公告' : '班级公告和通知', 'mail') +
+          (isAdmin ? appMeRow('🧰', '急救箱', '强制退出、维护工具', 'aid') : '') +
+          appMeRow('⚙️', '更多工具', '背景音乐等', 'tools') +
+          appMeRow('🚪', '退出登录', '下次进来要重新输入密码', 'logout', 'danger') +
+        '</div>' +
+        '<div class="me-foot">徐悲鸿中学 · 班级服务平台</div>' +
+      '</div>';
+
+    box.querySelector('.me-rows').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-meact]');
+      if (!b) return;
+      var act = b.getAttribute('data-meact');
+      if (act === 'profile') return openProfileModule();
+      if (act === 'member')  return openMemberModule();
+      if (act === 'mail')    return openMailbox();
+      if (act === 'aid')     return openFirstAid();
+      if (act === 'tools')   return openTools();
+      if (act === 'logout')  return logout();
+    });
+  }
+
+  /* 静默登录时的白屏，避免登录页闪一下 */
+  function appSplash(show) {
+    if (!IS_APP) return;
+    var el = $('appSplash');
+    if (show) {
+      if (el) return;
+      el = document.createElement('div');
+      el.id = 'appSplash';
+      el.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#fff;display:flex;' +
+        'flex-direction:column;align-items:center;justify-content:center;gap:14px';
+      el.innerHTML = '<div class="spinner"></div>' +
+        '<div style="font-size:13px;color:#8A9099;letter-spacing:2px">正在进入…</div>';
+      document.body.appendChild(el);
+    } else if (el) {
+      el.parentNode.removeChild(el);
+    }
+  }
+
+  function readSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION) || 'null'); } catch (e) { return null; }
+  }
+
+  /* App 免登录：本地有 token 就直接续期进站，失败才回登录页 */
+  function resumeSession(token) {
+    appSplash(true);
+    loadBootInfo();
+    api('api_resume', { p_token: token }).then(function (r) {
+      appSplash(false);
+      S.token = r.token;
+      saveSession(r.token, r.profile);
+      enter(r.profile);
+    }, function (e) {
+      appSplash(false);
+      clearSession();
+      showLogin();
+      if (e.data && e.data.banned) { showBanNotice(e.data); return; }
+      toast(e.message || '请重新登录', 'err');
+    });
+  }
+
   /* ---------- 启动 ---------- */
   function boot() {
     var ready = window.__supaReady || Promise.resolve(!!window.supabase);
@@ -1590,7 +1806,15 @@ window.__supaReady = new Promise(function (resolve) {
       db = window.supabase.createClient(URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
     } catch (e) { return fatal('连接创建失败：' + e.message); }
 
-    // 不自动登录：每次打开或刷新页面都要重新输入登录名和密码
+    appInit();
+
+    /* App：本地存过 token 就静默进站（30 天滑动续期），不用再输密码 */
+    if (IS_APP) {
+      var saved = readSession();
+      if (saved && saved.token) return resumeSession(saved.token);
+    }
+
+    // 网页版不自动登录：每次打开或刷新页面都要重新输入登录名和密码
     clearSession();
     clearThemeClass();
     showLogin();
@@ -1664,7 +1888,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (!u || !p) { err.textContent = '请输入登录名和密码'; return; }
 
     busy(btn, true, '登 录');
-    api('api_login', { p_username: u, p_password: p }).then(function (r) {
+    api(IS_APP ? 'api_login_keep' : 'api_login', { p_username: u, p_password: p }).then(function (r) {
       busy(btn, false);
       saveSession(r.token, r.profile);
       S.token = r.token;
@@ -1862,6 +2086,8 @@ window.__supaReady = new Promise(function (resolve) {
 
     loadMailBadge();
 
+    if (IS_APP) appTab('home');
+
     var welcome = function () {
       if (profile.role === 'vip') showVipWelcome(name);
     };
@@ -2032,6 +2258,7 @@ window.__supaReady = new Promise(function (resolve) {
     $('userPanel').hidden = true;
     $('modView').hidden = false;
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
     try { history.pushState({ mod: mod }, '', '#' + mod); } catch (e) {}
     collapseSearch();
     renderModule();
@@ -2044,10 +2271,12 @@ window.__supaReady = new Promise(function (resolve) {
     hwState.view = 'home';
     $('modView').hidden = true;
     document.body.style.overflow = '';
+    document.body.classList.remove('app-mod');
     expandSearch();
     if (!S.me) return;
-    $('userPanel').hidden = false;
     if (location.hash) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
+    if (IS_APP) { appTab(APP_TAB); return; }
+    $('userPanel').hidden = false;
   }
 
   /* 魔方里面有多层，返回键逐层退 */
@@ -2392,7 +2621,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ================= 论坛 ================= */
   var forumReaders = {};
   var postReaders = {};
-  var forumScope = 'all';        // all / public / 类别 id
+  var forumScope = 'public';     // all / public / 类别 id（默认进公共贴区）
   var forumCats = [];
 
   /* 已读的人名：渲染成真正的 <button>，onclick 直接调全局函数 */
@@ -3786,6 +4015,7 @@ window.__supaReady = new Promise(function (resolve) {
     $('userPanel').hidden = true;
     $('modView').hidden = false;
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
     try { history.pushState({ mod: 'profile' }, '', '#profile'); } catch (e) {}
     renderProfile();
   }
@@ -5645,6 +5875,7 @@ window.__supaReady = new Promise(function (resolve) {
     $('userPanel').hidden = true;
     $('modView').hidden = false;
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
     try { history.pushState({ mod: 'member' }, '', '#member'); } catch (e) {}
     renderMember();
   }
@@ -7314,7 +7545,8 @@ window.__supaReady = new Promise(function (resolve) {
 
     $('modBack').addEventListener('click', modBack);
     window.addEventListener('popstate', function () {
-      if ($('modView').hidden === false) closeModule();
+      if ($('modView').hidden === false) { closeModule(); return; }
+      if (IS_APP && APP_TAB === 'me') appTab('home');
     });
 
     var searchEl = $('search');
