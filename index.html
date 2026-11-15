@@ -125,6 +125,12 @@ button{font-family:inherit;cursor:pointer}
 #userSearchBtn:active{transform:scale(.94)}
 #userSearchWrap.collapsed .search-box{width:44px}
 #userSearchWrap.collapsed .search-box input{opacity:0;padding:0;width:0}
+/* 键盘弹起来时，底栏和搜索圆点别被顶到键盘上面；
+   正在搜索框里打字时例外，不然看不到自己输的字 */
+body.kb-open #appTabbar{display:none!important}
+body.kb-open #modView{bottom:0!important}
+body.kb-open #userSearchWrap{opacity:0;pointer-events:none}
+body.kb-open.kb-search #userSearchWrap{opacity:1;pointer-events:auto}
 #pageSuggest{position:absolute;left:0;bottom:calc(100% + 8px);width:270px;max-height:280px}
 
 /* 搜索自动补全 */
@@ -1784,7 +1790,8 @@ window.__supaReady = new Promise(function (resolve) {
     mail:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.2" width="18" height="13.6" rx="2.2"/><path d="m3.8 6.8 8.2 6 8.2-6"/></svg>',
     aid:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.4"/><path d="M8.6 7V5.5A1.5 1.5 0 0 1 10.1 4h3.8a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
     tools:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 18V6.4l9-1.9v11"/><circle cx="6.8" cy="18" r="2.7"/><circle cx="15.8" cy="15.5" r="2.7"/></svg>',
-    logout:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.2A1.8 1.8 0 0 1 20 5.8v12.4A1.8 1.8 0 0 1 18.2 20H15"/><path d="m10 8-4 4 4 4"/><path d="M6 12h9"/></svg>'
+    logout:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.2A1.8 1.8 0 0 1 20 5.8v12.4A1.8 1.8 0 0 1 18.2 20H15"/><path d="m10 8-4 4 4 4"/><path d="M6 12h9"/></svg>',
+    update:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 12a8.2 8.2 0 1 1-2.5-5.9"/><path d="M20.4 4.2v4.4h-4.4"/></svg>'
   };
 
   function appMeRow(icon, title, sub, act, cls) {
@@ -1827,6 +1834,7 @@ window.__supaReady = new Promise(function (resolve) {
           appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封公告' : '班级公告和通知', 'mail') +
           (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
           appMeRow(MI_ICON.tools, '更多工具', '背景音乐等', 'tools') +
+          appMeRow(MI_ICON.update, '检查更新', '看看有没有新版本', 'update') +
           appMeRow(MI_ICON.logout, '退出登录', '下次进来要重新输入密码', 'logout', 'danger') +
         '</div>' +
         '<div class="me-foot">徐悲鸿中学 · 班级服务平台</div>' +
@@ -1841,8 +1849,17 @@ window.__supaReady = new Promise(function (resolve) {
       if (act === 'mail')    return openMailbox();
       if (act === 'aid')     return openFirstAid();
       if (act === 'tools')   return openTools();
+      if (act === 'update')  return checkAppUpdate();
       if (act === 'logout')  return logout();
     });
+  }
+
+  /* 「检查更新」：App 里交给原生去问服务器；网页版只能自己去下载 */
+  function checkAppUpdate() {
+    if (window.XkyctpShell && window.XkyctpShell.checkUpdate) {
+      try { window.XkyctpShell.checkUpdate(); return; } catch (e) {}
+    }
+    toast('网页版请到「更多」最下面下载最新安装包', 'ok', 2800);
   }
 
   /* 静默登录时的白屏，避免登录页闪一下 */
@@ -2150,6 +2167,13 @@ window.__supaReady = new Promise(function (resolve) {
   function enter(profile) {
     S.me = profile;
     S.ad2Shown = false;
+
+    /* 登录成功就把键盘收掉，不然它会一直挂在屏幕上 */
+    try {
+      var ae = document.activeElement;
+      if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) ae.blur();
+    } catch (e) {}
+
     var name = profile.display_name || profile.username;
     $('loginView').hidden = true;
     $('appView').hidden = false;
@@ -2171,7 +2195,7 @@ window.__supaReady = new Promise(function (resolve) {
       $('adminPanel').hidden = true;
       $('btnMember').hidden = false;
       $('userSearchWrap').style.display = '';
-      collapseSearch();                 // 登录后首页应该是展开的输入框
+      collapseSearch();                 // 平时就是一个圆，点了才展开
       $('btnFirstAid').style.display = 'none';
       showActions(false);
       $('userPanel').hidden = false;
@@ -2349,18 +2373,15 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 全屏模块 ---------- */
   var currentMod = '';
 
-  /* 首页展开成输入框，进模块后收成圆形（管理员看不到） */
+  /* 左下角搜索：平时永远是一个圆，点了才展开（管理员看不到） */
   function collapseSearch() {
     var wrap = $('userSearchWrap');
-    if (!wrap) return;
-    if ($('modView').hidden) { wrap.classList.remove('collapsed'); return; }
-    wrap.classList.add('collapsed');
+    if (wrap) wrap.classList.add('collapsed');
   }
 
   function expandSearch() {
     var wrap = $('userSearchWrap');
-    if (!wrap) return;
-    wrap.classList.remove('collapsed');
+    if (wrap) wrap.classList.remove('collapsed');
   }
 
   function openModule(mod, name) {
@@ -2400,7 +2421,7 @@ window.__supaReady = new Promise(function (resolve) {
     $('modView').hidden = true;
     document.body.style.overflow = '';
     document.body.classList.remove('app-mod');
-    expandSearch();
+    collapseSearch();
     if (!S.me) return;
     if (location.hash) { try { history.replaceState(null, '', location.pathname); } catch (e) {} }
     if (IS_APP) { appTab(APP_TAB); return; }
@@ -6900,6 +6921,33 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* ---------- 绑定 ---------- */
   function bind() {
+    /* 输入框一聚焦就当作键盘弹起来了：底栏和搜索圆点藏起来，别被顶到键盘上面 */
+    function isTyping(el) {
+      if (!el) return false;
+      var tag = el.tagName;
+      return tag === 'INPUT' || tag === 'TEXTAREA' || el.isContentEditable === true;
+    }
+    function inSearch(el) {
+      var wrap = $('userSearchWrap');
+      return !!(wrap && el && wrap.contains(el));
+    }
+    document.addEventListener('focusin', function (e) {
+      if (!isTyping(e.target)) return;
+      document.body.classList.add('kb-open');
+      document.body.classList.toggle('kb-search', inSearch(e.target));
+    });
+    document.addEventListener('focusout', function () {
+      setTimeout(function () {
+        var ae = document.activeElement;
+        if (isTyping(ae)) {
+          document.body.classList.toggle('kb-search', inSearch(ae));
+          return;
+        }
+        document.body.classList.remove('kb-open');
+        document.body.classList.remove('kb-search');
+      }, 120);
+    });
+
     $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
     $('btnLogout').addEventListener('click', logout);
     $('btnAdd2').addEventListener('click', openAdd);
@@ -6999,7 +7047,7 @@ window.__supaReady = new Promise(function (resolve) {
           hidePageSuggest();
           if (items.length === 1) {
             openUserCard(items[0].id);
-            if (!$('modView').hidden) collapseSearch();
+            collapseSearch();
             return;
           }
           pickUser(items);
@@ -7026,12 +7074,17 @@ window.__supaReady = new Promise(function (resolve) {
       }
 
       $('userSearchBtn').addEventListener('click', function () {
-        if (wrap.classList.contains('collapsed')) {          // 收起状态：先展开
+        if (wrap.classList.contains('collapsed')) {          // 平时是圆：点一下展开
           wrap.classList.remove('collapsed');
-          setTimeout(function () { uSearch.focus(); }, 200);
+          setTimeout(function () { uSearch.focus(); }, 180);
           return;
         }
-        runUserSearch();                                     // 已经展开：直接搜
+        if (!uSearch.value.trim()) {                          // 展开了但没输入：收回圆
+          wrap.classList.add('collapsed');
+          uSearch.blur();
+          return;
+        }
+        runUserSearch();                                      // 有输入：直接搜
       });
 
       uSearch.addEventListener('keydown', function (e) {
@@ -7044,7 +7097,7 @@ window.__supaReady = new Promise(function (resolve) {
       uSearch.addEventListener('blur', function () {
         setTimeout(function () {
           hidePageSuggest();
-          if (!$('modView').hidden && !uSearch.value.trim()) collapseSearch();
+          if (!uSearch.value.trim()) collapseSearch();
         }, 150);
       });
 
