@@ -270,6 +270,16 @@ body.theme-wujin .switch .slider{background:#3A3122}
   padding-bottom:env(safe-area-inset-bottom,0px);
   transition:background .25s,box-shadow .25s,left .28s,right .28s,bottom .28s,border-radius .28s}
 body.app-mode #appTabbar{display:flex}
+/* 选中项下面那块小方框，会跟着手指滑过去 */
+#appTabbar{overflow:visible}
+#appTabbar .tab-pill{position:absolute;top:5px;height:calc(100% - 10px);left:0;width:0;
+  border-radius:16px;background:#fff;
+  box-shadow:0 6px 16px rgba(17,24,39,.12),0 1px 2px rgba(17,24,39,.06);
+  transition:transform .3s cubic-bezier(.22,.61,.36,1),width .3s cubic-bezier(.22,.61,.36,1);
+  pointer-events:none;z-index:0}
+body.theme-wujin #appTabbar .tab-pill{background:#241E13;
+  box-shadow:0 6px 16px rgba(0,0,0,.5)}
+#appTabbar button{position:relative;z-index:1}
 #appTabbar button{flex:1;min-width:0;background:none;border:none;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:3px;font-size:10px;letter-spacing:.6px;
   color:var(--ink);opacity:.42;transition:opacity .16s,color .16s}
@@ -317,12 +327,12 @@ body.theme-wujin .me-row .mi{color:#D4B25E}
 body.theme-wujin .me-row .ms{color:#9A7B2E}
 body.theme-wujin .me-foot{color:#9A7B2E}
 
-/* App 里让页面背景透出来（雪山背景在 APK 里也能看见） */
-body.app-mode #modView{background:transparent}
+/* App 里让页面背景透出来（雪山背景在网页端也能看见） */
+body.app-mode #modView{background:transparent!important}
+body.theme-wujin #modView{background:#12100C!important}
 body.app-mode #modBody{background:transparent}
 body.app-mode #mePanel{background:transparent}
 body.app-mode #adminPanel{background:transparent}
-body.theme-wujin.app-mode #modView{background:transparent}
 
 /* 页面切换：像 iOS 那样从一侧滑进来 */
 @keyframes slideInRight{from{transform:translate3d(22%,0,0);opacity:.25}to{transform:none;opacity:1}}
@@ -1786,11 +1796,29 @@ window.__supaReady = new Promise(function (resolve) {
   function buildTabbar() {
     var tb = $('appTabbar');
     if (!tb) return;
-    tb.innerHTML = appTabs().map(function (k) {
+    tb.innerHTML = '<span class="tab-pill"></span>' + appTabs().map(function (k) {
       return '<button type="button" data-atab="' + k + '">' +
         '<span class="ti">' + TAB_DEF[k].icon + '</span>' +
         '<span class="tl">' + TAB_DEF[k].label + '</span></button>';
     }).join('');
+  }
+
+  /* 让那块小方框滑到当前选中的位置上 */
+  function moveTabPill() {
+    var tb = $('appTabbar');
+    if (!tb) return;
+    var pill = tb.querySelector('.tab-pill');
+    var btn = tb.querySelector('[data-atab="' + APP_TAB + '"]');
+    if (!pill || !btn) return;
+    var w = btn.offsetWidth, x = btn.offsetLeft;
+    if (!w) return;
+    pill.style.width = w + 'px';
+    pill.style.transform = 'translateX(' + x + 'px)';
+  }
+
+  function syncTabPill() {
+    if (window.requestAnimationFrame) requestAnimationFrame(moveTabPill);
+    else setTimeout(moveTabPill, 0);
   }
 
   function appInit() {
@@ -1805,6 +1833,8 @@ window.__supaReady = new Promise(function (resolve) {
     var notice = $('homeNotice');
     if (notice && $('modView')) $('modView').insertBefore(notice, $('modBody'));
     buildTabbar();
+    syncTabPill();
+    window.addEventListener('resize', syncTabPill);
     var mb = $('modBody');
     if (mb && window.MutationObserver) {
       new MutationObserver(syncAppChrome).observe(mb, { childList: true });
@@ -1838,6 +1868,7 @@ window.__supaReady = new Promise(function (resolve) {
     Array.prototype.forEach.call(document.querySelectorAll('#appTabbar [data-atab]'), function (b) {
       b.classList.toggle('on', b.getAttribute('data-atab') === APP_TAB);
     });
+    syncTabPill();
 
     $('userPanel').hidden = true;
     currentMod = '';
@@ -6717,7 +6748,7 @@ window.__supaReady = new Promise(function (resolve) {
           (p.glass_nav ? '<span class="badge gold" style="height:18px;font-size:11px">毛玻璃底栏</span>' : '') +
           '<span class="hint">' + items.length + ' 项权益 · ' + (p.users || 0) + ' 人</span>' +
           '<span style="margin-left:auto;display:flex;gap:12px">' +
-            '<button type="button" class="link" data-mpact="edit" data-mpid2="' + esc(p.id) + '">改名</button>' +
+            '<button type="button" class="link" data-mpact="edit" data-mpid2="' + esc(p.id) + '">编辑</button>' +
             '<button type="button" class="link danger" data-mpact="del" data-mpid2="' + esc(p.id) + '">删除</button>' +
           '</span>' +
         '</div>' +
@@ -6728,14 +6759,16 @@ window.__supaReady = new Promise(function (resolve) {
 
   function openMemberPlanForm(item) {
     var edit = !!item;
-    var m = modal(edit ? '方案改名' : '新建会员方案',
+    var m = modal(edit ? '编辑方案' : '新建会员方案',
       '<label class="field"><span>方案名称<em>*</em></span>' +
         '<input class="input" id="mpName" maxlength="30" placeholder="例如：黄金方案" value="' + esc(item ? item.name : '') + '"></label>' +
       '<label class="field" style="display:flex;align-items:center;gap:10px;margin-top:-4px">' +
         '<input type="checkbox" id="mpGlass" ' + (item && item.glass_nav ? 'checked' : '') +
           ' style="width:16px;height:16px;accent-color:var(--red);flex:none">' +
         '<span style="font-size:13px;color:var(--ink2)">毛玻璃悬空底栏（只影响 App 端）</span></label>' +
-      '<p class="hint" style="font-size:12.5px">建好后点开这个方案，往里加权益。</p>',
+      '<p class="hint" style="font-size:12.5px">' +
+        (edit ? '改完点保存，已经在这个方案里的人立刻生效。' : '建好后点开这个方案，往里加权益。') +
+      '</p>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
       '<button class="btn primary" id="mpOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 460);
 
