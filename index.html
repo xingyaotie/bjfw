@@ -258,23 +258,24 @@ body.theme-wujin .switch .slider{background:#3A3122}
 /* ===== App 模式（APK）：底部导航 ===== */
 #appTabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:700;
   background:rgba(255,255,255,.97);border-top:1px solid var(--line);
-  padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));
-  box-shadow:0 -6px 24px rgba(17,24,39,.07)}
+  box-shadow:0 -6px 24px rgba(17,24,39,.07);
+  height:calc(56px + env(safe-area-inset-bottom,0px));
+  padding-bottom:env(safe-area-inset-bottom,0px)}
 body.app-mode #appTabbar{display:flex}
-#appTabbar button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;
-  gap:4px;padding:7px 0 4px;font-size:11px;letter-spacing:1.5px;color:var(--muted);transition:.15s}
-#appTabbar button .ti{font-size:19px;line-height:1;filter:grayscale(1);opacity:.5}
-#appTabbar button.on{color:var(--red);font-weight:600}
-#appTabbar button.on .ti{filter:none;opacity:1}
-body.app-mode .wrap{padding-bottom:100px}
-body.app-mode #userSearchWrap{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
-body.app-mode.app-mod #userSearchWrap{bottom:16px}
-body.app-mode .actions{bottom:86px!important}
-body.app-mode.app-mod .actions{bottom:24px!important}
-body.app-mode .topbar .member-btn,
-body.app-mode .topbar .mail-btn,
-body.app-mode .topbar .btn-logout,
-body.app-mode .topbar .chip{display:none!important}
+#appTabbar button{flex:1;background:none;border:none;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;font-size:10.5px;letter-spacing:1.2px;
+  color:#111;opacity:.42;transition:opacity .16s}
+#appTabbar button .ti,#appTabbar button .ti svg{display:block;width:22px;height:22px}
+#appTabbar button .tl{line-height:1}
+#appTabbar button.on{opacity:1;font-weight:600}
+#appTabbar button.on .tl{color:var(--red)}
+
+/* App 里没有首页：顶栏整个收进「我的」，模块页占满底栏以上的区域 */
+body.app-mode .topbar{display:none!important}
+body.app-mode #modView{bottom:calc(56px + env(safe-area-inset-bottom,0px))!important}
+body.app-mode .wrap{padding-bottom:96px}
+body.app-mode #userSearchWrap{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+body.app-mode .actions{bottom:78px!important}
 
 /* App 模式：我的 */
 .me-wrap{max-width:600px;margin:0 auto}
@@ -292,7 +293,8 @@ body.app-mode .topbar .chip{display:none!important}
   border-bottom:1px solid #F1F2F5;text-align:left;font-size:15px;color:var(--ink);transition:.15s}
 .me-row:last-child{border-bottom:none}
 .me-row:active{background:#FCFCFD}
-.me-row .mi{font-size:17px;width:24px;text-align:center;flex:none}
+.me-row .mi{width:24px;height:24px;flex:none;color:var(--ink2);display:flex;align-items:center;justify-content:center}
+.me-row .mi svg{display:block;width:19px;height:19px}
 .me-row .ms{font-size:12px;color:var(--muted);margin-top:2px}
 .me-row .arrow{margin-left:auto;color:var(--muted);flex:none}
 .me-row.danger{color:var(--red)}
@@ -1338,11 +1340,8 @@ body.theme-wujin .promo-tl-today{border-color:#B8860B}
   <!-- App 模式：我的 -->
   <main class="wrap" id="mePanel" hidden></main>
 
-  <!-- App 模式：底部导航 -->
-  <nav id="appTabbar">
-    <button type="button" data-atab="home" class="on"><span class="ti">🏠</span>首页</button>
-    <button type="button" data-atab="me"><span class="ti">👤</span>我的</button>
-  </nav>
+  <!-- App 模式：底部导航（按钮由 JS 按角色生成） -->
+  <nav id="appTabbar"></nav>
 
   <audio id="bgm" src="./music.m4a" loop preload="none"></audio>
 
@@ -1638,7 +1637,53 @@ window.__supaReady = new Promise(function (resolve) {
     } catch (e) { return false; }
   })();
 
-  var APP_TAB = 'home';
+  /* 四个方块就是底栏的四个导航项；管理端多一个「管理」 */
+  var TAB_DEF = {
+    news: {
+      label: '热点',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 6-3 7.5-3 7.5h18s-3-1.5-3-7.5"/><path d="M13.8 20a2.2 2.2 0 0 1-3.6 0"/></svg>'
+    },
+    homework: {
+      label: '事项',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.3A1.3 1.3 0 0 1 6.3 3H19v18H6.3A1.3 1.3 0 0 1 5 19.7z"/><path d="M9 3v18"/></svg>'
+    },
+    forum: {
+      label: '论坛',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 14.5a2.2 2.2 0 0 1-2.2 2.2H8.6L4 20.2V6.1a2.2 2.2 0 0 1 2.2-2.2h11.8a2.2 2.2 0 0 1 2.2 2.2z"/></svg>'
+    },
+    more: {
+      label: '更多',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.8" y="3.8" width="7" height="7" rx="1.8"/><rect x="13.2" y="3.8" width="7" height="7" rx="1.8"/><rect x="3.8" y="13.2" width="7" height="7" rx="1.8"/><rect x="13.2" y="13.2" width="7" height="7" rx="1.8"/></svg>'
+    },
+    admin: {
+      label: '管理',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 19 6v5.6c0 4.3-2.9 7.6-7 9.2-4.1-1.6-7-4.9-7-9.2V6z"/><path d="m9.2 12.2 2 2 3.6-3.9"/></svg>'
+    },
+    me: {
+      label: '我的',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20.4a7.2 7.2 0 0 1 14.4 0"/></svg>'
+    }
+  };
+
+  var MOD_TITLE = { news: '班级热点', homework: '班级事项', forum: '论坛', more: '更多' };
+  var APP_TAB = 'news';
+
+  function appTabs() {
+    return (S.me && S.me.role === 'admin')
+      ? ['admin', 'news', 'forum', 'me']
+      : ['news', 'homework', 'forum', 'more', 'me'];
+  }
+  function appHomeTab() { return appTabs()[0]; }
+
+  function buildTabbar() {
+    var tb = $('appTabbar');
+    if (!tb) return;
+    tb.innerHTML = appTabs().map(function (k) {
+      return '<button type="button" data-atab="' + k + '">' +
+        '<span class="ti">' + TAB_DEF[k].icon + '</span>' +
+        '<span class="tl">' + TAB_DEF[k].label + '</span></button>';
+    }).join('');
+  }
 
   function appInit() {
     if (!IS_APP) return;
@@ -1648,47 +1693,99 @@ window.__supaReady = new Promise(function (resolve) {
       var b = e.target.closest('[data-atab]');
       if (b) appTab(b.getAttribute('data-atab'));
     });
+    /* 登录后的公告条搬进模块页，App 里也看得到 */
+    var notice = $('homeNotice');
+    if (notice && $('modView')) $('modView').insertBefore(notice, $('modBody'));
+    buildTabbar();
+    var mb = $('modBody');
+    if (mb && window.MutationObserver) {
+      new MutationObserver(syncAppChrome).observe(mb, { childList: true });
+    }
   }
 
-  function appTab(which) {
-    var prev = APP_TAB;
-    APP_TAB = which === 'me' ? 'me' : 'home';
+  /* 模块自己的一级页面不显示「返回」，二级才显示 */
+  function modAtRoot() {
+    if (currentMod === 'homework') return hwState.view === 'home';
+    if (currentMod === 'cube') return cubeState.view === 'home';
+    if (currentMod === 'more') return moreState.view === 'info';
+    return true;
+  }
+  function syncAppChrome() {
+    if (!IS_APP) return;
+    var back = $('modBack');
+    if (back) back.hidden = modAtRoot();
+  }
 
-    /* 我的 也占一条历史记录，安卓返回键能从「我的」回到「首页」 */
-    try {
-      if (APP_TAB === 'me') {
-        if (prev !== 'me' && location.hash !== '#me') history.pushState({ tab: 'me' }, '', '#me');
-      } else if (location.hash === '#me') {
-        history.replaceState(null, '', location.pathname);
-      }
-    } catch (e) {}
+  function appTab(t) {
+    if (!IS_APP) return;
+    if (!TAB_DEF[t]) t = appHomeTab();
+    if (t === 'admin' && !(S.me && S.me.role === 'admin')) t = appHomeTab();
+
+    APP_TAB = t;
 
     Array.prototype.forEach.call(document.querySelectorAll('#appTabbar [data-atab]'), function (b) {
       b.classList.toggle('on', b.getAttribute('data-atab') === APP_TAB);
     });
 
-    /* 切底栏时，把全屏模块一起收掉 */
-    if (currentMod) {
-      currentMod = '';
-      cubeState.view = 'home'; moreState.view = 'info'; hwState.view = 'home';
+    $('userPanel').hidden = true;
+    currentMod = '';
+
+    /* 我的 */
+    if (APP_TAB === 'me') {
+      $('modView').hidden = true;
+      $('adminPanel').hidden = true;
+      $('mePanel').hidden = false;
+      document.body.style.overflow = '';
+      document.body.classList.remove('app-mod');
+      renderAppMe();
+      return;
+    }
+
+    $('mePanel').hidden = true;
+
+    /* 管理端后台 */
+    if (APP_TAB === 'admin') {
       $('modView').hidden = true;
       document.body.style.overflow = '';
       document.body.classList.remove('app-mod');
+      $('adminPanel').hidden = false;
+      return;
     }
 
-    if (APP_TAB === 'me') {
-      $('userPanel').hidden = true;
-      $('adminPanel').hidden = true;
-      $('mePanel').hidden = false;
-      renderAppMe();
-    } else {
-      $('mePanel').hidden = true;
-      if (S.me && S.me.role === 'admin') $('adminPanel').hidden = false;
-      else $('userPanel').hidden = false;
-    }
-
-    try { window.scrollTo(0, 0); } catch (e) {}
+    /* 四个方块：直接在这个区域里渲染成整页 */
+    $('adminPanel').hidden = true;
+    currentMod = APP_TAB;
+    $('modTitle').textContent = MOD_TITLE[APP_TAB] || '';
+    $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    renderModule();
+    syncAppChrome();
+    try { $('modBody').scrollTop = 0; } catch (e) {}
   }
+
+  /* 给安卓返回键用：能往上退就退，退到顶返回 false（交给系统退出） */
+  window.__appBack = function () {
+    if (!IS_APP) return false;
+    if (!$('modView').hidden) {
+      if (!modAtRoot()) { modBack(); return true; }
+      if (currentMod !== APP_TAB) { appTab(APP_TAB); return true; }
+      if (APP_TAB !== appHomeTab()) { appTab(appHomeTab()); return true; }
+      return false;
+    }
+    if (APP_TAB !== appHomeTab()) { appTab(appHomeTab()); return true; }
+    return false;
+  };
+
+  var MI_ICON = {
+    profile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>',
+    member:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 3.5h11.2L21 9l-9 11.5L3 9z"/><path d="M3 9h18"/></svg>',
+    mail:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.2" width="18" height="13.6" rx="2.2"/><path d="m3.8 6.8 8.2 6 8.2-6"/></svg>',
+    aid:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.4"/><path d="M8.6 7V5.5A1.5 1.5 0 0 1 10.1 4h3.8a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
+    tools:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 18V6.4l9-1.9v11"/><circle cx="6.8" cy="18" r="2.7"/><circle cx="15.8" cy="15.5" r="2.7"/></svg>',
+    logout:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.2A1.8 1.8 0 0 1 20 5.8v12.4A1.8 1.8 0 0 1 18.2 20H15"/><path d="m10 8-4 4 4 4"/><path d="M6 12h9"/></svg>'
+  };
 
   function appMeRow(icon, title, sub, act, cls) {
     return '<button type="button" class="me-row' + (cls ? ' ' + cls : '') + '" data-meact="' + act + '">' +
@@ -1725,12 +1822,12 @@ window.__supaReady = new Promise(function (resolve) {
           '</div>' +
         '</div>' +
         '<div class="me-rows">' +
-          appMeRow('🙍', '我的资料', '性别、生日、签名、勋章', 'profile') +
-          (isAdmin ? '' : appMeRow('💎', '会员', '方案与专属主题', 'member')) +
-          appMeRow('✉️', '信箱', unread ? '有 ' + unread + ' 封公告' : '班级公告和通知', 'mail') +
-          (isAdmin ? appMeRow('🧰', '急救箱', '强制退出、维护工具', 'aid') : '') +
-          appMeRow('⚙️', '更多工具', '背景音乐等', 'tools') +
-          appMeRow('🚪', '退出登录', '下次进来要重新输入密码', 'logout', 'danger') +
+          appMeRow(MI_ICON.profile, '我的资料', '性别、生日、签名、勋章', 'profile') +
+          (isAdmin ? '' : appMeRow(MI_ICON.member, '会员', '方案与专属主题', 'member')) +
+          appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封公告' : '班级公告和通知', 'mail') +
+          (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
+          appMeRow(MI_ICON.tools, '更多工具', '背景音乐等', 'tools') +
+          appMeRow(MI_ICON.logout, '退出登录', '下次进来要重新输入密码', 'logout', 'danger') +
         '</div>' +
         '<div class="me-foot">徐悲鸿中学 · 班级服务平台</div>' +
       '</div>';
@@ -2086,7 +2183,7 @@ window.__supaReady = new Promise(function (resolve) {
 
     loadMailBadge();
 
-    if (IS_APP) appTab('home');
+    if (IS_APP) { buildTabbar(); appTab(appHomeTab()); }
 
     var welcome = function () {
       if (profile.role === 'vip') showVipWelcome(name);
@@ -2255,6 +2352,20 @@ window.__supaReady = new Promise(function (resolve) {
     if (mod === 'homework') { hwState.view = 'home'; }
     $('modTitle').textContent = name;
     $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    /* App 里二级页面也留在底栏上面，不开新的历史记录 */
+    if (IS_APP) {
+      $('mePanel').hidden = true;
+      $('userPanel').hidden = true;
+      $('adminPanel').hidden = true;
+      $('modView').hidden = false;
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('app-mod');
+      renderModule();
+      syncAppChrome();
+      return;
+    }
+
     $('userPanel').hidden = true;
     $('modView').hidden = false;
     document.body.style.overflow = 'hidden';
@@ -7545,8 +7656,8 @@ window.__supaReady = new Promise(function (resolve) {
 
     $('modBack').addEventListener('click', modBack);
     window.addEventListener('popstate', function () {
-      if ($('modView').hidden === false) { closeModule(); return; }
-      if (IS_APP && APP_TAB === 'me') appTab('home');
+      if (IS_APP) return;                    /* App 里返回键走 __appBack，不用历史记录 */
+      if ($('modView').hidden === false) closeModule();
     });
 
     var searchEl = $('search');
