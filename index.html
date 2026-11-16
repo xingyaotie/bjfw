@@ -230,6 +230,7 @@ body.theme-wujin .switch .slider{background:#3A3122}
 
 /* ---------- 应用 ---------- */
 #appView{min-height:100vh;display:flex;flex-direction:column;animation:fadeIn .35s ease}
+#modView{background:var(--bg)}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .topbar{background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;padding:14px 0;
   box-shadow:0 4px 16px rgba(200,16,46,.22)}
@@ -263,7 +264,7 @@ body.theme-wujin .switch .slider{background:#3A3122}
 
 /* ===== App 模式（APK）：底部导航 ===== */
 /* 不用边框，靠底色和投影做出层次；深色主题整条跟着变深 */
-#appTabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:700;
+#appTabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:810;pointer-events:auto;
   background:var(--card);
   box-shadow:0 -10px 26px rgba(17,24,39,.06);
   height:calc(56px + env(safe-area-inset-bottom,0px));
@@ -351,7 +352,8 @@ body.app-mode #userSearchWrap{display:none!important}
 
 /* 电脑宽屏：底栏收成一条居中的悬浮条；手机上仍是通栏 */
 @media (min-width:720px){
-  #appTabbar{left:50%;right:auto;transform:translateX(-50%);width:600px;
+  #appTabbar{left:0;right:0;margin:0 auto;transform:none;
+    width:min(600px,calc(100vw - 48px));max-width:600px;
     bottom:18px;border-radius:22px;height:58px;
     background:rgba(255,255,255,.78);
     -webkit-backdrop-filter:blur(20px) saturate(180%);
@@ -837,7 +839,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
   </main>
 
   <!-- 全屏模块页（点方块后覆盖整个屏幕） -->
-  <section id="modView" hidden style="position:fixed;inset:0;z-index:800;background:var(--bg);display:flex;flex-direction:column">
+  <section id="modView" hidden style="position:fixed;inset:0;z-index:800;display:flex;flex-direction:column">
     <header style="flex:none;background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;padding:0 18px;height:54px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(200,16,46,.22)">
       <button id="modBack" type="button" style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;height:32px;padding:0 14px;border-radius:999px;font-size:13.5px">‹ 返回</button>
       <b id="modTitle" style="font-size:17px;letter-spacing:2px"></b>
@@ -2725,6 +2727,8 @@ window.__supaReady = new Promise(function (resolve) {
       var kw = input.value.trim();
       if (!kw) { input.focus(); return; }
       var feats = matchFeatures(kw);
+      var exact = feats.filter(function (f) { return f.name === kw; })[0];
+      if (exact) return goFeature(exact.to);
       if (feats.length === 1) return goFeature(feats[0].to);
       api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
         var items = r.items || [];
@@ -3017,7 +3021,11 @@ window.__supaReady = new Promise(function (resolve) {
     { kw: '会员 方案 vip 会籍 高级',         to: 'member',    name: '会员',       desc: '会员方案与专属主题' },
     { kw: '反馈 建议 意见 问题 报错',        to: 'fb',        name: '反馈',       desc: '提问题、提建议' },
     { kw: '广告 推广 档期 排期 价格 推销',   to: 'promo',     name: '推广信息',   desc: '价格和档期' },
-    { kw: '资料 我的 个人信息 签名 生日 性别', to: 'profile', name: '我的资料',   desc: '性别、生日、签名' }
+    { kw: '资料 我的 个人信息 签名 生日 性别', to: 'profile', name: '我的资料',   desc: '性别、生日、签名' },
+    { kw: '信箱 邮箱 邮件 站内信 收件箱',     to: 'mail',      name: '信箱',       desc: '班级公告和站内信' },
+    { kw: '食堂 菜单 吃饭 午饭 晚饭 吃什么', to: 'canteen',   name: '本周食堂菜单', desc: '看看这几天吃什么' },
+    { kw: '勋章 徽章 成就 荣誉',             to: 'medal',     name: '勋章',       desc: '我拿到的勋章' },
+    { kw: '加盟商 合作 象棋 围棋 音乐 平台', to: 'vendor',    name: '加盟商平台', desc: '象棋、音乐等' }
   ];
 
   /* 输入里含某个关键词也算命中（比如「课程表」里含「课程」） */
@@ -3060,6 +3068,20 @@ window.__supaReady = new Promise(function (resolve) {
       if (to === 'cube') return openModule('cube', '魔方');
       if (to === 'debug') { openModule('cube', '魔方'); return renderCubeDebug(); }
       if (to === 'more') return openModule('more', '更多');
+      if (to === 'mail') return openMailbox();
+      if (to === 'canteen') {
+        if (TAB_UI) appTab('homework'); else openModule('homework', '班级事项');
+        return renderCanteen();
+      }
+      if (to === 'medal') return openProfileModule();
+      if (to === 'vendor') {
+        if (TAB_UI) appTab('more'); else openModule('more', '更多');
+        setTimeout(function () {
+          var v = $('vendorList');
+          if (v && v.scrollIntoView) v.scrollIntoView({ block: 'center' });
+        }, 260);
+        return;
+      }
       if (to === 'ver') { openModule('more', '更多'); return renderVersion(); }
       if (to === 'member') return openMemberModule();
       if (to === 'fb') { openModule('more', '更多'); return openFeedback(); }
@@ -4534,6 +4556,10 @@ window.__supaReady = new Promise(function (resolve) {
 
     api('api_user_profile', { p_token: S.token, p_user_id: S.me.id }).then(function (r) {
       var u = r.user;
+      if (!u) {
+        body.innerHTML = '<div class="empty"><strong>没拿到资料</strong>刷新一下再试</div>';
+        return;
+      }
       var medals = r.medals || [];
       currentMedals = medals;            // 点击勋章时要能查到
       var gLeft = daysLeft(S.me.gender_set_at, 30);
