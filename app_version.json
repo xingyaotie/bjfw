@@ -1,1 +1,1 @@
-{"versionCode":6,"versionName":"1.5","url":"https://xingyaotie.github.io/bjfw/xkyctp.apk","notes":"· 状态栏跟着主题深浅变化，不再一直是红的\n· 搜索成为底栏第一项，进来就能输入\n· 底栏去掉边框，靠深浅区分；乌金模式下整条变黑\n· 会员方案可勾选「毛玻璃悬空底栏」\n· 切页加入滑动动画\n· 更多 / 班级事项的图标改成细线条\n· 修复 App 里雪山背景不显示"}
+{"versionCode":7,"versionName":"1.6","url":"https://xingyaotie.github.io/bjfw/xkyctp.apk","notes":"· 网页版也换成底部导航，和安卓一致\n· 搜索页顶部是 xkyctp，地址栏式输入框\n· 选中项会滑动的胶囊只在毛玻璃方案里出现，普通用户保持原样\n· 毛玻璃悬空底栏改为半透明液态玻璃\n· 网页背景在所有页面可见｜修复 App 内广告与公告不弹\n· 会员方案可直接编辑名称与毛玻璃开关"}
