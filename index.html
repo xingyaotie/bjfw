@@ -423,7 +423,6 @@ body.theme-wujin .page-state .ps-t{color:#E8C46A}
 
 /* 班级页的分区标题 */
 .class-sec{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);letter-spacing:2px}
-.class-sec::after{content:'';flex:1;height:1px;background:var(--line)}
 body.theme-wujin .class-sec{color:#9A7B2E}
 
 /* App 搜索页 */
@@ -1928,7 +1927,7 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* 模块自己的一级页面不显示「返回」，二级才显示 */
   function modAtRoot() {
-    if (currentMod === 'search' || currentMod === 'news' || currentMod === 'forum') return true;
+    if (currentMod === 'search' || currentMod === 'forum') return true;
     if (currentMod === 'class') return hwState.view === 'home';
     if (currentMod === 'rank') return rankState.view === 'list';
     if (currentMod === 'homework') return hwState.view === 'home';
@@ -1961,6 +1960,9 @@ window.__supaReady = new Promise(function (resolve) {
 
     $('userPanel').hidden = true;
     currentMod = '';
+
+    /* 那三个浮动按钮只属于「用户管理」，一离开就必须消失 */
+    if (APP_TAB !== 'admin') showActions(false);
 
     /* 我的 */
     if (APP_TAB === 'me') {
@@ -2798,7 +2800,7 @@ window.__supaReady = new Promise(function (resolve) {
           '</button>' +
         '</div>' +
         '<div class="app-scope" id="appScope">' +
-          [['all', '全部'], ['user', '同学搜索'], ['forum', '论坛搜索'], ['news', '热点搜索']].map(function (x) {
+          [['user', '同学搜索'], ['forum', '论坛搜索'], ['news', '热点搜索']].map(function (x) {
             return '<button type="button" class="chip-btn' + (searchScope === x[0] ? ' on' : '') +
               '" data-scope="' + x[0] + '">' + x[1] + '</button>';
           }).join('') +
@@ -2916,8 +2918,11 @@ window.__supaReady = new Promise(function (resolve) {
     $('appScope').addEventListener('click', function (e) {
       var b = e.target.closest('[data-scope]');
       if (!b) return;
-      searchScope = b.getAttribute('data-scope');
-      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      var v = b.getAttribute('data-scope');
+      searchScope = (searchScope === v) ? 'all' : v;      /* 再点一下取消，回到全搜 */
+      Array.prototype.forEach.call(this.children, function (x) {
+        x.classList.toggle('on', x.getAttribute('data-scope') === searchScope);
+      });
       suggest();
     });
 
@@ -4634,10 +4639,20 @@ window.__supaReady = new Promise(function (resolve) {
     a.style.display = on ? 'flex' : 'none';
   }
 
+  /* 只要不在「用户管理」，这几个按钮一律藏掉 */
+  function hideActionsUnless(ok) {
+    var a = $('adminActions');
+    if (!a) return;
+    if (ok) return;
+    a.hidden = true;
+    a.style.display = 'none';
+  }
+
   /* ---------- 管理端：班级（选择器） ---------- */
   function adminClassPane(which) {
     var hw = $('tab-hw');
     if (!hw) return;
+    hideActionsUnless(false);
     var chooser = $('hwChooser');
     if (chooser) chooser.hidden = !!which;
 
