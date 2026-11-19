@@ -157,8 +157,10 @@ body.kb-open.kb-search #userSearchWrap{opacity:1;pointer-events:auto}
 .pf-label{font-size:12.5px;color:var(--muted);margin-bottom:6px}
 .pf-val{font-size:14.5px;color:var(--ink);word-break:break-word;line-height:1.6}
 .pf-hint{font-size:11.5px;color:var(--muted);margin-top:4px}
-.medal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.medal{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+.medal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.medal{border:1px solid var(--line);border-radius:14px;padding:10px 8px;background:#fff;
+  aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:5px;overflow:hidden}
 .medal.off{opacity:.45;background:#F7F8FA}
 .medal .mn{font-size:13.5px;font-weight:700;color:var(--ink)}
 .medal .mq{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5}
@@ -273,9 +275,9 @@ body.theme-wujin .switch .slider{background:#3A3122}
 body.app-mode #appTabbar{display:flex}
 /* 选中项下面那块胶囊：只有勾了毛玻璃的方案才有，且是半透明玻璃 */
 #appTabbar{overflow:visible}
-#appTabbar .tab-pill{position:absolute;top:4px;height:calc(100% - 8px);left:0;width:0;
+#appTabbar .tab-pill{position:absolute;top:4px;height:calc(100% - 8px);left:5px;width:0;
   border-radius:999px;background:transparent;opacity:0;
-  transition:transform .32s cubic-bezier(.22,.61,.36,1),width .32s cubic-bezier(.22,.61,.36,1),opacity .18s;
+  transition:left .32s cubic-bezier(.22,.61,.36,1),width .32s cubic-bezier(.22,.61,.36,1),opacity .18s;
   pointer-events:none;z-index:0}
 body.glass-nav #appTabbar .tab-pill{opacity:1;
   background:rgba(255,255,255,.60);
@@ -300,15 +302,15 @@ body.theme-wujin #appTabbar button.on .tl{color:#E8C46A}
 
 /* 毛玻璃悬空底栏：方案里勾了才有（body.glass-nav） */
 body.glass-nav #appTabbar{
-  left:12px;right:12px;
-  bottom:calc(10px + env(safe-area-inset-bottom,0px));
-  height:60px;padding-bottom:0;border-radius:22px;
-  background:rgba(255,255,255,.42);
-  -webkit-backdrop-filter:blur(22px) saturate(190%);
-  backdrop-filter:blur(22px) saturate(190%);
-  box-shadow:0 10px 34px rgba(17,24,39,.22), inset 0 1px 0 rgba(255,255,255,.75)}
+  left:18px;right:18px;
+  bottom:calc(12px + env(safe-area-inset-bottom,0px));
+  height:58px;padding-bottom:0;border-radius:22px;
+  background:rgba(255,255,255,.30);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  backdrop-filter:blur(24px) saturate(200%);
+  box-shadow:0 10px 34px rgba(17,24,39,.20), inset 0 1px 0 rgba(255,255,255,.65)}
 body.theme-wujin.glass-nav #appTabbar{
-  background:rgba(22,19,14,.42);
+  background:rgba(22,19,14,.32);
   box-shadow:0 10px 34px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.10)}
 body.glass-nav #appTabbar button.on .tl{color:var(--red)}
 body.theme-wujin.glass-nav #appTabbar button.on .tl{color:#E8C46A}
@@ -353,15 +355,16 @@ body.app-mode #userSearchWrap{display:none!important}
 /* 电脑宽屏：底栏收成一条居中的悬浮条；手机上仍是通栏 */
 @media (min-width:720px){
   #appTabbar{left:0;right:0;margin:0 auto;transform:none;
-    width:min(600px,calc(100vw - 48px));max-width:600px;
+    width:min(640px,calc(100vw - 64px));max-width:640px;
     bottom:18px;border-radius:22px;height:58px;
-    background:rgba(255,255,255,.78);
+    background:rgba(255,255,255,.72);
     -webkit-backdrop-filter:blur(20px) saturate(180%);
     backdrop-filter:blur(20px) saturate(180%);
     box-shadow:0 14px 40px rgba(17,24,39,.18)}
-  body.theme-wujin #appTabbar{background:rgba(22,19,14,.74)}
+  body.theme-wujin #appTabbar{background:rgba(22,19,14,.70)}
   body.app-mode #modView{bottom:calc(94px + env(safe-area-inset-bottom,0px))!important}
-  body.app-mode.glass-nav #modView{bottom:calc(94px + env(safe-area-inset-bottom,0px))!important}
+  body.app-mode.glass-nav #modView{bottom:0!important}
+  body.app-mode.glass-nav #modBody{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}
   body.app-mode .wrap{padding-bottom:126px}
 }
 
@@ -387,6 +390,11 @@ body.app-mode #userSearchWrap{display:none!important}
 .me-row .arrow{margin-left:auto;color:var(--muted);flex:none}
 .me-row.danger{color:var(--red)}
 .me-foot{text-align:center;font-size:11.5px;color:var(--muted);letter-spacing:1px;margin-top:18px}
+
+/* 班级页的分区标题 */
+.class-sec{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);letter-spacing:2px}
+.class-sec::after{content:'';flex:1;height:1px;background:var(--line)}
+body.theme-wujin .class-sec{color:#9A7B2E}
 
 /* App 搜索页 */
 .app-search{max-width:560px;margin:0 auto}
@@ -852,8 +860,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
     <div class="tabs">
       <button class="tab active" data-tab="users" type="button">用户管理</button>
       <button class="tab" data-tab="identity" type="button">身份管理</button>
-      <button class="tab" data-tab="hw" type="button">班级事项</button>
-      <button class="tab" data-tab="news" type="button">班级热点</button>
+      <button class="tab" data-tab="hw" type="button">班级</button>
       <button class="tab" data-tab="cube" type="button">魔方教程</button>
       <button class="tab" data-tab="debug" type="button">魔方调试</button>
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
@@ -1766,6 +1773,10 @@ window.__supaReady = new Promise(function (resolve) {
       label: '热点',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 6-3 7.5-3 7.5h18s-3-1.5-3-7.5"/><path d="M13.8 20a2.2 2.2 0 0 1-3.6 0"/></svg>'
     },
+    'class': {
+      label: '班级',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.6" r="3.3"/><path d="M3.6 19.4a5.6 5.6 0 0 1 10.8 0"/><circle cx="17.2" cy="10" r="2.4"/><path d="M15.4 19.4a4.7 4.7 0 0 1 5.1-3.7"/></svg>'
+    },
     homework: {
       label: '事项',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.3A1.3 1.3 0 0 1 6.3 3H19v18H6.3A1.3 1.3 0 0 1 5 19.7z"/><path d="M9 3v18"/></svg>'
@@ -1788,16 +1799,17 @@ window.__supaReady = new Promise(function (resolve) {
     }
   };
 
-  var MOD_TITLE = { search: '搜索', news: '班级热点', homework: '班级事项', forum: '论坛', more: '更多' };
+  var MOD_TITLE = { search: '搜索', 'class': '班级', news: '班级热点', homework: '班级事项', forum: '论坛', more: '更多' };
   /* 底栏布局：网页和 App 用同一套，不再分两边 */
   var TAB_UI = true;
 
   var APP_TAB = 'search';
 
+  /* 热点和事项合成一个「班级」页 */
   function appTabs() {
     return (S.me && S.me.role === 'admin')
-      ? ['search', 'admin', 'news', 'forum', 'me']
-      : ['search', 'news', 'homework', 'forum', 'more', 'me'];
+      ? ['search', 'admin', 'class', 'forum', 'me']
+      : ['search', 'class', 'forum', 'more', 'me'];
   }
   function appHomeTab() { return appTabs()[0]; }
 
@@ -1811,17 +1823,22 @@ window.__supaReady = new Promise(function (resolve) {
     }).join('');
   }
 
-  /* 让那块小方框滑到当前选中的位置上 */
+  /* 让那块胶囊滑到当前选中的位置上（用百分比，不读布局，切到「我的」也不会丢） */
   function moveTabPill() {
     var tb = $('appTabbar');
     if (!tb) return;
     var pill = tb.querySelector('.tab-pill');
-    var btn = tb.querySelector('[data-atab="' + APP_TAB + '"]');
-    if (!pill || !btn) return;
-    var w = btn.offsetWidth, x = btn.offsetLeft;
-    if (!w) return;
-    pill.style.width = w + 'px';
-    pill.style.transform = 'translateX(' + x + 'px)';
+    if (!pill) return;
+    var btns = tb.querySelectorAll('[data-atab]');
+    var n = btns.length;
+    if (!n) return;
+    var idx = -1;
+    for (var i = 0; i < n; i++) {
+      if (btns[i].getAttribute('data-atab') === APP_TAB) { idx = i; break; }
+    }
+    if (idx < 0) return;
+    pill.style.width = 'calc(100% / ' + n + ' - 10px)';
+    pill.style.left = 'calc(100% / ' + n + ' * ' + idx + ' + 5px)';
   }
 
   function syncTabPill() {
@@ -1852,6 +1869,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* 模块自己的一级页面不显示「返回」，二级才显示 */
   function modAtRoot() {
     if (currentMod === 'search' || currentMod === 'news' || currentMod === 'forum') return true;
+    if (currentMod === 'class') return hwState.view === 'home';
     if (currentMod === 'homework') return hwState.view === 'home';
     if (currentMod === 'cube') return cubeState.view === 'home';
     if (currentMod === 'more') return moreState.view === 'info';
@@ -1861,6 +1879,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (!TAB_UI) return;
     var back = $('modBack');
     if (back) back.hidden = modAtRoot();
+    fillClientVersion();
   }
 
   function appTab(t) {
@@ -2390,11 +2409,16 @@ window.__supaReady = new Promise(function (resolve) {
     };
 
     /* 登录后的 广告 → 公告 → 欢迎 */
+    var afterNoticeFinal = function () {
+      afterNotice();
+      setTimeout(maybeAskProfile, 700);
+    };
+
     var afterLogin = function () {
       if (profile.role === 'admin') {
-        setTimeout(afterNotice, 260);
+        setTimeout(afterNoticeFinal, 260);
       } else {
-        setTimeout(function () { showAdThen(afterNotice); }, 200);
+        setTimeout(function () { showAdThen(afterNoticeFinal); }, 200);
       }
     };
 
@@ -2636,6 +2660,9 @@ window.__supaReady = new Promise(function (resolve) {
       if (cubeState.view === 'debugProject') return renderCubeDebug();
       if (cubeState.view === 'tutorials' || cubeState.view === 'debug') return renderCubeHome();
     }
+    if (currentMod === 'class') {
+      if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderClassPage();
+    }
     if (currentMod === 'homework') {
       if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderItemsHome();
     }
@@ -2651,6 +2678,7 @@ window.__supaReady = new Promise(function (resolve) {
   function renderModule() {
     var body = $('modBody');
     if (currentMod === 'search') return renderSearchPage();
+    if (currentMod === 'class') return renderClassPage();
     if (currentMod === 'news') return renderNewsInModule(body);
     if (currentMod === 'homework') return renderItemsHome();
     if (currentMod === 'cube') return renderCubeHome();
@@ -2764,6 +2792,40 @@ window.__supaReady = new Promise(function (resolve) {
     });
 
     /* 不自动聚焦：一进来就弹键盘很烦，点一下再输 */
+  }
+
+  /* ================= 班级页：热点在上，事项在下 ================= */
+  function renderClassPage() {
+    hwState.view = 'home';
+    $('modBody').innerHTML =
+      '<div id="classNews"></div>' +
+      '<div id="classItems" style="max-width:640px;margin:24px auto 0"></div>';
+    renderClassItems();
+    renderNewsInModule($('classNews'));
+  }
+
+  function renderClassItems() {
+    var box = $('classItems');
+    if (!box) return;
+    box.innerHTML =
+      '<div class="class-sec">班级事项</div>' +
+      '<div class="cube-stack" style="margin-top:12px">' +
+        '<button class="cube-opt" type="button" data-items="hw">' +
+          '<span class="ico">' + LINE_ICON.hw + '</span>' +
+          '<span><b>班级作业</b><small>看老师布置的作业</small></span>' +
+          '<span class="arrow">\u203a</span>' +
+        '</button>' +
+        '<button class="cube-opt" type="button" data-items="tt">' +
+          '<span class="ico">' + LINE_ICON.tt + '</span>' +
+          '<span><b>班级课表</b><small>看本周课程安排</small></span>' +
+          '<span class="arrow">\u203a</span>' +
+        '</button>' +
+        '<button class="cube-opt" type="button" data-items="canteen">' +
+          '<span class="ico">' + LINE_ICON.canteen + '</span>' +
+          '<span><b>本周食堂菜单</b><small>看看这几天吃什么</small></span>' +
+          '<span class="arrow">\u203a</span>' +
+        '</button>' +
+      '</div>';
   }
 
   /* ================= 班级事项（作业 + 课表） ================= */
@@ -2937,6 +2999,23 @@ window.__supaReady = new Promise(function (resolve) {
       .catch(function () {});
   }
 
+  /* 客户端版本：App 读原生版本号，网页读 app_version.json */
+  function fillClientVersion() {
+    var el = $('verClient');
+    if (!el) return;
+    if (IS_APP && window.XkyctpShell && window.XkyctpShell.version) {
+      try { el.textContent = 'v' + window.XkyctpShell.version() + '（安卓端）'; return; } catch (e) {}
+    }
+    if (!window.fetch) { el.textContent = '—'; return; }
+    fetch('https://xingyaotie.github.io/bjfw/app_version.json', { cache: 'no-store' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!el.isConnected) return;
+        el.textContent = (j && j.versionName) ? ('v' + j.versionName + '（最新）') : '—';
+      })
+      .catch(function () { if (el.isConnected) el.textContent = '—'; });
+  }
+
   /* 版本信息：原来散在「更多」里的四块都收在这儿 */
   function loadVendors() {
     var box = $('vendorList');
@@ -2986,7 +3065,8 @@ window.__supaReady = new Promise(function (resolve) {
         '<div class="card" style="padding:18px">' +
           '<dl class="kv">' +
             '<dt>平台</dt><dd>徐悲鸿中学 · 2026级</dd>' +
-            '<dt>版本</dt><dd>' + esc(b.version || '体验版 v5') + '</dd>' +
+            '<dt>客户端</dt><dd id="verClient">读取中…</dd>' +
+            '<dt>平台版本</dt><dd>' + esc(b.version || '体验版 v5') + '</dd>' +
             '<dt>我的账号</dt><dd>' + esc(me.display_name || '—') + '（' + esc(me.username || '—') + '）</dd>' +
           '</dl>' +
         '</div>' +
@@ -3058,8 +3138,9 @@ window.__supaReady = new Promise(function (resolve) {
   function goFeature(to) {
     var open = function () {
       /* App 里四个页是底栏的 tab，先切过去，高亮才对 */
-      if (TAB_UI && (to === 'news' || to === 'homework' || to === 'forum' || to === 'more')) return appTab(to);
-      if (TAB_UI && to === 'timetable') { appTab('homework'); return renderTimetableForUser(); }
+      if (TAB_UI && (to === 'news' || to === 'homework')) return appTab('class');
+      if (TAB_UI && (to === 'forum' || to === 'more')) return appTab(to);
+      if (TAB_UI && to === 'timetable') { appTab('class'); return renderTimetableForUser(); }
 
       if (to === 'news') return openModule('news', '班级热点');
       if (to === 'homework') return openModule('homework', '班级事项');
@@ -3070,7 +3151,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (to === 'more') return openModule('more', '更多');
       if (to === 'mail') return openMailbox();
       if (to === 'canteen') {
-        if (TAB_UI) appTab('homework'); else openModule('homework', '班级事项');
+        if (TAB_UI) appTab('class'); else openModule('homework', '班级事项');
         return renderCanteen();
       }
       if (to === 'medal') return openProfileModule();
@@ -3259,6 +3340,7 @@ window.__supaReady = new Promise(function (resolve) {
         function () { forumCats = []; return []; }),
       api('api_forum_list', { p_token: S.token, p_scope: forumScope })
     ]).then(function (res) {
+      if (currentMod !== 'forum') return;           /* 已经切页，丢弃这次结果 */
       var r = res[1];
       var items = r.items || [];
       var left = Math.max(0, (r.my_limit || 3) - (r.my_today || 0));
@@ -4217,6 +4299,7 @@ window.__supaReady = new Promise(function (resolve) {
 
   function renderNewsInModule(body) {
     api('api_list_announcements', { p_token: S.token }).then(function (r) {
+      if (!body || !body.isConnected) return;      /* 已经切到别的页了，别回来覆盖 */
       var items = r.items || [];
       body.innerHTML =
         '<div style="display:flex;justify-content:flex-end;margin-bottom:10px">' +
@@ -4311,8 +4394,11 @@ window.__supaReady = new Promise(function (resolve) {
     showActions(name === 'users');
     if (name === 'users') loadUsers();
     if (name === 'identity') loadIdentity();
-    if (name === 'hw') { loadHwAdmin(); loadTtAdmin(); loadCanteenAdmin(); }
-    if (name === 'news') { loadNews(); loadNewsApplies(); }
+    if (name === 'hw') {
+      $('tab-news').hidden = false;            /* 班级 tab 里上下两块：事项 + 热点 */
+      loadHwAdmin(); loadTtAdmin(); loadCanteenAdmin();
+      loadNews(); loadNewsApplies();
+    }
     if (name === 'cube') loadCubeAdmin();
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
     if (name === 'mail') loadMailTab();
@@ -4409,14 +4495,50 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* 列表里只显示名字 + 是否已获得；详情点了才看 */
   function medalTileHtml(m) {
-    var state = m.kind === 'tiered'
-      ? (m.level > 0 ? '已获得 ' + m.level + ' 级' : '未获得')
-      : (m.awarded ? '已获得' : '未获得');
+    var sub;
+    if (m.kind === 'tiered') {
+      if (m.level > 0) {
+        var lv = (m.levels || []).filter(function (l) { return l.level === m.level; })[0];
+        sub = (lv && lv.name ? lv.name : '') + '\u00b7' + m.level + '\u7ea7';
+      } else {
+        sub = '\u672a\u83b7\u5f97';
+      }
+    } else {
+      sub = m.awarded ? '\u5df2\u83b7\u5f97' : '\u672a\u83b7\u5f97';
+    }
     return '<div class="medal' + (m.awarded ? '' : ' off') + '" data-medal-id="' + esc(m.id) + '"' +
       ' style="cursor:pointer">' +
       '<div class="mn">' + esc(m.name) + '</div>' +
-      '<div class="ms">' + state + '</div>' +
+      '<div class="ms">' + esc(sub) + '</div>' +
     '</div>';
+  }
+
+  /* 默认完全折叠，只留一行；点开才铺开全部（正方形，自适应列数） */
+  function medalFoldHtml(medals) {
+    var list = medals || [];
+    var got = list.filter(function (m) { return m.awarded; }).length;
+    return '<div class="pf-row medal-fold" data-medal-fold="1" style="cursor:pointer">' +
+        '<div class="pf-main"><div class="pf-label">\u52cb\u7ae0</div>' +
+          '<div class="pf-val">' +
+            (list.length ? '\u5df2\u83b7\u5f97 ' + got + ' \u679a \u00b7 \u5171 ' + list.length + ' \u679a' : '\u8fd8\u6ca1\u6709\u52cb\u7ae0') +
+          '</div></div>' +
+        '<span class="arrow" style="margin-left:auto;color:var(--muted);transition:.2s" data-fold-arrow>\u25b8</span>' +
+      '</div>' +
+      (list.length ? '<div id="medalGrid" hidden style="margin-top:10px"></div>' : '');
+  }
+
+  function toggleMedalFold(el) {
+    var wrap = el.parentNode;
+    var grid = wrap ? wrap.querySelector('#medalGrid') : null;
+    if (!grid) return;
+    if (grid.hidden) {
+      grid.innerHTML = (currentMedals || []).map(medalTileHtml).join('');
+      grid.hidden = false;
+    } else {
+      grid.hidden = true;
+    }
+    var ar = el.querySelector('[data-fold-arrow]');
+    if (ar) ar.style.transform = grid.hidden ? '' : 'rotate(90deg)';
   }
 
   /* 勋章详情：分级的用左右箭头切级 */
@@ -4522,18 +4644,123 @@ window.__supaReady = new Promise(function (resolve) {
         '<div class="pf-label">个性签名</div>' +
         '<div class="pf-val">' + (u.bio ? esc(u.bio) : '<span class="hint">还没写</span>') + '</div>' +
       '</div></div>' +
-      '<div class="pf-label" style="margin-bottom:8px">勋章' +
-        ((medals && medals.length) ? '（' + medals.length + '）' : '') + '</div>' +
-      ((medals && medals.length)
-        ? '<div class="medal-grid" id="medalGrid">' +
-            medals.slice(0, 6).map(medalTileHtml).join('') +
-          '</div>' +
-          (medals.length > 6
-            ? '<div style="text-align:center;margin-top:10px">' +
-                '<button class="btn ghost sm" type="button" data-medal-more="1" style="height:30px">展开全部 ' +
-                  medals.length + ' 枚</button></div>'
-            : '')
-        : '<div class="hint">还没有设置任何勋章</div>');
+      medalFoldHtml(medals);
+  }
+
+  /* ================= 新用户：完善资料提示 ================= */
+  /* 性别 / 生日 / 签名三项全空才弹；关掉一次之后这个账号不再弹 */
+  var askProfileTries = 0;
+
+  function maybeAskProfile() {
+    var me = S.me || {};
+    if (!me.id || me.role === 'admin') return;
+    if (me.profile_prompted) return;
+    if (me.gender || me.birth_year || me.birth_month || me.birth_day) return;
+    if ((me.bio || '').trim()) return;
+
+    /* 有别的弹窗（公告、欢迎、新信）开着就别抢，等它关掉再问 */
+    if (modalEl) {
+      if (askProfileTries++ < 8) setTimeout(maybeAskProfile, 1200);
+      return;
+    }
+    showProfilePrompt();
+  }
+
+  function showProfilePrompt() {
+    var pick = { g: '', y: '', m: '', d: '' };
+    var years = '';
+    for (var y = 2012; y >= 1998; y--) years += '<option value="' + y + '">' + y + ' 年</option>';
+    var months = '';
+    for (var m = 1; m <= 12; m++) months += '<option value="' + m + '">' + m + ' 月</option>';
+    var days = '';
+    for (var d = 1; d <= 31; d++) days += '<option value="' + d + '">' + d + ' 日</option>';
+
+    var mo = modal('完善一下资料',
+      '<p class="hint" style="margin-bottom:14px;line-height:1.7">' +
+        '填不填都行，以后也能在「我的 → 我的资料」里改。' +
+      '</p>' +
+      '<label class="field"><span>性别</span>' +
+        '<div class="chips" id="ppGender">' +
+          ['', 'male', 'female'].map(function (k) {
+            var t = k === '' ? '不选' : (k === 'male' ? '男' : '女');
+            return '<button type="button" class="chip-btn' + (k === '' ? ' on' : '') + '" data-g="' + k + '">' + t + '</button>';
+          }).join('') +
+        '</div>' +
+      '</label>' +
+      '<label class="field"><span>生日</span>' +
+        '<div style="display:flex;gap:8px">' +
+          '<select class="input" id="ppY" style="flex:1">' + '<option value="">年</option>' + years + '</select>' +
+          '<select class="input" id="ppM" style="flex:1">' + '<option value="">月</option>' + months + '</select>' +
+          '<select class="input" id="ppD" style="flex:1">' + '<option value="">日</option>' + days + '</select>' +
+        '</div>' +
+      '</label>' +
+      '<label class="field"><span>个性签名</span>' +
+        '<input class="input" id="ppBio" maxlength="40" placeholder="一句话介绍自己"></label>',
+      '<button class="btn ghost" type="button" data-close>以后再说</button>' +
+      '<button class="btn primary" id="ppSave" type="button">保存</button>', 460);
+
+    /* 右上角 X：提示一次，然后这个账号就不再弹 */
+    var x = mo.querySelector('.modal-x');
+    if (x) {
+      x.onclick = function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        closeModal();
+        modal('提示',
+          '<p style="font-size:14px;line-height:1.8;color:var(--ink2)">' +
+            '后续可在「我的 → 我的资料」中设置。' +
+          '</p>',
+          '<button class="btn primary" type="button" id="ppKnow">知道了</button>', 400);
+        var k = $('ppKnow');
+        if (k) k.onclick = function () { markPrompted(); closeModal(); };
+      };
+    }
+
+    var gBox = mo.querySelector('#ppGender');
+    gBox.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-g]');
+      if (!b) return;
+      pick.g = b.getAttribute('data-g');
+      Array.prototype.forEach.call(this.children, function (x2) { x2.classList.toggle('on', x2 === b); });
+    });
+
+    mo.querySelector('#ppSave').onclick = function () {
+      var btn = this;
+      pick.y = mo.querySelector('#ppY').value;
+      pick.m = mo.querySelector('#ppM').value;
+      pick.d = mo.querySelector('#ppD').value;
+      var bio = mo.querySelector('#ppBio').value.trim();
+
+      busy(btn, true, '保存中…');
+      var jobs = [];
+      if (pick.g) jobs.push(api('api_profile_set_gender', { p_token: S.token, p_gender: pick.g }));
+      if (pick.y) {
+        jobs.push(api('api_profile_set_birthday', {
+          p_token: S.token, p_year: +pick.y,
+          p_month: pick.m ? +pick.m : null, p_day: pick.d ? +pick.d : null
+        }));
+      }
+      if (bio) jobs.push(api('api_profile_set_bio', { p_token: S.token, p_bio: bio }));
+
+      Promise.all(jobs).then(function () {
+        busy(btn, false);
+        if (pick.g) S.me.gender = pick.g;
+        if (pick.y) { S.me.birth_year = +pick.y; S.me.birth_month = pick.m ? +pick.m : null; S.me.birth_day = pick.d ? +pick.d : null; }
+        if (bio) S.me.bio = bio;
+        markPrompted();
+        closeModal();
+        toast('资料已保存', 'ok');
+      }, function (e) {
+        busy(btn, false);
+        toast(e.message, 'err', 3600);
+      });
+    };
+  }
+
+  function markPrompted() {
+    S.me = S.me || {};
+    S.me.profile_prompted = true;
+    api('api_profile_prompted', { p_token: S.token }).catch(function () {});
   }
 
   /* ---------- 用户端：我的资料 ---------- */
@@ -4615,15 +4842,7 @@ window.__supaReady = new Promise(function (resolve) {
 
           '<div class="card" style="padding:16px">' +
             '<div class="pf-label" style="margin-bottom:10px">我的勋章</div>' +
-            (medals.length
-              ? '<div class="medal-grid" id="medalGrid">' +
-                  medals.slice(0, 6).map(medalTileHtml).join('') + '</div>' +
-                (medals.length > 6
-                  ? '<div style="text-align:center;margin-top:10px">' +
-                      '<button class="btn ghost sm" type="button" data-medal-more="1" style="height:30px">展开全部 ' +
-                        medals.length + ' 枚</button></div>'
-                  : '')
-              : '<div class="hint">还没有设置任何勋章</div>') +
+            medalFoldHtml(medals) +
           '</div>' +
         '</div>';
 
@@ -4967,19 +5186,28 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* 论坛 / 管理端：点名字看主页 */
+  /* 看别人的主页：整页打开，带返回 */
   function openUserCard(uid) {
     if (!uid) return;
-    var m = modal('个人主页', '<div class="loading"><span class="spinner"></span>加载中…</div>', '', 520);
-    var body = m.querySelector('.modal-body');
+    currentMod = 'userpage';
+    $('modTitle').textContent = '个人主页';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    slideIn($('modView'), 'right');
+    syncAppChrome();
+
     api('api_user_profile', { p_token: S.token, p_user_id: uid }).then(function (r) {
-      body.innerHTML = profileCardHtml(r.user, r.medals, false);
-      body.addEventListener('click', function (ev) {
-        var more = ev.target.closest('[data-medal-more]');
-        if (more) { expandMedals(more); return; }
-        var t = ev.target.closest('[data-medal-id]');
-        if (t) openMedalDetail(t.dataset.medalId);
-      });
+      if (currentMod !== 'userpage') return;
+      body.innerHTML = '<div style="max-width:600px;margin:0 auto">' +
+        profileCardHtml(r.user, r.medals, false) + '</div>';
     }, function (e) {
+      if (currentMod !== 'userpage') return;
       body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
     });
   }
@@ -8012,6 +8240,9 @@ window.__supaReady = new Promise(function (resolve) {
         return;
       }
 
+
+      var mfold = e.target.closest('[data-medal-fold]');
+      if (mfold) { toggleMedalFold(mfold); return; }
 
       var mmore = e.target.closest('[data-medal-more]');
       if (mmore) { expandMedals(mmore); return; }

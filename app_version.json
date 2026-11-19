@@ -1,1 +1,1 @@
-{"versionCode":7,"versionName":"1.6","url":"https://xingyaotie.github.io/bjfw/xkyctp.apk","notes":"· 网页版也换成底部导航，和安卓一致\n· 搜索页顶部是 xkyctp，地址栏式输入框\n· 选中项会滑动的胶囊只在毛玻璃方案里出现，普通用户保持原样\n· 毛玻璃悬空底栏改为半透明液态玻璃\n· 网页背景在所有页面可见｜修复 App 内广告与公告不弹\n· 会员方案可直接编辑名称与毛玻璃开关"}
+{"versionCode":8,"versionName":"1.7","url":"https://xingyaotie.github.io/bjfw/xkyctp.apk","notes":"· 热点和事项合成「班级」一页\n· 看别人主页改成整页打开，带返回\n· 勋章默认折叠，点开是正方形格子，写成「等级名·N级」\n· 新用户会问一次资料（性别/生日/签名），关掉后不再问\n· 底栏毛玻璃更透、更窄；切页不会再被上一页覆盖"}
