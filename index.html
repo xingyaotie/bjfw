@@ -157,8 +157,9 @@ body.kb-open.kb-search #userSearchWrap{opacity:1;pointer-events:auto}
 .pf-label{font-size:12.5px;color:var(--muted);margin-bottom:6px}
 .pf-val{font-size:14.5px;color:var(--ink);word-break:break-word;line-height:1.6}
 .pf-hint{font-size:11.5px;color:var(--muted);margin-top:4px}
-.medal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
-.medal{border:1px solid var(--line);border-radius:14px;padding:10px 8px;background:#fff;
+.medal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
+@media (max-width:430px){ .medal-grid{grid-template-columns:repeat(2,1fr)} }
+.medal{border:1px solid var(--line);border-radius:12px;padding:8px 6px;background:#fff;
   aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;gap:5px;overflow:hidden}
 .medal.off{opacity:.45;background:#F7F8FA}
@@ -391,6 +392,35 @@ body.app-mode #userSearchWrap{display:none!important}
 .me-row.danger{color:var(--red)}
 .me-foot{text-align:center;font-size:11.5px;color:var(--muted);letter-spacing:1px;margin-top:18px}
 
+/* 排行榜 */
+.rank-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--card);
+  box-shadow:0 6px 18px rgba(17,24,39,.06);margin-bottom:10px}
+.rank-row .rk{width:26px;text-align:center;font-size:13px;font-weight:700;color:var(--muted);flex:none}
+.rank-row .nm{flex:1;min-width:0;font-size:14.5px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank-row .sc{font-size:15px;font-weight:700;color:var(--red);flex:none}
+.rank-row .sc small{font-size:11px;font-weight:400;color:var(--muted)}
+.rank-row.me{outline:1.5px solid var(--red);background:#FFF7F8}
+.rank-row:nth-child(1) .rk{color:#C8102E}
+.rank-off{font-size:13px;color:var(--muted);background:rgba(0,0,0,.04);border-radius:12px;
+  padding:10px 14px;margin-bottom:12px;text-align:center}
+body.theme-wujin .rank-row{background:#1B1710;box-shadow:none}
+body.theme-wujin .rank-row .nm{color:#E8C46A}
+body.theme-wujin .rank-row.me{background:#221C12;outline-color:#B8860B}
+body.theme-wujin .rank-off{background:rgba(255,255,255,.06);color:#9A7B2E}
+
+/* 整页的更新 / 停运状态 */
+.page-state{min-height:60vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;text-align:center;padding:40px 20px;border-radius:22px;position:relative;overflow:hidden}
+.page-state::before{content:'';position:absolute;inset:-30%;border-radius:50%;filter:blur(60px);opacity:.55}
+.page-state.is-update::before{background:radial-gradient(circle,#3ddc84 0%,transparent 65%)}
+.page-state.is-down::before{background:radial-gradient(circle,#c8102e 0%,transparent 65%)}
+.page-state .ps-t{font-size:19px;font-weight:700;letter-spacing:2px;color:var(--ink);position:relative}
+.page-state .ps-s{font-size:13.5px;color:var(--muted);position:relative}
+.page-state .ps-dot{width:10px;height:10px;border-radius:50%;position:relative;margin-bottom:6px}
+.page-state.is-update .ps-dot{background:#3ddc84;box-shadow:0 0 18px 6px rgba(61,220,132,.55)}
+.page-state.is-down .ps-dot{background:#c8102e;box-shadow:0 0 18px 6px rgba(200,16,46,.5)}
+body.theme-wujin .page-state .ps-t{color:#E8C46A}
+
 /* 班级页的分区标题 */
 .class-sec{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);letter-spacing:2px}
 .class-sec::after{content:'';flex:1;height:1px;background:var(--line)}
@@ -403,6 +433,9 @@ body.theme-wujin .class-sec{color:#9A7B2E}
   color:var(--ink);margin:38px 0 26px;user-select:none;line-height:1;
   font-family:"SF Pro Display","Segoe UI","PingFang SC",-apple-system,sans-serif}
 .app-brand i{font-style:normal;color:var(--red)}
+.app-brand em{display:block;font-style:normal;font-size:12px;font-weight:400;letter-spacing:3px;
+  color:var(--muted);margin-top:10px;opacity:.9}
+.app-scope{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0 6px}
 body.theme-wujin .app-brand{color:#F2EDE3}
 body.theme-wujin .app-brand i{color:#E8C46A}
 .app-search-box{display:flex;align-items:center;gap:10px;height:48px;padding:0 16px;
@@ -870,6 +903,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       <button class="tab" data-tab="vendor" type="button">加盟商</button>
       <button class="tab" data-tab="member" type="button">会员</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
+      <button class="tab" data-tab="rank" type="button">排行榜</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
       <button class="tab" data-tab="status" type="button">平台状态</button>
       <button class="tab" data-tab="more" type="button">更多</button>
@@ -921,6 +955,24 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
 
     <!-- 班级作业 -->
     <section id="tab-hw" hidden>
+      <div id="hwChooser">
+        <div class="panel-head"><div><h2>班级</h2><div class="hint">选一个进去管理</div></div></div>
+        <div class="cube-stack" style="max-width:520px">
+          <button class="cube-opt" type="button" data-hwpane="news">
+            <span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 6-3 7.5-3 7.5h18s-3-1.5-3-7.5"/><path d="M13.8 20a2.2 2.2 0 0 1-3.6 0"/></svg></span>
+            <span><b>班级热点</b><small>发公告、审核学生投稿</small></span>
+            <span class="arrow">›</span>
+          </button>
+          <button class="cube-opt" type="button" data-hwpane="hw">
+            <span class="ico"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.3A1.3 1.3 0 0 1 6.3 3H19v18H6.3A1.3 1.3 0 0 1 5 19.7z"/><path d="M9 3v18"/></svg></span>
+            <span><b>班级事项</b><small>作业、课表、食堂菜单</small></span>
+            <span class="arrow">›</span>
+          </button>
+        </div>
+      </div>
+      <div class="panel-head" data-hwback="1" hidden>
+        <div><button class="btn ghost sm" type="button" data-hwback-btn>‹ 返回</button></div>
+      </div>
       <div class="panel-head">
         <div>
           <h2>班级事项</h2>
@@ -1358,6 +1410,10 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
     </section>
 
     <!-- 公告 -->
+    <section id="tab-rank" hidden>
+      <div id="rankAdminBox"></div>
+    </section>
+
     <section id="tab-notice" hidden>
       <div class="panel-head">
         <div><h2>公告</h2><div class="hint">三个位置各自独立，留空就不显示</div></div>
@@ -1773,6 +1829,10 @@ window.__supaReady = new Promise(function (resolve) {
       label: '热点',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 6-3 7.5-3 7.5h18s-3-1.5-3-7.5"/><path d="M13.8 20a2.2 2.2 0 0 1-3.6 0"/></svg>'
     },
+    rank: {
+      label: '排行榜',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 20V12M9.5 20V6.5M14.5 20v-9M19.5 20V4"/><path d="M3 20h18"/></svg>'
+    },
     'class': {
       label: '班级',
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.6" r="3.3"/><path d="M3.6 19.4a5.6 5.6 0 0 1 10.8 0"/><circle cx="17.2" cy="10" r="2.4"/><path d="M15.4 19.4a4.7 4.7 0 0 1 5.1-3.7"/></svg>'
@@ -1799,17 +1859,17 @@ window.__supaReady = new Promise(function (resolve) {
     }
   };
 
-  var MOD_TITLE = { search: '搜索', 'class': '班级', news: '班级热点', homework: '班级事项', forum: '论坛', more: '更多' };
+  var MOD_TITLE = { search: '搜索', 'class': '班级', news: '班级热点', homework: '班级事项', forum: '论坛', rank: '排行榜', more: '更多' };
   /* 底栏布局：网页和 App 用同一套，不再分两边 */
   var TAB_UI = true;
 
   var APP_TAB = 'search';
 
-  /* 热点和事项合成一个「班级」页 */
+  /* 热点和事项合成一个「班级」页；排行榜单独一页 */
   function appTabs() {
     return (S.me && S.me.role === 'admin')
-      ? ['search', 'admin', 'class', 'forum', 'me']
-      : ['search', 'class', 'forum', 'more', 'me'];
+      ? ['search', 'admin', 'class', 'forum', 'rank', 'me']
+      : ['search', 'class', 'forum', 'rank', 'more', 'me'];
   }
   function appHomeTab() { return appTabs()[0]; }
 
@@ -1870,6 +1930,7 @@ window.__supaReady = new Promise(function (resolve) {
   function modAtRoot() {
     if (currentMod === 'search' || currentMod === 'news' || currentMod === 'forum') return true;
     if (currentMod === 'class') return hwState.view === 'home';
+    if (currentMod === 'rank') return rankState.view === 'list';
     if (currentMod === 'homework') return hwState.view === 'home';
     if (currentMod === 'cube') return cubeState.view === 'home';
     if (currentMod === 'more') return moreState.view === 'info';
@@ -1925,10 +1986,21 @@ window.__supaReady = new Promise(function (resolve) {
       return;
     }
 
-    /* 搜索 / 热点 / 事项 / 论坛 / 更多：都在 modView 里整页渲染 */
+    /* 搜索 / 班级 / 论坛 / 排行榜 / 更多：都在 modView 里整页渲染 */
     $('adminPanel').hidden = true;
     currentMod = APP_TAB;
     $('modTitle').textContent = MOD_TITLE[APP_TAB] || '';
+
+    var pst = pageStatus(APP_TAB);
+    if (pst !== 'run') {
+      $('modView').hidden = false;
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('app-mod');
+      slideIn($('modView'), dir);
+      showPageStatus(pst);
+      syncAppChrome();
+      return;
+    }
     $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     $('modView').hidden = false;
     document.body.style.overflow = 'hidden';
@@ -1952,6 +2024,23 @@ window.__supaReady = new Promise(function (resolve) {
     el.classList.remove('slide-left', 'slide-right');
     void el.offsetWidth;                  /* 强制重排，动画才会重播 */
     el.classList.add(dir === 'left' ? 'slide-left' : 'slide-right');
+  }
+
+  /* 每个底栏页自己的运行状态 */
+  function pageStatus(tab) {
+    var k = 'status_' + tab;
+    var v = (S.boot && S.boot[k]) || 'run';
+    return (v === 'update' || v === 'down') ? v : 'run';
+  }
+
+  function showPageStatus(st) {
+    var up = st === 'update';
+    $('modBody').innerHTML =
+      '<div class="page-state ' + (up ? 'is-update' : 'is-down') + '">' +
+        '<span class="ps-dot"></span>' +
+        '<div class="ps-t">' + (up ? '当前正在更新中' : '当前页面已停运') + '</div>' +
+        '<div class="ps-s">' + (up ? '看看其他的吧~' : '给您带来不便，敬请谅解') + '</div>' +
+      '</div>';
   }
 
   /* 给安卓返回键用：能往上退就退，退到顶返回 false（交给系统退出） */
@@ -2663,6 +2752,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'class') {
       if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderClassPage();
     }
+    if (currentMod === 'rank' && rankState.view === 'detail') return renderRankPage();
     if (currentMod === 'homework') {
       if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderItemsHome();
     }
@@ -2679,6 +2769,7 @@ window.__supaReady = new Promise(function (resolve) {
     var body = $('modBody');
     if (currentMod === 'search') return renderSearchPage();
     if (currentMod === 'class') return renderClassPage();
+    if (currentMod === 'rank') return renderRankPage();
     if (currentMod === 'news') return renderNewsInModule(body);
     if (currentMod === 'homework') return renderItemsHome();
     if (currentMod === 'cube') return renderCubeHome();
@@ -2687,11 +2778,13 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* ================= 搜索页 ================= */
-  /* 像浏览器的地址栏：打几个字就出候选，右边一个前往箭头 */
+  /* 像浏览器的地址栏：打几个字就出候选；上面可以选搜哪个模块 */
+  var searchScope = 'all';
+
   function renderSearchPage() {
     $('modBody').innerHTML =
       '<div class="app-search">' +
-        '<div class="app-brand">xkyctp<i>.</i></div>' +
+        '<div class="app-brand">xkyctp<em>班级服务平台</em></div>' +
         '<div class="app-search-box">' +
           '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" ' +
             'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
@@ -2704,7 +2797,12 @@ window.__supaReady = new Promise(function (resolve) {
               '<path d="M4.5 12h14"/><path d="m12.5 5.5 6.5 6.5-6.5 6.5"/></svg>' +
           '</button>' +
         '</div>' +
-        '<div class="app-search-tip">打几个字就有候选，回车或点箭头直接去</div>' +
+        '<div class="app-scope" id="appScope">' +
+          [['all', '全部'], ['user', '同学搜索'], ['forum', '论坛搜索'], ['news', '热点搜索']].map(function (x) {
+            return '<button type="button" class="chip-btn' + (searchScope === x[0] ? ' on' : '') +
+              '" data-scope="' + x[0] + '">' + x[1] + '</button>';
+          }).join('') +
+        '</div>' +
         '<div id="appSearchOut"></div>' +
       '</div>';
 
@@ -2712,6 +2810,7 @@ window.__supaReady = new Promise(function (resolve) {
     var out = $('appSearchOut');
 
     function featsHtml(kw) {
+      if (searchScope !== 'all') return '';
       var feats = matchFeatures(kw);
       if (!feats.length) return '';
       return '<div class="app-search-sec">功能</div>' +
@@ -2733,48 +2832,78 @@ window.__supaReady = new Promise(function (resolve) {
         }).join('');
     }
 
-    /* 边打边出候选：功能本地匹配，同学走接口 */
+    /* 论坛里的帖子 / 热点里的公告，都在本地过滤 */
+    function forumHtml(kw) {
+      return api('api_forum_list', { p_token: S.token, p_scope: 'all' }).then(function (r) {
+        var kwl = kw.toLowerCase();
+        var hits = (r.items || []).filter(function (x) {
+          return (String(x.body || '') + ' ' + String(x.author || '')).toLowerCase().indexOf(kwl) >= 0;
+        }).slice(0, 12);
+        if (!hits.length) return '<div class="empty"><strong>论坛里没有</strong>换个词试试</div>';
+        return '<div class="app-search-sec">论坛里的帖子</div>' +
+          hits.map(function (x) {
+            return '<button type="button" class="me-row" data-goforum="' + esc(x.id) + '">' +
+              '<span class="mi">›</span><span style="flex:1">' + esc(String(x.body || '').slice(0, 40)) +
+              '<span class="ms" style="display:block">' + esc(x.author || '') + ' · ' + esc(x.created_at || '') + '</span></span></button>';
+          }).join('');
+      }, function () { return ''; });
+    }
+
+    function newsHtml(kw) {
+      return api('api_list_announcements', { p_token: S.token }).then(function (r) {
+        var kwl = kw.toLowerCase();
+        var hits = (r.items || []).filter(function (x) {
+          return (String(x.title || '') + ' ' + String(x.sub || '') + ' ' + String(x.content || ''))
+            .toLowerCase().indexOf(kwl) >= 0;
+        }).slice(0, 12);
+        if (!hits.length) return '<div class="empty"><strong>热点里没有</strong>换个词试试</div>';
+        return '<div class="app-search-sec">热点里的公告</div>' +
+          hits.map(function (x) {
+            return '<button type="button" class="me-row" data-gonews="1">' +
+              '<span class="mi">›</span><span style="flex:1">' + esc(x.title) +
+              '<span class="ms" style="display:block">' + esc(x.sub || String(x.content || '').slice(0, 30)) + '</span></span></button>';
+          }).join('');
+      }, function () { return ''; });
+    }
+
     var seq = 0;
     function suggest() {
       var kw = input.value.trim();
       var my = ++seq;
       if (!kw) { out.innerHTML = ''; return; }
-      out.innerHTML = featsHtml(kw);
-      api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
-        if (my !== seq) return;                       /* 打字太快，丢掉过期结果 */
-        var html = featsHtml(kw) + usersHtml((r.items || []).slice(0, 8));
-        out.innerHTML = html || '<div class="empty"><strong>没找到</strong>换个词试试</div>';
-      }, function () {
+      out.innerHTML = featsHtml(kw) || '<div class="hint" style="padding:16px 4px">正在搜…</div>';
+
+      var jobs = [];
+      if (searchScope === 'all' || searchScope === 'user') {
+        jobs.push(api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
+          return usersHtml((r.items || []).slice(0, 8));
+        }, function () { return ''; }));
+      } else { jobs.push(Promise.resolve('')); }
+
+      if (searchScope === 'forum') jobs.push(forumHtml(kw));
+      if (searchScope === 'news') jobs.push(newsHtml(kw));
+
+      Promise.all(jobs).then(function (parts) {
         if (my !== seq) return;
-        if (!out.innerHTML) out.innerHTML = '<div class="empty"><strong>搜不到</strong>网络好像不通</div>';
+        var html = featsHtml(kw) + parts.join('');
+        out.innerHTML = html || '<div class="empty"><strong>没找到</strong>换个词试试</div>';
       });
     }
 
-    /* 回车 / 点箭头：能确定就直达，否则列出候选 */
     function run() {
       var kw = input.value.trim();
       if (!kw) { input.focus(); return; }
       var feats = matchFeatures(kw);
       var exact = feats.filter(function (f) { return f.name === kw; })[0];
-      if (exact) return goFeature(exact.to);
-      if (feats.length === 1) return goFeature(feats[0].to);
-      api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
-        var items = r.items || [];
-        if (!feats.length && items.length === 1) return openUserCard(items[0].id);
-        if (feats.length || items.length) {
-          out.innerHTML = featsHtml(kw) + usersHtml(items.slice(0, 8));
-          return;
-        }
-        out.innerHTML = '<div class="empty"><strong>没找到</strong>换个词试试</div>';
-      }, function (e) {
-        out.innerHTML = '<div class="empty">' + esc(e.message) + '</div>';
-      });
+      if (searchScope === 'all' && exact) return goFeature(exact.to);
+      if (searchScope === 'all' && feats.length === 1) return goFeature(feats[0].to);
+      suggest();
     }
 
     var timer = null;
     input.addEventListener('input', function () {
       clearTimeout(timer);
-      timer = setTimeout(suggest, 200);
+      timer = setTimeout(suggest, 220);
     });
     input.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter') return;
@@ -2784,24 +2913,108 @@ window.__supaReady = new Promise(function (resolve) {
     });
     $('appSearchGo').onclick = function () { clearTimeout(timer); run(); };
 
+    $('appScope').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-scope]');
+      if (!b) return;
+      searchScope = b.getAttribute('data-scope');
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      suggest();
+    });
+
     out.addEventListener('click', function (e) {
       var f = e.target.closest('[data-feat]');
       if (f) return goFeature(f.getAttribute('data-feat'));
       var u = e.target.closest('[data-uid]');
       if (u) return openUserCard(u.getAttribute('data-uid'));
+      if (e.target.closest('[data-goforum]')) return appTab('forum');
+      if (e.target.closest('[data-gonews]')) return openModule('news', '班级热点');
     });
+  }
 
-    /* 不自动聚焦：一进来就弹键盘很烦，点一下再输 */
+  /* ================= 排行榜 ================= */
+  var rankState = { view: 'list', id: '' };
+
+  function renderRankPage() {
+    if (rankState.view === 'detail' && rankState.id) return renderRankDetail(rankState.id);
+    rankState.view = 'list';
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_rank_boards', { p_token: S.token }).then(function (r) {
+      if (currentMod !== 'rank') return;
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>还没有排行榜</strong>管理员建好后会显示在这里</div>';
+        return;
+      }
+      body.innerHTML = '<div style="max-width:640px;margin:0 auto">' +
+        items.map(function (b) {
+          var unit = b.unit || '分';
+          var mine = b.my_score > 0 ? ('\u00b7 \u6211 ' + b.my_score + unit) : '';
+          return '<button type="button" class="cube-opt" data-rank="' + esc(b.id) + '"' +
+              ' style="margin-bottom:12px;text-align:left;width:100%">' +
+            '<span class="ico">' + LINE_ICON.rank + '</span>' +
+            '<span style="flex:1;min-width:0"><b>' + esc(b.name) + '</b>' +
+              '<small>' + (b.sub ? esc(b.sub) + ' \u00b7 ' : '') + b.people + ' \u4eba\u4e0a\u699c ' + mine + '</small></span>' +
+            '<span class="arrow">\u203a</span></button>';
+        }).join('') + '</div>';
+    }, function (e) {
+      if (currentMod !== 'rank') return;
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderRankDetail(id) {
+    rankState.view = 'detail';
+    rankState.id = id;
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_rank_board', { p_token: S.token, p_id: id }).then(function (r) {
+      if (currentMod !== 'rank' || rankState.id !== id) return;
+      var b = r.board || {};
+      var rows = r.rows || [];
+      var unit = b.unit || '分';
+
+      var head = '<div class="card" style="padding:16px;margin-bottom:14px">' +
+          '<div style="font-size:17px;font-weight:700;color:var(--ink)">' + esc(b.name) + '</div>' +
+          (b.sub ? '<div class="hint" style="margin-top:5px">' + esc(b.sub) + '</div>' : '') +
+          (b.unit_desc ? '<div class="hint" style="margin-top:3px">' + esc(b.unit_desc) + '</div>' : '') +
+        '</div>';
+
+      var myLine = (r.my_score > 0)
+        ? '<div class="hint" style="margin:0 0 12px 2px">我的：' + r.my_score + ' ' + esc(unit) + '</div>'
+        : '<div class="rank-off">你当前未上榜</div>';
+
+      var list = rows.length ? rows.map(function (x, i) {
+        return '<div class="rank-row' + (x.is_me ? ' me' : '') + '">' +
+          '<span class="rk">' + (i + 1) + '</span>' +
+          '<span class="nm">' + esc(x.name) +
+            (x.is_vip ? ' <span class="badge gold" style="height:17px;font-size:10px">VIP</span>' : '') + '</span>' +
+          '<span class="sc">' + x.score + ' <small>' + esc(unit) + '</small></span>' +
+        '</div>';
+      }).join('') : '<div class="empty"><strong>还没有人上榜</strong>等管理员加分</div>';
+
+      body.innerHTML = '<div style="max-width:600px;margin:0 auto">' + head + myLine + list + '</div>';
+    }, function (e) {
+      if (currentMod !== 'rank') return;
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
   }
 
   /* ================= 班级页：热点在上，事项在下 ================= */
   function renderClassPage() {
     hwState.view = 'home';
     $('modBody').innerHTML =
-      '<div id="classNews"></div>' +
-      '<div id="classItems" style="max-width:640px;margin:24px auto 0"></div>';
+      '<div style="max-width:640px;margin:6px auto 0">' +
+        '<div class="class-sec">班级热点</div>' +
+        '<button class="cube-opt" type="button" data-open-news="1" style="margin-top:12px;margin-bottom:26px">' +
+          '<span class="ico">' + LINE_ICON.news + '</span>' +
+          '<span><b>班级热点</b><small>公告、通知和同学投稿</small></span>' +
+          '<span class="arrow">\u203a</span>' +
+        '</button>' +
+        '<div class="class-sec">班级事项</div>' +
+        '<div id="classItems" style="margin-top:12px"></div>' +
+      '</div>';
     renderClassItems();
-    renderNewsInModule($('classNews'));
   }
 
   function renderClassItems() {
@@ -2837,9 +3050,11 @@ window.__supaReady = new Promise(function (resolve) {
     promo:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5a1.5 1.5 0 0 0 1.5 1.5H7l3.6 3.2V6.3L7 9.5H5.5A1.5 1.5 0 0 0 4 11z"/><path d="M14.5 8.6a5 5 0 0 1 0 6.8M17.4 6a9 9 0 0 1 0 12"/></svg>',
     cube:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 20 7.6v8.8L12 20.8 4 16.4V7.6z"/><path d="M4 7.6 12 12l8-4.4M12 12v8.8"/></svg>',
     ver:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 11v5.4"/><path d="M12 7.9h.01"/></svg>',
+    news:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 6-3 7.5-3 7.5h18s-3-1.5-3-7.5"/><path d="M13.8 20a2.2 2.2 0 0 1-3.6 0"/></svg>',
     hw:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.3A1.3 1.3 0 0 1 6.3 3H19v18H6.3A1.3 1.3 0 0 1 5 19.7z"/><path d="M9 3v18"/></svg>',
     tt:      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="5" width="17.2" height="15.6" rx="2.4"/><path d="M3.4 9.6h17.2M8 3.4v3.2M16 3.4v3.2"/></svg>',
     canteen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 7.5c0-1.2 1-1.6 1-2.8M13 7.5c0-1.2 1-1.6 1-2.8"/></svg>',
+    rank:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 20V11M12 20V4M18 20v-6"/><path d="M3.5 20h17"/></svg>',
     vendor:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 10.5V19a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1v-8.5"/><path d="M3 9.6 5.1 4.4A1.4 1.4 0 0 1 6.4 3.6h11.2a1.4 1.4 0 0 1 1.3.8L21 9.6a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z"/><path d="M9.6 20v-5.4h4.8V20"/></svg>'
   };
 
@@ -4385,7 +4600,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -4394,11 +4609,7 @@ window.__supaReady = new Promise(function (resolve) {
     showActions(name === 'users');
     if (name === 'users') loadUsers();
     if (name === 'identity') loadIdentity();
-    if (name === 'hw') {
-      $('tab-news').hidden = false;            /* 班级 tab 里上下两块：事项 + 热点 */
-      loadHwAdmin(); loadTtAdmin(); loadCanteenAdmin();
-      loadNews(); loadNewsApplies();
-    }
+    if (name === 'hw') adminClassPane('');
     if (name === 'cube') loadCubeAdmin();
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
     if (name === 'mail') loadMailTab();
@@ -4408,6 +4619,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
     if (name === 'ad') { loadAdAdmin(); loadAdFreeList(); }
+    if (name === 'rank') loadRankAdmin();
     if (name === 'notice') loadNoticeAdmin();
     if (name === 'status') { loadStatusAdmin(); loadAttackLog(); }
     if (name === 'more') loadMoreAdmin();
@@ -4420,6 +4632,165 @@ window.__supaReady = new Promise(function (resolve) {
     if (!a) return;
     a.hidden = !on;
     a.style.display = on ? 'flex' : 'none';
+  }
+
+  /* ---------- 管理端：班级（选择器） ---------- */
+  function adminClassPane(which) {
+    var hw = $('tab-hw');
+    if (!hw) return;
+    var chooser = $('hwChooser');
+    if (chooser) chooser.hidden = !!which;
+
+    Array.prototype.forEach.call(hw.querySelectorAll('[data-hwback]'), function (el) {
+      el.hidden = !which;
+    });
+    Array.prototype.forEach.call(hw.children, function (el) {
+      if (el.id === 'hwChooser' || el.hasAttribute('data-hwback')) return;
+      el.hidden = (which !== 'hw');
+    });
+
+    $('tab-news').hidden = (which !== 'news');
+
+    if (which === 'hw') { loadHwAdmin(); loadTtAdmin(); loadCanteenAdmin(); }
+    if (which === 'news') { loadNews(); loadNewsApplies(); }
+  }
+
+  /* ---------- 管理端：排行榜 ---------- */
+  var rankAdminState = { view: 'list', id: '' };
+
+  function loadRankAdmin() {
+    var box = $('rankAdminBox');
+    if (!box) return;
+    if (rankAdminState.view === 'detail' && rankAdminState.id) {
+      return renderRankAdminMembers(rankAdminState.id);
+    }
+    rankAdminState.view = 'list';
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_rank_boards', { p_token: S.token }).then(function (r) {
+      S.rankBoards = r.items || [];
+      var items = S.rankBoards;
+      box.innerHTML =
+        '<div class="panel-head"><div><h2>排行榜</h2>' +
+          '<div class="hint">点「编辑人」进去加分或减分，按分数自动排名</div></div>' +
+          '<button class="btn primary sm" id="rankNewBtn" type="button" style="height:34px;padding:0 14px">＋ 新建排行榜</button></div>' +
+        (items.length ? items.map(function (b) {
+          return '<div class="news-item" style="display:flex;align-items:center;gap:12px">' +
+            '<div style="flex:1;min-width:0">' +
+              '<b style="font-size:14.5px;color:var(--ink)">' + esc(b.name) + '</b>' +
+              '<div class="hint" style="margin-top:3px">' +
+                (b.sub ? esc(b.sub) + ' · ' : '') +
+                (b.unit ? '单位：' + esc(b.unit) + ' · ' : '') + b.people + ' 人上榜</div>' +
+            '</div>' +
+            '<button class="link" data-rkact="edit" data-rkid="' + esc(b.id) + '">编辑</button>' +
+            '<button class="link" data-rkact="people" data-rkid="' + esc(b.id) + '">编辑人</button>' +
+            '<button class="link danger" data-rkact="del" data-rkid="' + esc(b.id) + '">删除</button>' +
+          '</div>';
+        }).join('') : '<div class="empty"><strong>还没有排行榜</strong>点右上角新建一个</div>');
+
+      var nb = $('rankNewBtn');
+      if (nb) nb.onclick = function () { openRankForm(null); };
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openRankForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '编辑排行榜' : '新建排行榜',
+      '<label class="field"><span>总名称<em>*</em></span>' +
+        '<input class="input" id="rkName" maxlength="24" placeholder="例如：阅读排行榜" value="' + esc(item ? item.name : '') + '"></label>' +
+      '<label class="field"><span>小字</span>' +
+        '<input class="input" id="rkSub" maxlength="30" placeholder="例如：按本月读完的书算" value="' + esc(item ? (item.sub || '') : '') + '"></label>' +
+      '<label class="field"><span>计量单位（自己填）</span>' +
+        '<input class="input" id="rkUnit" maxlength="8" placeholder="例如：本" value="' + esc(item ? (item.unit || '') : '') + '"></label>' +
+      '<label class="field"><span>计量说明（自己填）</span>' +
+        '<input class="input" id="rkDesc" maxlength="40" placeholder="例如：读完一本记 1" value="' + esc(item ? (item.unit_desc || '') : '') + '"></label>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="rkOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 480);
+
+    m.querySelector('#rkOk').onclick = function () {
+      var btn = this;
+      var nm = m.querySelector('#rkName').value.trim();
+      if (!nm) return toast('名称不能为空', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_rank_save', {
+        p_token: S.token, p_id: edit ? item.id : null, p_name: nm,
+        p_sub: m.querySelector('#rkSub').value.trim(),
+        p_unit: m.querySelector('#rkUnit').value.trim(),
+        p_unit_desc: m.querySelector('#rkDesc').value.trim()
+      }).then(function () {
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadRankAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function renderRankAdminMembers(id) {
+    var box = $('rankAdminBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_admin_rank_members', { p_token: S.token, p_id: id }).then(function (r) {
+      var b = r.board || {};
+      var items = r.items || [];
+      var unit = b.unit || '分';
+      box.innerHTML =
+        '<div class="panel-head"><div>' +
+          '<button class="btn ghost sm" type="button" id="rankBackList" style="height:30px;margin-bottom:8px">‹ 返回</button>' +
+          '<h2>' + esc(b.name) + '</h2>' +
+          '<div class="hint">' + (b.unit_desc ? esc(b.unit_desc) + ' · ' : '') + '共 ' + items.length + ' 人</div>' +
+        '</div></div>' +
+        (items.length ? items.map(function (u) {
+          return '<div class="news-item" style="display:flex;align-items:center;gap:12px">' +
+            '<div style="flex:1;min-width:0"><b style="font-size:14px">' + esc(u.name) + '</b>' +
+              ' <span class="hint" style="font-size:11.5px">' + esc(u.username) + '</span></div>' +
+            '<span style="font-size:14px;font-weight:700;color:var(--red);min-width:60px;text-align:right">' +
+              u.score + ' <small style="font-weight:400;color:var(--muted)">' + esc(unit) + '</small></span>' +
+            '<button class="link" data-rkadd="' + esc(u.id) + '">加分</button>' +
+          '</div>';
+        }).join('') : '<div class="empty"><strong>还没有用户</strong></div>');
+
+      $('rankBackList').onclick = function () { rankAdminState = { view: 'list', id: '' }; loadRankAdmin(); };
+      box.querySelectorAll('[data-rkadd]').forEach ?
+        box.querySelectorAll('[data-rkadd]').forEach(function (el) {
+          el.onclick = function () { openRankAdd(id, el.getAttribute('data-rkadd'), unit); };
+        }) :
+        Array.prototype.forEach.call(box.querySelectorAll('[data-rkadd]'), function (el) {
+          el.onclick = function () { openRankAdd(id, el.getAttribute('data-rkadd'), unit); };
+        });
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function openRankAdd(boardId, uid, unit) {
+    var m = modal('加分 / 减分',
+      '<p class="hint" style="margin-bottom:12px">可正可负，填 5 就是加 5，填 -3 就是减 3。</p>' +
+      '<label class="field"><span>分数</span>' +
+        '<input class="input" id="rkDelta" type="number" value="1" step="1"></label>' +
+      '<div class="row" style="gap:8px;flex-wrap:wrap">' +
+        [1, 5, 10, -1].map(function (v) {
+          return '<button class="btn ghost sm" type="button" data-rkquick="' + v + '">' + (v > 0 ? '+' : '') + v + '</button>';
+        }).join('') +
+      '</div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="rkAddOk" type="button">确定</button>', 420);
+
+    m.querySelectorAll('[data-rkquick]').forEach(function (b) {
+      b.onclick = function () { m.querySelector('#rkDelta').value = b.getAttribute('data-rkquick'); };
+    });
+
+    m.querySelector('#rkAddOk').onclick = function () {
+      var btn = this;
+      var d = parseInt(m.querySelector('#rkDelta').value, 10);
+      if (!d) return toast('填一个不是 0 的数', 'err');
+      busy(btn, true, '提交中…');
+      api('api_admin_rank_add', { p_token: S.token, p_id: boardId, p_user_id: uid, p_delta: d })
+        .then(function () {
+          busy(btn, false); closeModal(); toast('已' + (d > 0 ? '加' : '减') + Math.abs(d) + ' ' + unit, 'ok');
+          renderRankAdminMembers(boardId);
+        }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
   }
 
   /* ---------- 管理端：用户 ---------- */
@@ -5847,14 +6218,28 @@ window.__supaReady = new Promise(function (resolve) {
       return;
     }
     box.innerHTML = S.news.map(function (n) {
+      var sub = newsSubText(n);
       return '<div class="news-item" data-id="' + esc(n.id) + '">' +
-        '<div class="hd">' + (n.pinned ? '<span class="badge red">置顶</span>' : '') +
+        '<div class="hd" data-nfold="' + esc(n.id) + '" style="cursor:pointer">' +
+          (n.pinned ? '<span class="badge red">置顶</span>' : '') +
           '<h4>' + esc(n.title) + '</h4><span class="time">' + fmt(n.created_at) + '</span></div>' +
-        '<p>' + esc(n.content) + '</p>' +
+        (sub ? '<p style="color:var(--muted);font-size:13px">' + esc(sub) + '</p>' : '') +
+        '<div data-nbody="' + esc(n.id) + '" hidden style="margin-top:8px">' +
+          '<p>' + esc(n.content) + '</p></div>' +
         '<div class="ops"><button class="link" data-act="edit" type="button">编辑</button>' +
           '<button class="link danger" data-act="del" type="button">删除</button></div>' +
       '</div>';
     }).join('');
+
+    if (!box.__foldBound) {
+      box.__foldBound = true;
+      box.addEventListener('click', function (e) {
+        var h = e.target.closest('[data-nfold]');
+        if (!h) return;
+        var bodyEl = box.querySelector('[data-nbody="' + h.getAttribute('data-nfold') + '"]');
+        if (bodyEl) bodyEl.hidden = !bodyEl.hidden;
+      });
+    }
   }
 
   function openNewsForm(item) {
@@ -7404,8 +7789,48 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
+  function renderPageStatusUI() {
+    var grid = $('statusGrid');
+    if (!grid) return;
+    var sec = grid.closest('section') || grid.parentNode.parentNode;
+    var box = $('pageStatusBox');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'pageStatusBox';
+      box.className = 'card';
+      box.style.cssText = 'padding:16px;margin-top:14px';
+      sec.appendChild(box);
+    }
+
+    var PAGES = [['search', '搜索'], ['class', '班级热点'], ['forum', '论坛'], ['rank', '排行榜'], ['more', '更多']];
+    box.innerHTML = '<div class="hint" style="margin-bottom:10px">每个页面单独设状态；停运/更新时，学生点那个按钮会看到对应提示</div>' +
+      PAGES.map(function (p) {
+        var cur = (S.boot && S.boot['status_' + p[0]]) || 'run';
+        return '<div class="pf-row" style="align-items:center;gap:10px">' +
+          '<div class="pf-main"><div class="pf-val" style="font-size:14px">' + p[1] + '</div></div>' +
+          '<select class="input" data-pstatus="' + p[0] + '" style="width:110px;flex:none">' +
+            [['run', '运行'], ['update', '更新'], ['down', '停运']].map(function (v) {
+              return '<option value="' + v[0] + '"' + (cur === v[0] ? ' selected' : '') + '>' + v[1] + '</option>';
+            }).join('') +
+          '</select></div>';
+      }).join('');
+
+    Array.prototype.forEach.call(box.querySelectorAll('[data-pstatus]'), function (sel) {
+      sel.onchange = function () {
+        var k = 'status_' + sel.getAttribute('data-pstatus');
+        var v = sel.value;
+        saveSetting(k, v, null).then(function () {
+          if (!S.boot) S.boot = {};
+          S.boot[k] = v;
+          toast('已保存', 'ok');
+        }, function (e) { toast(e.message, 'err', 3600); });
+      };
+    });
+  }
+
   function loadStatusAdmin() {
     renderStatusUI((S.boot && S.boot.status) || 'run');
+    renderPageStatusUI();
     if (!S.boot) bootInfo().then(function (r) { renderStatusUI(r.status); }, function () {});
   }
 
@@ -7549,6 +7974,29 @@ window.__supaReady = new Promise(function (resolve) {
         document.body.classList.remove('kb-open');
         document.body.classList.remove('kb-search');
       }, 120);
+    });
+
+    document.addEventListener('click', function (e) {
+      var hp = e.target.closest('[data-hwpane]');
+      if (hp) { adminClassPane(hp.getAttribute('data-hwpane')); return; }
+      if (e.target.closest('[data-hwback-btn]')) { adminClassPane(''); return; }
+
+      var ra = e.target.closest('[data-rkact]');
+      if (ra) {
+        var id = ra.getAttribute('data-rkid');
+        var act = ra.getAttribute('data-rkact');
+        var b = (S.rankBoards || []).filter(function (x) { return x.id === id; })[0];
+        if (act === 'edit') return openRankForm(b);
+        if (act === 'people') { rankAdminState = { view: 'detail', id: id }; return loadRankAdmin(); }
+        if (act === 'del') {
+          confirmBox('删除排行榜', '确定删除这个排行榜？', '里面的分数会一起删掉。', '删除').then(function (yes) {
+            if (!yes) return;
+            api('api_admin_rank_delete', { p_token: S.token, p_id: id }).then(function () {
+              toast('已删除', 'ok'); loadRankAdmin();
+            }, function (err) { toast(err.message, 'err', 3600); });
+          });
+        }
+      }
     });
 
     $('loginForm').addEventListener('submit', function (e) { e.preventDefault(); doLogin(); });
@@ -8267,6 +8715,11 @@ window.__supaReady = new Promise(function (resolve) {
         if (rbox) toggleForumReplies(exp.dataset.expand, rbox);
         return;
       }
+
+      if (e.target.closest('[data-open-news]')) { openModule('news', '班级热点'); return; }
+
+      var rk = e.target.closest('[data-rank]');
+      if (rk) { renderRankDetail(rk.getAttribute('data-rank')); return; }
 
       var op = e.target.closest('[data-open]');
       if (op && op.dataset.open === 'fb') { openFeedback(); return; }
