@@ -681,19 +681,7 @@ body.theme-light .pro-modal-head{ border-color:var(--line); }
   font-size:11px;font-weight:700;letter-spacing:.5px;color:#9B0C24;background:#FDF0F2;border:1px solid #F6D5DA}
 body.theme-wujin .mine-tag{color:#E8C46A;background:#2E2408;border-color:#5A4413}
 
-/* 雪山背景（vip / 管理端限定，两张可选） */
-body.snow-bg-1 #appView,
-body.snow-bg-2 #appView{
-  background-color:#fff;
-  background-size:cover;
-  background-position:center;
-  background-attachment:fixed;
-  background-repeat:no-repeat;
-}
-body.snow-bg-1 #appView{ background-image:url("./snow1.jpg"); }
-body.snow-bg-2 #appView{ background-image:url("./snow2.jpg"); }
-body.snow-bg-1 .wrap,
-body.snow-bg-2 .wrap{background:transparent}
+/* 雪山背景已移除 */
 
 
 /* 会员 / 广告 */
@@ -879,12 +867,12 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
   </main>
 
   <!-- 全屏模块页（点方块后覆盖整个屏幕） -->
-  <section id="modView" hidden style="position:fixed;inset:0;z-index:800;display:flex;flex-direction:column">
+  <section id="modView" hidden style="position:fixed;inset:0;z-index:800;display:flex;flex-direction:column;overflow-y:auto">
     <header style="flex:none;background:linear-gradient(135deg,var(--red-l),var(--red));color:#fff;padding:0 18px;height:54px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(200,16,46,.22)">
       <button id="modBack" type="button" style="background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);color:#fff;height:32px;padding:0 14px;border-radius:999px;font-size:13.5px">‹ 返回</button>
       <b id="modTitle" style="font-size:17px;letter-spacing:2px"></b>
     </header>
-    <div id="modBody" style="flex:1;overflow-y:auto;padding:18px;max-width:900px;width:100%;margin:0 auto"></div>
+    <div id="modBody" style="flex:1;overflow:visible;padding:18px;max-width:900px;width:100%;margin:0 auto"></div>
   </section>
 
   <!-- 管理端 -->
@@ -1944,6 +1932,7 @@ window.__supaReady = new Promise(function (resolve) {
 
   function appTab(t) {
     if (!TAB_UI) return;
+    dropKeyboard();
     if (!TAB_DEF[t]) t = appHomeTab();
     if (t === 'admin' && !(S.me && S.me.role === 'admin')) t = appHomeTab();
 
@@ -2026,6 +2015,16 @@ window.__supaReady = new Promise(function (resolve) {
     el.classList.remove('slide-left', 'slide-right');
     void el.offsetWidth;                  /* 强制重排，动画才会重播 */
     el.classList.add(dir === 'left' ? 'slide-left' : 'slide-right');
+  }
+
+  /* 收键盘：切页、跳转、搜索完都要调一次，不然底栏一直藏着 */
+  function dropKeyboard() {
+    try {
+      var a = document.activeElement;
+      if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA')) a.blur();
+    } catch (e) {}
+    document.body.classList.remove('kb-open');
+    document.body.classList.remove('kb-search');
   }
 
   /* 每个底栏页自己的运行状态 */
@@ -2895,6 +2894,7 @@ window.__supaReady = new Promise(function (resolve) {
     function run() {
       var kw = input.value.trim();
       if (!kw) { input.focus(); return; }
+      dropKeyboard();
       var feats = matchFeatures(kw);
       var exact = feats.filter(function (f) { return f.name === kw; })[0];
       if (searchScope === 'all' && exact) return goFeature(exact.to);
@@ -2927,6 +2927,7 @@ window.__supaReady = new Promise(function (resolve) {
     });
 
     out.addEventListener('click', function (e) {
+      dropKeyboard();
       var f = e.target.closest('[data-feat]');
       if (f) return goFeature(f.getAttribute('data-feat'));
       var u = e.target.closest('[data-uid]');
@@ -3010,14 +3011,12 @@ window.__supaReady = new Promise(function (resolve) {
     hwState.view = 'home';
     $('modBody').innerHTML =
       '<div style="max-width:640px;margin:6px auto 0">' +
-        '<div class="class-sec">班级热点</div>' +
-        '<button class="cube-opt" type="button" data-open-news="1" style="margin-top:12px;margin-bottom:26px">' +
+        '<button class="cube-opt" type="button" data-open-news="1" style="margin-bottom:20px">' +
           '<span class="ico">' + LINE_ICON.news + '</span>' +
           '<span><b>班级热点</b><small>公告、通知和同学投稿</small></span>' +
           '<span class="arrow">\u203a</span>' +
         '</button>' +
-        '<div class="class-sec">班级事项</div>' +
-        '<div id="classItems" style="margin-top:12px"></div>' +
+        '<div id="classItems"></div>' +
       '</div>';
     renderClassItems();
   }
@@ -3026,8 +3025,7 @@ window.__supaReady = new Promise(function (resolve) {
     var box = $('classItems');
     if (!box) return;
     box.innerHTML =
-      '<div class="class-sec">班级事项</div>' +
-      '<div class="cube-stack" style="margin-top:12px">' +
+      '<div class="cube-stack">' +
         '<button class="cube-opt" type="button" data-items="hw">' +
           '<span class="ico">' + LINE_ICON.hw + '</span>' +
           '<span><b>班级作业</b><small>看老师布置的作业</small></span>' +
@@ -7115,13 +7113,7 @@ window.__supaReady = new Promise(function (resolve) {
           return '<button type="button" class="chip-btn ' + (cur === t[0] ? 'on' : '') + '" data-theme="' + t[0] + '">' + t[1] + '</button>';
         }).join('') +
       '</div>' +
-      '<div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap">' +
-        '<span class="hint" style="font-size:12px;margin-right:2px">雪山背景</span>' +
-        (IS_APP ? '<span class="hint" style="font-size:12px">App 端暂不支持</span>' :
-        '<button type="button" class="chip-btn ' + (snow === '1' ? 'on' : '') + '" data-snow="1">雪山图1</button>' +
-        '<button type="button" class="chip-btn ' + (snow === '2' ? 'on' : '') + '" data-snow="2">雪山图2</button>' +
-        '<button type="button" class="chip-btn ' + (!snow ? 'on' : '') + '" data-snow="">不用</button>') +
-      '</div>' +
+
       '<div style="text-align:right;margin-top:10px">' +
         '<button type="button" class="btn ghost sm" data-theme-off="1" style="height:30px">关闭配色</button>' +
       '</div>' +
@@ -7144,10 +7136,9 @@ window.__supaReady = new Promise(function (resolve) {
     });
     document.body.classList.toggle('theme-light',
       theme === 'danxia' || theme === 'tianlan' || theme === 'hantan');
-    /* App 端不启用雪景背景（按需求禁用），网页端照旧 */
-    var sn = IS_APP ? '' : snowVal(me.snow_bg);
-    document.body.classList.toggle('snow-bg-1', sn === '1');
-    document.body.classList.toggle('snow-bg-2', sn === '2');
+    /* 雪山背景已彻底移除 */
+    document.body.classList.remove('snow-bg-1');
+    document.body.classList.remove('snow-bg-2');
 
     /* 方案里勾了「毛玻璃悬空」才有那种底栏 */
     document.body.classList.toggle('glass-nav', !!me.glass_nav);
@@ -7835,9 +7826,8 @@ window.__supaReady = new Promise(function (resolve) {
         var k = 'status_' + sel.getAttribute('data-pstatus');
         var v = sel.value;
         saveSetting(k, v, null).then(function () {
-          if (!S.boot) S.boot = {};
-          S.boot[k] = v;
           toast('已保存', 'ok');
+          renderPageStatusUI();          /* 用刚拉回来的 boot 重画一遍 */
         }, function (e) { toast(e.message, 'err', 3600); });
       };
     });
@@ -7846,6 +7836,10 @@ window.__supaReady = new Promise(function (resolve) {
   function loadStatusAdmin() {
     renderStatusUI((S.boot && S.boot.status) || 'run');
     renderPageStatusUI();
+    bootInfo().then(function (r) {
+      renderStatusUI(r.status);
+      renderPageStatusUI();
+    }, function () {});
     if (!S.boot) bootInfo().then(function (r) { renderStatusUI(r.status); }, function () {});
   }
 
@@ -7979,6 +7973,14 @@ window.__supaReady = new Promise(function (resolve) {
       document.body.classList.add('kb-open');
       document.body.classList.toggle('kb-search', inSearch(e.target));
     });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', function () {
+        if ((window.innerHeight - window.visualViewport.height) < 140) {
+          document.body.classList.remove('kb-open');
+          document.body.classList.remove('kb-search');
+        }
+      });
+    }
     document.addEventListener('focusout', function () {
       setTimeout(function () {
         var ae = document.activeElement;
@@ -8689,7 +8691,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (adbar) { openAdBar(adbar); return; }
 
       var it = e.target.closest('[data-items]');
-      if (it && currentMod === 'homework') {
+      if (it && (currentMod === 'homework' || currentMod === 'class')) {
         if (it.dataset.items === 'hw') renderHomeworkInModule($('modBody'));
         else if (it.dataset.items === 'canteen') renderCanteen();
         else renderTimetableForUser();
