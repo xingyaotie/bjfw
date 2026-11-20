@@ -521,11 +521,15 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 #loginView{background-attachment:fixed}
 body.s-update #loginView{background:#fff}
 
-.marquee{overflow:hidden;white-space:nowrap;border-radius:10px;padding:8px 0;font-size:13.5px;line-height:1.5}
-.marquee > span{display:inline-block;padding-left:100%;animation:marq 18s linear infinite}
-@keyframes marq{to{transform:translateX(-100%)}}
+.marquee{overflow:hidden;white-space:nowrap;border-radius:10px;padding:8px 12px;font-size:13.5px;line-height:1.5}
+/* 里面放两份一样的文字，走到 -50% 正好接上，中间不会空一大段 */
+.marquee > span{display:inline-block;padding-left:0;will-change:transform;animation:marq 18s linear infinite}
+.mq-gap{opacity:.55;padding:0 1px}
+@keyframes marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .marquee.on-dark{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;margin-bottom:14px}
 .marquee.on-card{background:#fff;border:1px solid var(--line);color:var(--ink2);box-shadow:0 2px 10px rgba(17,24,39,.05);margin-bottom:16px}
+/* 模块页里的公告条是 #modView 的 flex 子项：不写 flex:none 会被长页面压扁（论坛、更多只剩一条缝） */
+#modView>.marquee{flex:0 0 auto;align-self:center;width:calc(100% - 36px);max-width:864px;margin:12px 0 0;box-sizing:border-box}
 
 .status-banner{display:none;margin-bottom:14px;padding:11px 14px;border-radius:10px;font-size:13.5px;text-align:center;color:#fff;line-height:1.5}
 body.s-update .status-banner{display:block;background:rgba(27,135,63,.94)}
@@ -1906,7 +1910,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (notice && $('modView')) $('modView').insertBefore(notice, $('modBody'));
     buildTabbar();
     syncTabPill();
-    window.addEventListener('resize', syncTabPill);
+    window.addEventListener('resize', function () { syncTabPill(); syncNoticeWidth(); });
     var mb = $('modBody');
     if (mb && window.MutationObserver) {
       new MutationObserver(syncAppChrome).observe(mb, { childList: true });
@@ -1928,6 +1932,7 @@ window.__supaReady = new Promise(function (resolve) {
     var back = $('modBack');
     if (back) back.hidden = modAtRoot();
     fillClientVersion();
+    syncNoticeWidth();
   }
 
   function appTab(t) {
@@ -1949,6 +1954,9 @@ window.__supaReady = new Promise(function (resolve) {
 
     $('userPanel').hidden = true;
     currentMod = '';
+
+    /* 点底部 tab 一律回到这个模块的一级页面（排行榜详情、魔方里层都要退回来） */
+    if (t === 'rank') { rankState.view = 'list'; rankState.id = ''; }
 
     /* 那三个浮动按钮只属于「用户管理」，一离开就必须消失 */
     if (APP_TAB !== 'admin') showActions(false);
@@ -2084,8 +2092,9 @@ window.__supaReady = new Promise(function (resolve) {
     var name = me.display_name || me.username || '同学';
     var isAdmin = me.role === 'admin';
 
-    var roleTxt = isAdmin ? '管理员' : (me.role === 'vip' ? '会员' : '学生');
-    var tags = '<span class="me-tag">' + esc(roleTxt) + '</span>';
+    /* 会员只留一个身份标签：有方案名就只显示方案名（比如 super会员），别再叠一个「会员」 */
+    var roleTxt = isAdmin ? '管理员' : (me.member_plan_name ? '' : (me.role === 'vip' ? '会员' : '学生'));
+    var tags = roleTxt ? '<span class="me-tag">' + esc(roleTxt) + '</span>' : '';
     if (!isAdmin && me.member_plan_name) tags += '<span class="me-tag">' + esc(me.member_plan_name) + '</span>';
     if (me.class_name) tags += '<span class="me-tag">' + esc(me.class_name) + '</span>';
 
@@ -2244,14 +2253,42 @@ window.__supaReady = new Promise(function (resolve) {
     var span = $(spanId);
     if (!bar || !span) return;
     var t = String(text || '').trim();
-    if (!t) { bar.hidden = true; span.textContent = ''; return; }
+    if (!t) { bar.hidden = true; span.textContent = ''; span.style.animation = ''; return; }
+    var one = esc(t) + '<span class="mq-gap">　　·　　</span>';
+    /* 一行放得下的短公告就别滚了，闪来闪去反而看不清 */
+    span.style.animation = 'none';
     span.textContent = t;
-    span.style.animationDuration = Math.max(9, Math.min(48, t.length * 0.32)) + 's';
     bar.hidden = false;
+    if (span.offsetWidth && bar.clientWidth && span.offsetWidth <= bar.clientWidth - 24) return;
+    /* 放不下就两份首尾相接，translateX(-50%) 无缝循环：不会「滚一半就空了」 */
+    span.innerHTML = one + one;
+    span.style.animation = '';
+    var half = 0;
+    try { half = span.offsetWidth ? span.offsetWidth / 2 : 0; } catch (e) {}
+    var secs = half ? half / 70 : Math.max(9, Math.min(48, t.length * 0.4));
+    span.style.animationDuration = Math.max(8, Math.min(60, secs)).toFixed(1) + 's';
   }
 
   function renderLoginNotice(text) { renderMarquee('loginNotice', 'loginNoticeText', text); }
-  function renderHomeNotice(text) { renderMarquee('homeNotice', 'homeNoticeText', text); }
+
+  /* 登录后公告要等模块页真正显示出来再量一次宽度：
+     隐藏的时候量出来是 0，会把短公告误判成「放不下」而做成两份滚动 */
+  var homeNoticeText = '';
+  var homeNoticeW = -1;
+  function renderHomeNotice(text) {
+    homeNoticeText = String(text || '').trim();
+    homeNoticeW = -1;
+    renderMarquee('homeNotice', 'homeNoticeText', homeNoticeText);
+    syncNoticeWidth();
+  }
+  function syncNoticeWidth() {
+    var bar = $('homeNotice');
+    if (!bar || !homeNoticeText) return;
+    var w = bar.clientWidth || 0;
+    if (!w || w === homeNoticeW) return;
+    homeNoticeW = w;
+    renderMarquee('homeNotice', 'homeNoticeText', homeNoticeText);
+  }
 
   function fatal(msg) {
     $('loginView').innerHTML =
@@ -2268,6 +2305,8 @@ window.__supaReady = new Promise(function (resolve) {
     document.body.classList.remove('glass-nav');
     syncStatusBar();                     /* 登录页是白的，状态栏也跟着变白 */
     showActions(false);
+    /* 登录页藏起来时公告条量不到宽度，显示出来后重画一次，短公告才不会做成两份滚动 */
+    renderLoginNotice(S.boot && S.boot.login_notice);
     setTimeout(function () { var u = $('username'); if (u) u.focus(); }, 150);
   }
 
@@ -2753,7 +2792,11 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'class') {
       if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderClassPage();
     }
-    if (currentMod === 'rank' && rankState.view === 'detail') return renderRankPage();
+    if (currentMod === 'rank' && rankState.view === 'detail') {
+      rankState.view = 'list';           /* 先归位，否则 renderRankPage 又会回到详情页 */
+      rankState.id = '';
+      return renderRankPage();
+    }
     if (currentMod === 'homework') {
       if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderItemsHome();
     }
