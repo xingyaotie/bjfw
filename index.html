@@ -3009,38 +3009,25 @@ window.__supaReady = new Promise(function (resolve) {
   /* ================= 班级页：热点在上，事项在下 ================= */
   function renderClassPage() {
     hwState.view = 'home';
+    function item(key, icon, title, sub) {
+      return '<button class="cube-opt" type="button" data-items="' + key + '">' +
+        '<span class="ico">' + icon + '</span>' +
+        '<span><b>' + title + '</b><small>' + sub + '</small></span>' +
+        '<span class="arrow">\u203a</span>' +
+      '</button>';
+    }
     $('modBody').innerHTML =
       '<div style="max-width:640px;margin:6px auto 0">' +
-        '<button class="cube-opt" type="button" data-open-news="1" style="margin-bottom:20px">' +
-          '<span class="ico">' + LINE_ICON.news + '</span>' +
-          '<span><b>班级热点</b><small>公告、通知和同学投稿</small></span>' +
-          '<span class="arrow">\u203a</span>' +
-        '</button>' +
-        '<div id="classItems"></div>' +
-      '</div>';
-    renderClassItems();
-  }
-
-  function renderClassItems() {
-    var box = $('classItems');
-    if (!box) return;
-    box.innerHTML =
-      '<div class="cube-stack">' +
-        '<button class="cube-opt" type="button" data-items="hw">' +
-          '<span class="ico">' + LINE_ICON.hw + '</span>' +
-          '<span><b>班级作业</b><small>看老师布置的作业</small></span>' +
-          '<span class="arrow">\u203a</span>' +
-        '</button>' +
-        '<button class="cube-opt" type="button" data-items="tt">' +
-          '<span class="ico">' + LINE_ICON.tt + '</span>' +
-          '<span><b>班级课表</b><small>看本周课程安排</small></span>' +
-          '<span class="arrow">\u203a</span>' +
-        '</button>' +
-        '<button class="cube-opt" type="button" data-items="canteen">' +
-          '<span class="ico">' + LINE_ICON.canteen + '</span>' +
-          '<span><b>本周食堂菜单</b><small>看看这几天吃什么</small></span>' +
-          '<span class="arrow">\u203a</span>' +
-        '</button>' +
+        '<div class="cube-stack">' +
+          '<button class="cube-opt" type="button" data-open-news="1">' +
+            '<span class="ico">' + LINE_ICON.news + '</span>' +
+            '<span><b>班级热点</b><small>公告、通知和同学投稿</small></span>' +
+            '<span class="arrow">\u203a</span>' +
+          '</button>' +
+          item('hw', LINE_ICON.hw, '班级作业', '看老师布置的作业') +
+          item('tt', LINE_ICON.tt, '班级课表', '看本周课程安排') +
+          item('canteen', LINE_ICON.canteen, '本周食堂菜单', '看看这几天吃什么') +
+        '</div>' +
       '</div>';
   }
 
