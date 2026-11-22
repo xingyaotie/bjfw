@@ -158,7 +158,8 @@ body.kb-open.kb-search #userSearchWrap{opacity:1;pointer-events:auto}
 .pf-val{font-size:14.5px;color:var(--ink);word-break:break-word;line-height:1.6}
 .pf-hint{font-size:11.5px;color:var(--muted);margin-top:4px}
 .medal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
-@media (max-width:430px){ .medal-grid{grid-template-columns:repeat(2,1fr)} }
+/* 一行至少 3 个：窄屏也不许掉到 1 个 */
+@media (max-width:430px){ .medal-grid{grid-template-columns:repeat(3,1fr)} }
 .medal{border:1px solid var(--line);border-radius:12px;padding:8px 6px;background:#fff;
   aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;gap:5px;overflow:hidden}
@@ -278,15 +279,16 @@ body.app-mode #appTabbar{display:flex}
 #appTabbar{overflow:visible}
 #appTabbar .tab-pill{position:absolute;top:4px;height:calc(100% - 8px);left:5px;width:0;
   border-radius:999px;background:transparent;opacity:0;
-  transition:left .32s cubic-bezier(.22,.61,.36,1),width .32s cubic-bezier(.22,.61,.36,1),opacity .18s;
-  pointer-events:none;z-index:0}
+  transform:translateX(0);
+  transition:transform .34s cubic-bezier(.22,.61,.36,1),opacity .18s;
+  pointer-events:none;z-index:0;will-change:transform}
 body.glass-nav #appTabbar .tab-pill{opacity:1;
-  background:rgba(255,255,255,.60);
-  -webkit-backdrop-filter:blur(16px) saturate(180%);
-  backdrop-filter:blur(16px) saturate(180%);
-  box-shadow:0 8px 22px rgba(17,24,39,.16), inset 0 1px 0 rgba(255,255,255,.9)}
-body.theme-wujin.glass-nav #appTabbar .tab-pill{background:rgba(40,34,22,.55);
-  box-shadow:0 8px 22px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14)}
+  background:rgba(255,255,255,.34);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);
+  backdrop-filter:blur(18px) saturate(180%);
+  box-shadow:0 6px 18px rgba(17,24,39,.12), inset 0 1px 0 rgba(255,255,255,.7)}
+body.theme-wujin.glass-nav #appTabbar .tab-pill{background:rgba(40,34,22,.34);
+  box-shadow:0 6px 18px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12)}
 #appTabbar button{position:relative;z-index:1}
 #appTabbar button{flex:1;min-width:0;background:none;border:none;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:3px;font-size:10px;letter-spacing:.6px;
@@ -306,13 +308,13 @@ body.glass-nav #appTabbar{
   left:18px;right:18px;
   bottom:calc(12px + env(safe-area-inset-bottom,0px));
   height:58px;padding-bottom:0;border-radius:22px;
-  background:rgba(255,255,255,.30);
-  -webkit-backdrop-filter:blur(24px) saturate(200%);
-  backdrop-filter:blur(24px) saturate(200%);
-  box-shadow:0 10px 34px rgba(17,24,39,.20), inset 0 1px 0 rgba(255,255,255,.65)}
+  background:rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(26px) saturate(190%);
+  backdrop-filter:blur(26px) saturate(190%);
+  box-shadow:0 10px 34px rgba(17,24,39,.16), inset 0 1px 0 rgba(255,255,255,.5)}
 body.theme-wujin.glass-nav #appTabbar{
-  background:rgba(22,19,14,.32);
-  box-shadow:0 10px 34px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.10)}
+  background:rgba(22,19,14,.22);
+  box-shadow:0 10px 34px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.08)}
 body.glass-nav #appTabbar button.on .tl{color:var(--red)}
 body.theme-wujin.glass-nav #appTabbar button.on .tl{color:#E8C46A}
 
@@ -358,11 +360,11 @@ body.app-mode #userSearchWrap{display:none!important}
   #appTabbar{left:0;right:0;margin:0 auto;transform:none;
     width:min(640px,calc(100vw - 64px));max-width:640px;
     bottom:18px;border-radius:22px;height:58px;
-    background:rgba(255,255,255,.72);
-    -webkit-backdrop-filter:blur(20px) saturate(180%);
-    backdrop-filter:blur(20px) saturate(180%);
-    box-shadow:0 14px 40px rgba(17,24,39,.18)}
-  body.theme-wujin #appTabbar{background:rgba(22,19,14,.70)}
+    background:rgba(255,255,255,.24);
+    -webkit-backdrop-filter:blur(22px) saturate(180%);
+    backdrop-filter:blur(22px) saturate(180%);
+    box-shadow:0 14px 40px rgba(17,24,39,.16)}
+  body.theme-wujin #appTabbar{background:rgba(22,19,14,.26)}
   body.app-mode #modView{bottom:calc(94px + env(safe-area-inset-bottom,0px))!important}
   body.app-mode.glass-nav #modView{bottom:0!important}
   body.app-mode.glass-nav #modBody{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))!important}
@@ -516,6 +518,15 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 .row{display:flex;gap:8px}
 .row .btn{flex:none;height:40px}
 
+/* 图文编辑：插入图片后的缩略图预览 */
+.img-preview{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.img-preview .pv-item{position:relative;width:74px;height:74px;border-radius:10px;overflow:hidden;
+  border:1px solid var(--line);background:var(--bg)}
+.img-preview .pv-item img{width:100%;height:100%;object-fit:cover;display:block}
+.img-preview .pv-x{position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;
+  border:none;background:rgba(0,0,0,.55);color:#fff;font-size:13px;line-height:1;cursor:pointer}
+.img-preview .pv-x:hover{background:var(--red)}
+
 /* 登录页：公告滚动 + 状态横幅 + 停服红条 */
 .login-stack{width:100%;max-width:390px}
 #loginView{background-attachment:fixed}
@@ -664,6 +675,110 @@ body.theme-hantan{
   --ink:#0B3B38; --ink2:#2A6562; --muted:#7CA6A2;
   --line:#D5E7E5; --bg:#F3FBF9; --card:#fff;
 }
+/* ---------- 黑橙：纯黑打底 + 细网格 + 橙色点缀，灰字用亮灰 ---------- */
+body.theme-heicheng{
+  --red:#FF7A18; --red-d:#D95F06; --red-l:#FFA24B;
+  --ink:#FFB05E; --ink2:#E6E7E9; --muted:#9BA1A8;
+  --line:#2B2118; --bg:#000; --card:#0C0B0A;
+  background:#000;
+}
+body.theme-heicheng #appView,
+body.theme-heicheng #loginView{ background:#000; }
+body.theme-heicheng #appView::before{
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,122,24,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,122,24,.055) 1px, transparent 1px);
+  background-size:30px 30px;
+}
+body.theme-heicheng .wrap,
+body.theme-heicheng #modView,
+body.theme-heicheng #mePanel,
+body.theme-heicheng #adminPanel{ position:relative; z-index:1; }
+body.theme-heicheng #modView{ background:transparent!important; }
+body.theme-heicheng #modBody,
+body.theme-heicheng #mePanel,
+body.theme-heicheng #adminPanel{ background:transparent; }
+body.theme-heicheng .card,
+body.theme-heicheng .modal,
+body.theme-heicheng .news-item,
+body.theme-heicheng .cube-card,
+body.theme-heicheng .cube-opt,
+body.theme-heicheng .status-card,
+body.theme-heicheng .member-head,
+body.theme-heicheng .me-rows,
+body.theme-heicheng .home-card{ background:#0E0D0C; border-color:#2B2118; color:#E6E7E9; }
+body.theme-heicheng .modal-head h3,
+body.theme-heicheng .card h2,
+body.theme-heicheng .card h3,
+body.theme-heicheng .cube-opt b{ color:#FFB05E; }
+body.theme-heicheng .hint,
+body.theme-heicheng .empty,
+body.theme-heicheng .loading,
+body.theme-heicheng .sub,
+body.theme-heicheng .foot,
+body.theme-heicheng .ms{ color:#9BA1A8; }
+body.theme-heicheng .cube-opt small,
+body.theme-heicheng .me-row .ms{ color:#9BA1A8; }
+body.theme-heicheng .input,
+body.theme-heicheng .textarea{ background:#111010; border-color:#2B2118; color:#E6E7E9; }
+body.theme-heicheng .input::placeholder,
+body.theme-heicheng .textarea::placeholder{ color:#6E7378; }
+body.theme-heicheng table th{ background:#141210; color:#9BA1A8; border-color:#2B2118; }
+body.theme-heicheng table td{ background:#0E0D0C; border-color:#211A14; color:#E6E7E9; }
+body.theme-heicheng tbody tr:hover td{ background:#141210; }
+body.theme-heicheng .btn.ghost{ background:#12100E; color:#E6E7E9; border-color:#2B2118; }
+body.theme-heicheng .btn.ghost:hover{ border-color:#FF7A18; color:#FFB05E; }
+body.theme-heicheng .btn.primary{ background:linear-gradient(135deg,#FF8A2B,#E0630A); color:#160C03; box-shadow:0 8px 22px rgba(255,122,24,.28); }
+body.theme-heicheng .chip-btn,
+body.theme-heicheng .seg button,
+body.theme-heicheng .tab{ background:#12100E; border-color:#2B2118; color:#C9CCD0; }
+body.theme-heicheng .chip-btn.on,
+body.theme-heicheng .seg button.on,
+body.theme-heicheng .tab.active{ background:#251505; border-color:#FF7A18; color:#FFB05E; }
+body.theme-heicheng .badge.red{ background:#2A1403; color:#FFB05E; border-color:#6B3208; }
+body.theme-heicheng .badge.gray{ background:#171513; color:#9BA1A8; border-color:#2B2118; }
+body.theme-heicheng .badge.gold{ background:#2A1C05; color:#FFC46B; border-color:#6B4708; }
+body.theme-heicheng .marquee.on-card{ background:#0E0D0C; border-color:#2B2118; color:#E6E7E9; }
+body.theme-heicheng .marquee.on-dark{ background:rgba(255,122,24,.10); border-color:#4A2A0C; color:#FFB05E; }
+body.theme-heicheng .me-row{ color:#E6E7E9; border-bottom-color:#211A14; background:none; }
+body.theme-heicheng .me-row:active{ background:#151210; }
+body.theme-heicheng .me-row .mi{ color:#FF7A18; }
+body.theme-heicheng .me-hero{ background:#0E0D0C; border:1px solid #2B2118; box-shadow:0 10px 26px rgba(0,0,0,.7); }
+body.theme-heicheng .me-hero .nm{ color:#FFB05E; }
+body.theme-heicheng .me-tag{ background:rgba(255,122,24,.12); border-color:#4A2A0C; color:#FFB05E; }
+body.theme-heicheng .me-foot{ color:#6E7378; }
+body.theme-heicheng .perm-row,
+body.theme-heicheng .fb-reply,
+body.theme-heicheng .fb-replies{ border-color:#211A14; }
+body.theme-heicheng .fb-reply{ background:#12100E; color:#E6E7E9; }
+body.theme-heicheng .fb-head .who{ color:#FFB05E; }
+body.theme-heicheng .app-brand{ color:#FFB05E; }
+body.theme-heicheng .app-brand em{ color:#9BA1A8; }
+body.theme-heicheng .app-search-box{ background:#0E0D0C; box-shadow:0 8px 22px rgba(0,0,0,.7); }
+body.theme-heicheng .app-search-box input{ color:#E6E7E9; }
+body.theme-heicheng .app-search-go{ background:#FF7A18; color:#160C03; box-shadow:0 4px 14px rgba(255,122,24,.35); }
+body.theme-heicheng .rank-row{ background:#0E0D0C; box-shadow:none; border:1px solid #211A14; }
+body.theme-heicheng .rank-row .nm{ color:#E6E7E9; }
+body.theme-heicheng .rank-row .sc{ color:#FFB05E; }
+body.theme-heicheng .rank-row.me{ background:#1B1208; outline-color:#FF7A18; }
+body.theme-heicheng .rank-off{ background:#12100E; color:#9BA1A8; }
+body.theme-heicheng .rich{ color:#E6E7E9; }
+body.theme-heicheng .page-state .ps-t{ color:#FFB05E; }
+body.theme-heicheng #appTabbar{ background:rgba(8,7,6,.86); }
+body.theme-heicheng.glass-nav #appTabbar{ background:rgba(10,9,8,.30); }
+body.theme-heicheng #appTabbar button{ color:#E6E7E9; }
+body.theme-heicheng #appTabbar button.on .tl{ color:#FF7A18; }
+body.theme-heicheng.glass-nav #appTabbar .tab-pill{ background:rgba(255,122,24,.20); box-shadow:0 6px 18px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,162,75,.25); }
+body.theme-heicheng .member-btn{ background:rgba(255,122,24,.16); border-color:#4A2A0C; color:#FFB05E; }
+body.theme-heicheng .btn-logout,
+body.theme-heicheng .mail-btn{ background:rgba(255,122,24,.14); border-color:#4A2A0C; color:#FFB05E; }
+body.theme-heicheng .chip .dot{ background:#FF7A18; color:#160C03; }
+body.theme-heicheng .suggest{ background:#0E0D0C; border-color:#2B2118; }
+body.theme-heicheng .suggest .sg:hover{ background:#151210; }
+body.theme-heicheng .fatal,
+body.theme-heicheng .login-card{ background:#0E0D0C; }
+body.theme-heicheng .login-card h1{ color:#FFB05E; }
 body.theme-light{ background:var(--bg); }
 body.theme-light #appView{ background:var(--bg); }
 body.theme-light .card,
@@ -887,6 +1002,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       <button class="tab" data-tab="hw" type="button">班级</button>
       <button class="tab" data-tab="cube" type="button">魔方教程</button>
       <button class="tab" data-tab="debug" type="button">魔方调试</button>
+      <button class="tab" data-tab="hwlib" type="button">作业</button>
       <button class="tab" data-tab="mail" type="button">邮箱发送</button>
       <button class="tab" data-tab="feedback" type="button">反馈管理</button>
       <button class="tab" data-tab="forum" type="button">论坛</button>
@@ -897,7 +1013,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       <button class="tab" data-tab="rank" type="button">排行榜</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
       <button class="tab" data-tab="status" type="button">平台状态</button>
-      <button class="tab" data-tab="more" type="button">更多</button>
+      <button class="tab" data-tab="more" type="button">版本信息</button>
       <button class="tab" data-tab="me" type="button">我的账号</button>
     </div>
 
@@ -1031,6 +1147,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
           <button class="btn ghost sm" id="btnCanteenImg" type="button">插入图片</button>
           <input type="file" id="canteenFile" accept="image/*" style="display:none">
         </div>
+        <div class="img-preview" id="canteenPrev" style="display:none"></div>
       </div>
     </section>
 
@@ -1120,6 +1237,19 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
         <button type="button" data-ps="all">全部</button>
       </div>
       <div class="card"><div class="news" id="payList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- 作业（总名称 → 分支；没有收费档，可以放图片） -->
+    <section id="tab-hwlib" hidden>
+      <div class="panel-head">
+        <div><h2>作业</h2>
+          <div class="hint">总名称 → 分支（名字 + 文字/图片）；<b>不收费</b>，只按会员方案里的「查看作业」放行</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn ghost sm" id="btnHwReload" type="button" style="height:34px">刷新</button>
+          <button class="btn primary sm" id="btnHwNew" type="button" style="height:34px;padding:0 14px">＋ 新建总名称</button>
+        </div>
+      </div>
+      <div class="card"><div class="news" id="hwlibList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
     </section>
 
     <!-- 身份管理 -->
@@ -1347,6 +1477,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
             强制看 <input class="input" id="adSeconds" type="number" min="1" max="999" value="5" style="width:88px;height:34px"> 秒
           </label>
         </div>
+        <div class="img-preview" id="adPrev" style="display:none"></div>
         <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">
           <input type="checkbox" id="adForce" checked style="width:16px;height:16px;accent-color:var(--red)"> 登录时强制播放
         </label>
@@ -1366,6 +1497,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
             强制看 <input class="input" id="ad2Seconds" type="number" min="1" max="999" value="5" style="width:88px;height:34px"> 秒
           </label>
         </div>
+        <div class="img-preview" id="ad2Prev" style="display:none"></div>
         <label style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink2)">
           <input type="checkbox" id="ad2On" checked style="width:16px;height:16px;accent-color:var(--red)"> 启用四宫格广告
         </label>
@@ -1473,25 +1605,25 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       </div>
     </section>
 
-    <!-- 更多 -->
+    <!-- 版本信息（原「更多」） -->
     <section id="tab-more" hidden>
       <div class="panel-head">
-        <div><h2>更多</h2><div class="hint">这些内容都会显示在学生端「更多」页</div></div>
+        <div><h2>版本信息</h2><div class="hint">版本号、更新日志、赞赏；这些会显示在学生端「更多 → 版本信息」</div></div>
       </div>
       <div class="card" style="padding:16px">
         <label class="field"><span>当前版本</span>
           <input class="input" id="setVersion" maxlength="40" placeholder="例如：体验版 v5"></label>
         <label class="field"><span>更新日志</span>
           <textarea class="textarea" id="setChangelog" rows="4" placeholder="一行一条，例如：&#10;新增付费分支&#10;魔方权限支持折叠"></textarea></label>
-        <label class="field"><span>赞助商</span>
-          <textarea class="textarea" id="setSponsors" rows="4" placeholder="一行写一个，例如：张三爸爸 · 文具店"></textarea></label>
         <label class="field"><span>赞赏（可以放图片）</span>
           <textarea class="textarea" id="setAppreciation" rows="4" placeholder="写给支持班级平台的人；点下面「插入图片」可以放收款码之类"></textarea></label>
         <div class="row" style="margin:-6px 0 12px">
           <button class="btn ghost sm" id="btnAppImg" type="button">插入图片</button>
           <input type="file" id="appFile" accept="image/*" style="display:none">
         </div>
-        <div style="text-align:right">
+        <div class="pf-label" id="appPreviewLabel" style="margin:6px 0 6px;display:none">图片预览</div>
+        <div id="appPreview" class="img-preview" style="display:none"></div>
+        <div style="text-align:right;margin-top:8px">
           <button class="btn primary" id="btnSaveMore" type="button">保存</button>
         </div>
       </div>
@@ -1652,6 +1784,118 @@ window.__supaReady = new Promise(function (resolve) {
     });
     return s;
   }
+  /* ---------- 图文编辑：图片收成短占位，输入框里不再是几万个字母 ---------- */
+  /* 数据里还是 ![说明](data:...) ，但编辑时显示〔图片1〕，同时下面出缩略图。
+     这样手机上「全选删除」不用再跟几百 KB 的 base64 较劲，也不会看花眼。 */
+  var IMG_TOKEN_RE = /〔图片(\d+)〕/g;
+
+  function richBind(ta, previewEl) {
+    if (!ta) return null;
+    var map = {};
+    var n = 0;
+
+    function collapse(text) {
+      return String(text || '').replace(/!\[([^\]]*)\]\((data:[^)]{40,})\)/g, function (_, alt, url) {
+        n++;
+        var tok = '〔图片' + n + '〕';
+        map[tok] = '![' + (alt || '图片') + '](' + url + ')';
+        return tok;
+      });
+    }
+
+    ta.value = collapse(ta.value);
+
+    function tokensInText() {
+      var out = [];
+      var s = ta.value || '';
+      IMG_TOKEN_RE.lastIndex = 0;
+      var m;
+      while ((m = IMG_TOKEN_RE.exec(s))) {
+        var tok = m[0];
+        if (map[tok] && out.indexOf(tok) < 0) out.push(tok);
+      }
+      return out;
+    }
+
+    function paint() {
+      if (!previewEl) return;
+      var toks = tokensInText();
+      if (!toks.length) { previewEl.style.display = 'none'; previewEl.innerHTML = ''; return; }
+      previewEl.style.display = 'flex';
+      previewEl.innerHTML = toks.map(function (tok) {
+        var src = (map[tok] || '').replace(/^!\[[^\]]*\]\(/, '').replace(/\)$/, '');
+        return '<span class="pv-item" data-tok="' + esc(tok) + '">' +
+          '<img src="' + esc(src) + '" alt="">' +
+          '<button type="button" class="pv-x" data-pvdel="' + esc(tok) + '" aria-label="移除">×</button>' +
+          '</span>';
+      }).join('');
+    }
+
+    function add(url, alt) {
+      n++;
+      var tok = '〔图片' + n + '〕';
+      map[tok] = '![' + (alt || '图片') + '](' + url + ')';
+      insertAtCursor(ta, (ta.value && !/\n$/.test(ta.value) ? '\n' : '') + tok + '\n');
+      paint();
+    }
+
+    function value() {
+      return String(ta.value || '').replace(IMG_TOKEN_RE, function (tok) {
+        return map[tok] || tok;
+      });
+    }
+
+    if (previewEl) {
+      previewEl.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-pvdel]');
+        if (!b) return;
+        var tok = b.getAttribute('data-pvdel');
+        ta.value = String(ta.value || '').split(tok).join('');
+        paint();
+      });
+      ta.addEventListener('input', paint);
+      paint();
+    }
+
+    return { add: add, value: value, paint: paint, term: ta };
+  }
+
+  /* 内容每次重新载入后要重新绑一次（图片占位表跟着换） */
+  function rebindRich(slot, taId, prevId) {
+    var ta = $(taId);
+    if (!ta) return null;
+    S[slot] = richBind(ta, $(prevId));
+    return S[slot];
+  }
+  /* 懒加载的编辑器：按钮先绑好，等编辑器出来再干活 */
+  function lazyRich(slot) {
+    return { add: function (url) { if (S[slot]) S[slot].add(url); } };
+  }
+  function richVal(slot, taId) {
+    if (S[slot]) return S[slot].value();
+    var el = $(taId);
+    return el ? el.value : '';
+  }
+
+  /* 图片文件 → 压缩 → 交给绑定好的编辑器 */
+  function bindImagePicker(btn, fileEl, rich) {
+    if (!btn || !fileEl || !rich) return;
+    btn.onclick = function () { fileEl.click(); };
+    fileEl.onchange = function (e) {
+      var f = e.target.files && e.target.files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        compressImage(reader.result, function (url) {
+          if (url.length > 900000) { toast('这张图太大了，换一张小一点的', 'err'); return; }
+          rich.add(url);
+        });
+      };
+      reader.readAsDataURL(f);
+      fileEl.value = '';
+    };
+  }
+
   function insertAtCursor(el, text) {
     if (!el) return;
     var s = el.selectionStart || 0, e = el.selectionEnd || 0, v = el.value;
@@ -1850,7 +2094,7 @@ window.__supaReady = new Promise(function (resolve) {
     }
   };
 
-  var MOD_TITLE = { search: '搜索', 'class': '班级', news: '班级热点', homework: '班级事项', forum: '论坛', rank: '排行榜', more: '更多' };
+  var MOD_TITLE = { search: '搜索', 'class': '班级', news: '班级热点', homework: '班级事项', forum: '论坛', rank: '排行榜', more: '更多', hwlib: '作业' };
   /* 底栏布局：网页和 App 用同一套，不再分两边 */
   var TAB_UI = true;
 
@@ -1859,8 +2103,8 @@ window.__supaReady = new Promise(function (resolve) {
   /* 热点和事项合成一个「班级」页；排行榜单独一页 */
   function appTabs() {
     return (S.me && S.me.role === 'admin')
-      ? ['search', 'admin', 'class', 'forum', 'rank', 'me']
-      : ['search', 'class', 'forum', 'rank', 'more', 'me'];
+      ? ['search', 'admin', 'class', 'forum', 'me']
+      : ['search', 'class', 'forum', 'more', 'me'];
   }
   function appHomeTab() { return appTabs()[0]; }
 
@@ -1888,8 +2132,9 @@ window.__supaReady = new Promise(function (resolve) {
       if (btns[i].getAttribute('data-atab') === APP_TAB) { idx = i; break; }
     }
     if (idx < 0) return;
+    /* 宽度固定成「一格减 10」，只改 translateX：移动过程不会拉长/压扁 */
     pill.style.width = 'calc(100% / ' + n + ' - 10px)';
-    pill.style.left = 'calc(100% / ' + n + ' * ' + idx + ' + 5px)';
+    pill.style.transform = 'translateX(calc(' + idx + ' * (100% + 10px)))';
   }
 
   function syncTabPill() {
@@ -1921,10 +2166,11 @@ window.__supaReady = new Promise(function (resolve) {
   function modAtRoot() {
     if (currentMod === 'search' || currentMod === 'forum') return true;
     if (currentMod === 'class') return hwState.view === 'home';
-    if (currentMod === 'rank') return rankState.view === 'list';
+    if (currentMod === 'rank') return rankState.view === 'list' && !rankFrom;
     if (currentMod === 'homework') return hwState.view === 'home';
     if (currentMod === 'cube') return cubeState.view === 'home';
     if (currentMod === 'more') return moreState.view === 'info';
+    if (currentMod === 'hwlib') return false;
     return false;                    /* 会员、我的资料这些二级页要能返回 */
   }
   function syncAppChrome() {
@@ -1956,6 +2202,7 @@ window.__supaReady = new Promise(function (resolve) {
     currentMod = '';
 
     /* 点底部 tab 一律回到这个模块的一级页面（排行榜详情、魔方里层都要退回来） */
+    rankFrom = '';
     if (t === 'rank') { rankState.view = 'list'; rankState.id = ''; }
 
     /* 那三个浮动按钮只属于「用户管理」，一离开就必须消失 */
@@ -2099,6 +2346,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (me.class_name) tags += '<span class="me-tag">' + esc(me.class_name) + '</span>';
 
     var unread = (S.mails && S.mails.length) || 0;
+    var memberHidden = !!(S.boot && S.boot.status_member === 'hidden');
 
     var box = $('mePanel');
     box.innerHTML =
@@ -2112,8 +2360,8 @@ window.__supaReady = new Promise(function (resolve) {
         '</div>' +
         '<div class="me-rows">' +
           appMeRow(MI_ICON.profile, '我的资料', '性别、生日、签名、勋章', 'profile') +
-          (isAdmin ? '' : appMeRow(MI_ICON.member, '会员', '方案与专属主题', 'member')) +
-          appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封公告' : '班级公告和通知', 'mail') +
+          (isAdmin || memberHidden ? '' : appMeRow(MI_ICON.member, '会员', '方案与专属主题', 'member')) +
+          appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封新通知' : '', 'mail') +
           (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
           appMeRow(MI_ICON.tools, '更多工具', '背景音乐等', 'tools') +
           appMeRow(MI_ICON.update, '检查更新', '看看有没有新版本', 'update') +
@@ -2219,7 +2467,7 @@ window.__supaReady = new Promise(function (resolve) {
     loadBootInfo();
   }
 
-  /* 公告 / 平台状态 / 版本 / 赞助商，登录前就能拿（不含任何隐私） */
+  /* 公告 / 平台状态 / 版本，登录前就能拿（不含任何隐私） */
   function loadBootInfo() {
     return api('api_get_boot_info', {}).then(function (r) {
       S.boot = r;
@@ -2511,7 +2759,7 @@ window.__supaReady = new Promise(function (resolve) {
         ? '高级用户 · ' + name
         : '2026级 · 班级服务平台';
       $('adminPanel').hidden = true;
-      $('btnMember').hidden = false;
+      $('btnMember').hidden = !!(S.boot && S.boot.status_member === 'hidden');
       $('userSearchWrap').style.display = '';
       collapseSearch();                 // 平时就是一个圆，点了才展开
       $('btnFirstAid').style.display = 'none';
@@ -2792,16 +3040,35 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'class') {
       if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderClassPage();
     }
-    if (currentMod === 'rank' && rankState.view === 'detail') {
-      rankState.view = 'list';           /* 先归位，否则 renderRankPage 又会回到详情页 */
-      rankState.id = '';
-      return renderRankPage();
+    if (currentMod === 'rank') {
+      if (rankState.view === 'detail') {
+        rankState.view = 'list';         /* 先归位，否则 renderRankPage 又会回到详情页 */
+        rankState.id = '';
+        renderRankPage();
+        syncAppChrome();
+        return;
+      }
+      if (rankFrom === 'class') {        /* 从班级进来的，退回去还是班级 */
+        rankFrom = '';
+        currentMod = 'class';
+        $('modTitle').textContent = '班级';
+        renderClassPage();
+        syncAppChrome();
+        return;
+      }
     }
     if (currentMod === 'homework') {
       if (hwState.view === 'hw' || hwState.view === 'tt' || hwState.view === 'canteen') return renderItemsHome();
     }
     if (currentMod === 'more') {
       if (moreState.view === 'fb' || moreState.view === 'promo' || moreState.view === 'ver') return renderMore();
+    }
+    if (currentMod === 'hwlib') {
+      if (hwlibState.view === 'content') return renderHwLibBranches(hwlibState.pid);
+      if (hwlibState.view === 'branches') return renderHwLib();
+      currentMod = 'more';
+      $('modTitle').textContent = '更多';
+      return renderMore();
     }
     if (currentMod === 'cube') {            /* 魔方现在从「更多」进，返回到更多 */
       if (cubeState.view === 'home') { currentMod = 'more'; return renderMore(); }
@@ -2819,6 +3086,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'cube') return renderCubeHome();
     if (currentMod === 'forum') return renderForum();
     if (currentMod === 'more') return renderMore();
+    if (currentMod === 'hwlib') return renderHwLib();
   }
 
   /* ================= 搜索页 ================= */
@@ -2980,8 +3248,26 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
-  /* ================= 排行榜 ================= */
+  /* ================= 排行榜（从班级页进） ================= */
   var rankState = { view: 'list', id: '' };
+  var rankFrom = '';                 /* '' = 底栏进来的；'class' = 从班级页进来的 */
+
+  function openRankFromClass() {
+    rankFrom = 'class';
+    rankState.view = 'list';
+    rankState.id = '';
+    currentMod = 'rank';
+    $('modTitle').textContent = '排行榜';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    slideIn($('modView'), 'right');
+    renderRankPage();
+    syncAppChrome();
+  }
 
   function renderRankPage() {
     if (rankState.view === 'detail' && rankState.id) return renderRankDetail(rankState.id);
@@ -3070,6 +3356,11 @@ window.__supaReady = new Promise(function (resolve) {
           item('hw', LINE_ICON.hw, '班级作业', '看老师布置的作业') +
           item('tt', LINE_ICON.tt, '班级课表', '看本周课程安排') +
           item('canteen', LINE_ICON.canteen, '本周食堂菜单', '看看这几天吃什么') +
+          '<button class="cube-opt" type="button" data-rank-open="1">' +
+            '<span class="ico">' + LINE_ICON.rank + '</span>' +
+            '<span><b>排行榜</b><small>看看谁排在前面</small></span>' +
+            '<span class="arrow">\u203a</span>' +
+          '</button>' +
         '</div>' +
       '</div>';
   }
@@ -3198,7 +3489,8 @@ window.__supaReady = new Promise(function (resolve) {
         moreBtn(LINE_ICON.fb, '反馈', '提问题、提建议，管理员会处理', 'fb') +
         moreBtn(LINE_ICON.promo, '推广信息', '价格和档期都在这儿', 'promo') +
         moreBtn(LINE_ICON.cube, '魔方', '教程和调试都在里面', 'cube') +
-        moreBtn(LINE_ICON.ver, '版本信息', '版本号、更新日志、赞助商、赞赏', 'ver') +
+        moreBtn(LINE_ICON.hw, '作业', '作业讲解和参考答案', 'hwlib') +
+        moreBtn(LINE_ICON.ver, '版本信息', '版本号、更新日志、赞赏', 'ver') +
 
         '<div style="display:flex;align-items:center;gap:10px;margin:20px 0 14px">' +
           '<div style="flex:1;height:1px;background:var(--line)"></div>' +
@@ -3304,7 +3596,6 @@ window.__supaReady = new Promise(function (resolve) {
     moreState.view = 'ver';
     var me = S.me || {};
     var b = S.boot || {};
-    var sp = String(b.sponsors || '').trim();
     var cl = String(b.changelog || '').trim();
     var ap = String(b.appreciation || '').trim();
 
@@ -3329,10 +3620,7 @@ window.__supaReady = new Promise(function (resolve) {
                 '<div class="rich">' + esc(cl) + '</div>' +
               '</div>' : '') +
 
-        (sp ? '<div class="card" style="padding:18px;margin-top:14px">' +
-                '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">赞助商</div>' +
-                '<div class="rich">' + esc(sp) + '</div>' +
-              '</div>' : '') +
+
       '</div>';
   }
 
@@ -4410,6 +4698,93 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
+
+  /* ================= 作业（更多 → 作业，会员权益） ================= */
+  var hwlibState = { view: 'list', pid: '', bid: '', branches: [] };
+
+  function hwlibDenied() {
+    return !!(S.me && S.me.role !== 'admin' && !S.me.can_view_homework);
+  }
+
+  function hwlibDeniedHtml() {
+    return '<div class="empty" style="padding:56px 20px">' +
+      '<strong>还没有作业权限</strong>' +
+      '作业是会员权益，开通后就能在这里看讲解和参考答案。' +
+    '</div>';
+  }
+
+  function renderHwLib() {
+    hwlibState = { view: 'list', pid: '', bid: '', branches: [] };
+    var body = $('modBody');
+    if (hwlibDenied()) { body.innerHTML = hwlibDeniedHtml(); return; }
+
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_hw_list', { p_token: S.token }).then(function (r) {
+      if (currentMod !== 'hwlib') return;
+      if (r.allowed === false) { body.innerHTML = hwlibDeniedHtml(); return; }
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>还没有作业</strong>管理员添加后会出现在这里</div>';
+        return;
+      }
+      body.innerHTML = '<div class="cube-stack" style="max-width:640px;margin:0 auto">' +
+        items.map(function (p) {
+          return '<button class="cube-opt" type="button" data-hwp="' + esc(p.id) + '">' +
+            '<span class="ico">' + LINE_ICON.hw + '</span>' +
+            '<span><b>' + esc(p.name) + '</b><small>' + (p.branch_count || 0) + ' 个分支</small></span>' +
+            '<span class="arrow">\u203a</span>' +
+          '</button>';
+        }).join('') + '</div>';
+    }, function (e) {
+      if (currentMod !== 'hwlib') return;
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderHwLibBranches(pid) {
+    hwlibState.view = 'branches';
+    hwlibState.pid = pid;
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_hw_detail', { p_token: S.token, p_id: pid }).then(function (r) {
+      if (currentMod !== 'hwlib' || hwlibState.pid !== pid) return;
+      hwlibState.branches = r.branches || [];
+      var pj = r.project || {};
+      if (!hwlibState.branches.length) {
+        body.innerHTML = '<div class="empty"><strong>这份作业还没有内容</strong>等管理员补充</div>';
+        return;
+      }
+      body.innerHTML =
+        '<div style="max-width:640px;margin:0 auto">' +
+          '<h2 style="font-size:17px;color:var(--ink);margin:2px 0 12px">' + esc(pj.name) + '</h2>' +
+          '<div class="cube-stack">' +
+            hwlibState.branches.map(function (b) {
+              return '<button class="cube-opt" type="button" data-hwb="' + esc(b.id) + '">' +
+                '<span class="ico">' + LINE_ICON.hw + '</span>' +
+                '<span><b>' + esc(b.name) + '</b><small>点开看内容</small></span>' +
+                '<span class="arrow">\u203a</span>' +
+              '</button>';
+            }).join('') +
+          '</div>' +
+        '</div>';
+    }, function (e) {
+      if (currentMod !== 'hwlib') return;
+      body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderHwLibContent(bid) {
+    var b = (hwlibState.branches || []).filter(function (x) { return x.id === bid; })[0];
+    if (!b) return;
+    hwlibState.view = 'content';
+    hwlibState.bid = bid;
+    $('modBody').innerHTML =
+      '<div style="max-width:640px;margin:0 auto">' +
+        '<h2 style="font-size:17px;color:var(--ink);margin:2px 0 12px">' + esc(b.name) + '</h2>' +
+        '<div class="card" style="padding:16px"><div class="rich">' + renderRich(b.content) + '</div></div>' +
+      '</div>';
+  }
+
   function renderCubeDebug() {
     cubeState.view = 'debug';
     var body = $('modBody');
@@ -4633,7 +5008,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'hwlib', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -4645,6 +5020,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'hw') adminClassPane('');
     if (name === 'cube') loadCubeAdmin();
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
+    if (name === 'hwlib') { S.hwOpen = S.hwOpen || {}; loadHwAdmin(); }
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
     if (name === 'forum') { loadForumAdmin(); loadMutePanel(); loadForumCatsAdmin(); }
@@ -4938,7 +5314,7 @@ window.__supaReady = new Promise(function (resolve) {
           '</div></div>' +
         '<span class="arrow" style="margin-left:auto;color:var(--muted);transition:.2s" data-fold-arrow>\u25b8</span>' +
       '</div>' +
-      (list.length ? '<div id="medalGrid" hidden style="margin-top:10px"></div>' : '');
+      (list.length ? '<div id="medalGrid" class="medal-grid" hidden style="margin-top:10px"></div>' : '');
   }
 
   function toggleMedalFold(el) {
@@ -6053,34 +6429,43 @@ window.__supaReady = new Promise(function (resolve) {
   function loadMailBadge() {
     if (S.me && S.me.role === 'admin') return;
 
-    api('api_list_mails', { p_token: S.token }).then(function (r) {
+    api('api_list_mails', { p_token: S.token, p_unread_only: true }).then(function (r) {
       S.mails = r.items || [];
       if (!S.mails.length) return;
 
       var newest = S.mails[0];
       var seen = '';
       try { seen = localStorage.getItem('xbh_mail_seen') || ''; } catch (e) {}
-
       if (seen === newest.id) return;
 
-      var m = modal('收到 ' + S.mails.length + ' 封公告',
-        '<div style="font-size:13px;color:var(--muted);margin-bottom:10px">只看标题，内容请到信箱里看</div>' +
-        S.mails.map(function (x, i) {
-          return '<div style="padding:9px 0;border-bottom:1px solid #F1F2F5;font-size:14px;color:var(--ink)">' +
-            (i + 1) + '. ' + esc(x.subject || '（无标题）') +
-            '<span style="float:right;font-size:11.5px;color:var(--muted)">' + fmt(x.created_at) + '</span>' +
-          '</div>';
-        }).join(''),
-        '<button class="btn ghost" type="button" id="mailLater">稍后</button>' +
-        '<button class="btn primary" type="button" id="mailGo">去看看</button>', 480);
-
-      var markSeen = function () {
-        try { localStorage.setItem('xbh_mail_seen', newest.id); } catch (e) {}
-      };
-
-      m.querySelector('#mailLater').onclick = function () { markSeen(); closeModal(); };
-      m.querySelector('#mailGo').onclick = function () { markSeen(); openMailbox(); };
+      /* 广告 / 公告 / 欢迎都可能弹窗，等它们都关掉再弹信箱，
+         否则 modal() 会把它顶掉，看起来就是「闪一下又自己退了」 */
+      showMailPopupWhenFree(newest, 0);
     }, function () {});
+  }
+
+  function showMailPopupWhenFree(newest, tries) {
+    if (tries > 20) return;
+    var busyNow = document.querySelector('.mask') || document.getElementById('xbhOvl');
+    if (busyNow) { setTimeout(function () { showMailPopupWhenFree(newest, tries + 1); }, 700); return; }
+
+    var list = (S.mails || []).slice(0, 5);
+    var m = modal('收到 ' + S.mails.length + ' 封新通知',
+      '<div style="font-size:13px;color:var(--muted);margin-bottom:10px">只看标题，内容请到信箱里看；看过就不会再出现</div>' +
+      list.map(function (x, i) {
+        return '<div style="padding:9px 0;border-bottom:1px solid #F1F2F5;font-size:14px;color:var(--ink)">' +
+          (i + 1) + '. ' + esc(x.subject || '（无标题）') +
+          '<span style="float:right;font-size:11.5px;color:var(--muted)">' + fmt(x.created_at) + '</span>' +
+        '</div>';
+      }).join(''),
+      '<button class="btn ghost" type="button" id="mailLater">稍后</button>' +
+      '<button class="btn primary" type="button" id="mailGo">去看看</button>', 480);
+
+    var markSeen = function () {
+      try { localStorage.setItem('xbh_mail_seen', newest.id); } catch (e) {}
+    };
+    m.querySelector('#mailLater').onclick = function () { markSeen(); closeModal(); };
+    m.querySelector('#mailGo').onclick = function () { markSeen(); openMailbox(); };
   }
 
   function openMailbox() {
@@ -6088,10 +6473,10 @@ window.__supaReady = new Promise(function (resolve) {
       '<button class="btn ghost" type="button" data-close>关闭</button>', 640);
     var body = m.querySelector('.modal-body');
 
-    api('api_list_mails', { p_token: S.token }).then(function (r) {
+    api('api_list_mails', { p_token: S.token, p_unread_only: true }).then(function (r) {
       var items = r.items || [];
       if (!items.length) {
-        body.innerHTML = '<div class="empty"><strong>没有站内信</strong>管理员发信后会出现在这里</div>';
+        body.innerHTML = '<div class="empty"><strong>没有新通知</strong>看过的通知不会再显示，安心</div>';
         return;
       }
       body.innerHTML = items.map(function (x) {
@@ -6132,6 +6517,8 @@ window.__supaReady = new Promise(function (resolve) {
     var body = m.querySelector('.modal-body');
 
     api('api_mail_detail', { p_token: S.token, p_id: id }).then(function (r) {
+      S.mails = (S.mails || []).filter(function (x) { return x.id !== id; });
+      if (!$('mePanel').hidden) renderAppMe();
       var mail = r.mail || {};
       var reps = r.replies || [];
       body.innerHTML =
@@ -6412,6 +6799,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (!el) return;
     api('api_canteen_get', { p_token: S.token }).then(function (r) {
       el.value = r.content || '';
+      rebindRich('richCanteen', 'canteenInput', 'canteenPrev');
     }, function () {});
   }
 
@@ -6704,33 +7092,20 @@ window.__supaReady = new Promise(function (resolve) {
       '<div class="row" style="margin-top:-6px">' +
         '<button class="btn ghost sm" id="cImg" type="button">插入图片</button>' +
         '<input type="file" id="cFile" accept="image/*" style="display:none">' +
-      '</div>',
+      '</div>' +
+      '<div class="img-preview" id="cPrev" style="display:none"></div>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
       '<button class="btn primary" id="cOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 620);
 
     var bodyEl = m.querySelector('#cBody');
-    var fileEl = m.querySelector('#cFile');
-
-    m.querySelector('#cImg').onclick = function () { fileEl.click(); };
-    fileEl.onchange = function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        compressImage(reader.result, function (url) {
-          if (url.length > 900000) { toast('这张图太大了，换一张小一点的', 'err'); return; }
-          insertAtCursor(bodyEl, '\n![图片](' + url + ')\n');
-        });
-      };
-      reader.readAsDataURL(f);
-      fileEl.value = '';
-    };
+    var rich = richBind(bodyEl, m.querySelector('#cPrev'));
+    bindImagePicker(m.querySelector('#cImg'), m.querySelector('#cFile'), rich);
 
     m.querySelector('#cOk').onclick = function () {
       var btn = this;
       var name = m.querySelector('#cName').value.trim();
       var type = m.querySelector('#cType').value;
-      var content = bodyEl.value;
+      var content = rich.value();
       if (!name) { toast('请填写教程名称', 'err'); return; }
 
       busy(btn, true, '保存中…');
@@ -6759,6 +7134,144 @@ window.__supaReady = new Promise(function (resolve) {
       api('api_admin_cube_delete_tutorial', { p_token: S.token, p_id: id }).then(function () {
         toast('已删除', 'ok');
         loadCubeAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+
+  /* ---------- 管理端：作业 ---------- */
+  function loadHwAdmin() {
+    if (!$('hwlibList')) return;
+    $('hwlibList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_hw_overview', { p_token: S.token }).then(function (r) {
+      S.hwProj = r.items || [];
+      renderHwAdmin();
+    }, function (e) {
+      $('hwlibList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderHwAdmin() {
+    var box = $('hwlibList');
+    if (!box) return;
+    var list = S.hwProj || [];
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有作业</strong>点右上角「新建总名称」建第一个</div>';
+      return;
+    }
+    box.innerHTML = list.map(function (p) {
+      var open = !!S.hwOpen[p.id];
+      var branches = p.branches || [];
+      var inner = '';
+      if (open) {
+        inner = (branches.length
+          ? branches.map(function (b) {
+              return '<div class="perm-row" style="padding:8px 0">' +
+                '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(b.name) + '</div>' +
+                '<button type="button" class="link" data-hwact="bedit" data-pid="' + esc(p.id) + '" data-bid="' + esc(b.id) + '">编辑</button>' +
+                '<button type="button" class="link danger" data-hwact="bdel" data-bid="' + esc(b.id) + '">删除</button>' +
+              '</div>';
+            }).join('')
+          : '<div class="empty" style="padding:12px"><strong>还没有分支</strong>点下面新建一个</div>') +
+          '<div style="margin-top:8px">' +
+            '<button type="button" class="btn ghost sm" data-hwact="badd" data-pid="' + esc(p.id) + '">＋ 新建分支</button></div>';
+      }
+      return '<div class="perm-row" style="flex-direction:column;align-items:stretch;gap:8px">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<button type="button" class="fold ' + (open ? 'open' : '') + '" data-hwact="fold" data-pid="' + esc(p.id) + '">▸</button>' +
+          '<b style="font-size:14px;color:var(--ink)">' + esc(p.name) + '</b>' +
+          '<span class="hint">' + branches.length + ' 个分支</span>' +
+          '<span style="margin-left:auto;display:flex;gap:12px">' +
+            '<button type="button" class="link" data-hwact="pedit" data-pid="' + esc(p.id) + '">改名</button>' +
+            '<button type="button" class="link danger" data-hwact="pdel" data-pid="' + esc(p.id) + '">删除</button>' +
+          '</span>' +
+        '</div>' +
+        (open ? '<div style="margin-left:22px">' + inner + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  function hwProjectById(id) {
+    return (S.hwProj || []).filter(function (p) { return p.id === id; })[0];
+  }
+
+  function openHwProjectForm(item) {
+    var edit = !!item;
+    var m = modal(edit ? '作业改名' : '新建作业',
+      '<label class="field"><span>总名称<em>*</em></span>' +
+        '<input class="input" id="hpName" maxlength="40" placeholder="例如：周末数学作业" value="' + esc(item ? item.name : '') + '"></label>' +
+      '<p class="hint" style="font-size:12.5px">建好后点开它，往里面加分支（每个分支 = 名字 + 文字/图片）。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="hpOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 460);
+
+    m.querySelector('#hpName').focus();
+    m.querySelector('#hpOk').onclick = function () {
+      var btn = this;
+      var v = m.querySelector('#hpName').value.trim();
+      if (!v) return toast('名称不能为空', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_hw_save_project', { p_token: S.token, p_id: edit ? item.id : null, p_name: v })
+        .then(function () {
+          busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadHwAdmin();
+        }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function openHwBranchForm(pid, branch) {
+    var edit = !!branch;
+    var m = modal(edit ? '编辑分支' : '新建分支',
+      '<label class="field"><span>分支名称<em>*</em></span>' +
+        '<input class="input" id="hbName" maxlength="40" placeholder="例如：第一题 解法" value="' + esc(branch ? branch.name : '') + '"></label>' +
+      '<label class="field"><span>内容</span>' +
+        '<textarea class="textarea" id="hbBody" rows="8" placeholder="写解法、步骤；需要图片就点下面「插入图片」">' + esc(branch ? branch.content : '') + '</textarea></label>' +
+      '<div class="row" style="margin-top:-6px">' +
+        '<button class="btn ghost sm" id="hbImg" type="button">插入图片</button>' +
+        '<input type="file" id="hbFile" accept="image/*" style="display:none">' +
+      '</div>' +
+      '<div class="img-preview" id="hbPrev" style="display:none"></div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="hbOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 620);
+
+    var rich = richBind(m.querySelector('#hbBody'), m.querySelector('#hbPrev'));
+    bindImagePicker(m.querySelector('#hbImg'), m.querySelector('#hbFile'), rich);
+
+    m.querySelector('#hbName').focus();
+    m.querySelector('#hbOk').onclick = function () {
+      var btn = this;
+      var nm = m.querySelector('#hbName').value.trim();
+      if (!nm) return toast('分支名称不能为空', 'err');
+      busy(btn, true, '保存中…');
+      api('api_admin_hw_save_branch', {
+        p_token: S.token,
+        p_id: edit ? branch.id : null,
+        p_project_id: pid,
+        p_name: nm,
+        p_content: rich.value()
+      }).then(function () {
+        busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok');
+        S.hwOpen[pid] = true;
+        loadHwAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  function deleteHwProject(id) {
+    confirmBox('删除作业', '确定删除这份作业吗？', '里面的分支会一起删掉，学生那边也看不到了。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_hw_delete_project', { p_token: S.token, p_id: id }).then(function () {
+        delete S.hwOpen[id];
+        toast('已删除', 'ok');
+        loadHwAdmin();
+      }, function (e) { toast(e.message, 'err'); });
+    });
+  }
+
+  function deleteHwBranch(id) {
+    confirmBox('删除分支', '确定删除这个分支吗？', '删掉后学生就看不到了。', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_hw_delete_branch', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        loadHwAdmin();
       }, function (e) { toast(e.message, 'err'); });
     });
   }
@@ -7059,6 +7572,22 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* ================= 会员（学生端） ================= */
   function openMemberModule() {
+    var mstat = (S.boot && S.boot.status_member) || 'run';
+    if (mstat === 'hidden') { toast('会员还没开通', 'err'); return; }
+    if (mstat === 'down') {
+      currentMod = 'member';
+      $('modTitle').textContent = '会员';
+      $('mePanel').hidden = true;
+      $('userPanel').hidden = true;
+      $('adminPanel').hidden = true;
+      $('modView').hidden = false;
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('app-mod');
+      slideIn($('modView'), 'right');
+      showPageStatus('down');
+      syncAppChrome();
+      return;
+    }
     currentMod = 'member';
     $('modTitle').textContent = '会员';
     $('modBody').innerHTML = '';
@@ -7127,7 +7656,8 @@ window.__supaReady = new Promise(function (resolve) {
     ['wujin',   '乌金'],
     ['danxia',  '丹霞色'],
     ['tianlan', '天蓝色'],
-    ['hantan',  '寒潭色']
+    ['hantan',  '寒潭色'],
+    ['heicheng','黑橙']
   ];
 
   function colorPickerHtml() {
@@ -7139,7 +7669,11 @@ window.__supaReady = new Promise(function (resolve) {
         '<span class="hint" style="font-size:12px">整站换色，跟乌金同一个逻辑</span>' +
       '</div>' +
       '<div class="chips">' +
-        THEME_LIST.map(function (t) {
+        THEME_LIST.filter(function (t) {
+          if (t[0] !== 'heicheng') return true;
+          var me = S.me || {};
+          return me.role === 'admin' || !!me.black_orange;
+        }).map(function (t) {
           return '<button type="button" class="chip-btn ' + (cur === t[0] ? 'on' : '') + '" data-theme="' + t[0] + '">' + t[1] + '</button>';
         }).join('') +
       '</div>' +
@@ -7161,7 +7695,7 @@ window.__supaReady = new Promise(function (resolve) {
   function applyTheme() {
     var me = S.me || {};
     var theme = me.theme || 'red';
-    ['wujin', 'danxia', 'tianlan', 'hantan'].forEach(function (k) {
+    ['wujin', 'danxia', 'tianlan', 'hantan', 'heicheng'].forEach(function (k) {
       document.body.classList.toggle('theme-' + k, theme === k);
     });
     document.body.classList.toggle('theme-light',
@@ -7180,7 +7714,8 @@ window.__supaReady = new Promise(function (resolve) {
   function syncStatusBar() {
     var bridge = window.XkyctpShell;
     if (!bridge || !bridge.setTheme) return;
-    var dark = document.body.classList.contains('theme-wujin');
+    var dark = document.body.classList.contains('theme-wujin') ||
+               document.body.classList.contains('theme-heicheng');
     try { bridge.setTheme(dark ? 'dark' : 'light'); } catch (e) {}
   }
 
@@ -7434,6 +7969,8 @@ window.__supaReady = new Promise(function (resolve) {
           '<button type="button" class="fold ' + (open ? 'open' : '') + '" data-mfold="' + esc(p.id) + '">&#9656;</button>' +
           '<b style="font-size:14px;color:var(--ink)">' + esc(p.name) + '</b>' +
           (p.glass_nav ? '<span class="badge gold" style="height:18px;font-size:11px">毛玻璃底栏</span>' : '') +
+          (p.can_view_homework ? '<span class="badge red" style="height:18px;font-size:11px">看作业</span>' : '') +
+          (p.black_orange ? '<span class="badge red" style="height:18px;font-size:11px">黑橙</span>' : '') +
           '<span class="hint">' + items.length + ' 项权益 · ' + (p.users || 0) + ' 人</span>' +
           '<span style="margin-left:auto;display:flex;gap:12px">' +
             '<button type="button" class="link" data-mpact="edit" data-mpid2="' + esc(p.id) + '">编辑</button>' +
@@ -7454,6 +7991,14 @@ window.__supaReady = new Promise(function (resolve) {
         '<input type="checkbox" id="mpGlass" ' + (item && item.glass_nav ? 'checked' : '') +
           ' style="width:16px;height:16px;accent-color:var(--red);flex:none">' +
         '<span style="font-size:13px;color:var(--ink2)">毛玻璃悬空底栏（只影响 App 端）</span></label>' +
+      '<label class="field" style="display:flex;align-items:center;gap:10px;margin-top:-8px">' +
+        '<input type="checkbox" id="mpHw" ' + (item && item.can_view_homework ? 'checked' : '') +
+          ' style="width:16px;height:16px;accent-color:var(--red);flex:none">' +
+        '<span style="font-size:13px;color:var(--ink2)">查看作业（勾了才能看「更多 → 作业」）</span></label>' +
+      '<label class="field" style="display:flex;align-items:center;gap:10px;margin-top:-8px">' +
+        '<input type="checkbox" id="mpBO" ' + (item && item.black_orange ? 'checked' : '') +
+          ' style="width:16px;height:16px;accent-color:var(--red);flex:none">' +
+        '<span style="font-size:13px;color:var(--ink2)">黑橙主题（勾了这个方案才出现「黑橙」配色）</span></label>' +
       '<p class="hint" style="font-size:12.5px">' +
         (edit ? '改完点保存，已经在这个方案里的人立刻生效。' : '建好后点开这个方案，往里加权益。') +
       '</p>',
@@ -7465,10 +8010,13 @@ window.__supaReady = new Promise(function (resolve) {
       var btn = this;
       var nm = m.querySelector('#mpName').value.trim();
       var glass = !!m.querySelector('#mpGlass').checked;
+      var hw = !!m.querySelector('#mpHw').checked;
+      var bo = !!m.querySelector('#mpBO').checked;
       if (!nm) return toast('方案名称不能为空', 'err');
       busy(btn, true, '保存中…');
       api('api_admin_member_plan_save', {
-        p_token: S.token, p_id: edit ? item.id : null, p_name: nm, p_glass: glass
+        p_token: S.token, p_id: edit ? item.id : null, p_name: nm,
+        p_glass: glass, p_homework: hw, p_black_orange: bo
       }).then(function () {
         busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok');
         loadMemberAdmin();
@@ -7486,25 +8034,14 @@ window.__supaReady = new Promise(function (resolve) {
       '<div class="row" style="margin-top:-6px">' +
         '<button class="btn ghost sm" id="miImg" type="button">插入图片</button>' +
         '<input type="file" id="miFile" accept="image/*" style="display:none">' +
-      '</div>',
+      '</div>' +
+      '<div class="img-preview" id="miPrev" style="display:none"></div>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
       '<button class="btn primary" id="miOk" type="button">' + (edit ? '保存' : '创建') + '</button>', 580);
 
     var bodyEl = m.querySelector('#miBody');
-    m.querySelector('#miImg').onclick = function () { m.querySelector('#miFile').click(); };
-    m.querySelector('#miFile').onchange = function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        compressImage(reader.result, function (url) {
-          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
-          insertAtCursor(bodyEl, '\n![图片](' + url + ')\n');
-        });
-      };
-      reader.readAsDataURL(f);
-      this.value = '';
-    };
+    var rich = richBind(bodyEl, m.querySelector('#miPrev'));
+    bindImagePicker(m.querySelector('#miImg'), m.querySelector('#miFile'), rich);
 
     m.querySelector('#miOk').onclick = function () {
       var btn = this;
@@ -7513,7 +8050,7 @@ window.__supaReady = new Promise(function (resolve) {
       busy(btn, true, '保存中…');
       api('api_admin_member_item_save', {
         p_token: S.token, p_id: edit ? item.id : null,
-        p_plan_id: planId, p_title: t, p_content: bodyEl.value
+        p_plan_id: planId, p_title: t, p_content: rich.value()
       }).then(function () {
         busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok');
         S.memberOpen[planId] = true;
@@ -7578,6 +8115,8 @@ window.__supaReady = new Promise(function (resolve) {
     S.ad2Mode = String(S.boot.ad2_mode || 'always');
     $('ad2Once').classList.toggle('on', S.ad2Mode === 'once');
     $('ad2Always').classList.toggle('on', S.ad2Mode === 'always');
+    rebindRich('richAd', 'adContent', 'adPrev');
+    rebindRich('richAd2', 'ad2Content', 'ad2Prev');
     loadAdSchedule();
   }
 
@@ -7592,7 +8131,7 @@ window.__supaReady = new Promise(function (resolve) {
   function saveAdContent(btn) {
     busy(btn, true, '保存中…');
     Promise.all([
-      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_content', p_value: $('adContent').value }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_content', p_value: richVal('richAd', 'adContent') }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_force', p_value: $('adForce').checked ? '1' : '0' }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad_seconds', p_value: String($('adSeconds').value || 5) })
     ]).then(function () {
@@ -7609,7 +8148,7 @@ window.__supaReady = new Promise(function (resolve) {
   function saveAd2(btn) {
     busy(btn, true, '保存中…');
     Promise.all([
-      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_content', p_value: $('ad2Content').value }),
+      api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_content', p_value: richVal('richAd2', 'ad2Content') }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_on', p_value: $('ad2On').checked ? '1' : '0' }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_seconds', p_value: String($('ad2Seconds').value || 5) }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'ad2_mode', p_value: S.ad2Mode || 'always' })
@@ -7838,14 +8377,16 @@ window.__supaReady = new Promise(function (resolve) {
       sec.appendChild(box);
     }
 
-    var PAGES = [['search', '搜索'], ['class', '班级热点'], ['forum', '论坛'], ['rank', '排行榜'], ['more', '更多']];
+    var PAGES = [['search', '搜索'], ['class', '班级'], ['forum', '论坛'], ['rank', '排行榜'], ['more', '更多'], ['member', '会员']];
     box.innerHTML = '<div class="hint" style="margin-bottom:10px">每个页面单独设状态；停运/更新时，学生点那个按钮会看到对应提示</div>' +
       PAGES.map(function (p) {
         var cur = (S.boot && S.boot['status_' + p[0]]) || 'run';
         return '<div class="pf-row" style="align-items:center;gap:10px">' +
           '<div class="pf-main"><div class="pf-val" style="font-size:14px">' + p[1] + '</div></div>' +
           '<select class="input" data-pstatus="' + p[0] + '" style="width:110px;flex:none">' +
-            [['run', '运行'], ['update', '更新'], ['down', '停运']].map(function (v) {
+            (p[0] === 'member'
+              ? [['run', '运行'], ['down', '停运'], ['hidden', '隐藏']]
+              : [['run', '运行'], ['update', '更新'], ['down', '停运']]).map(function (v) {
               return '<option value="' + v[0] + '"' + (cur === v[0] ? ' selected' : '') + '>' + v[1] + '</option>';
             }).join('') +
           '</select></div>';
@@ -7895,8 +8436,8 @@ window.__supaReady = new Promise(function (resolve) {
     var b = S.boot || {};
     $('setVersion').value = b.version || '';
     $('setChangelog').value = b.changelog || '';
-    $('setSponsors').value = b.sponsors || '';
     $('setAppreciation').value = b.appreciation || '';
+    rebindRich('richApp', 'setAppreciation', 'appPreview');
     if (!S.boot) bootInfo().then(loadMoreAdmin, function () {});
   }
 
@@ -7904,13 +8445,11 @@ window.__supaReady = new Promise(function (resolve) {
     var btn = $('btnSaveMore');
     var v = $('setVersion').value.trim();
     var cl = $('setChangelog').value;
-    var s = $('setSponsors').value.trim();
-    var ap = $('setAppreciation').value;
+    var ap = richVal('richApp', 'setAppreciation');
     busy(btn, true, '保存中…');
     Promise.all([
       api('api_admin_save_setting', { p_token: S.token, p_key: 'version', p_value: v }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'changelog', p_value: cl }),
-      api('api_admin_save_setting', { p_token: S.token, p_key: 'sponsors', p_value: s }),
       api('api_admin_save_setting', { p_token: S.token, p_key: 'appreciation', p_value: ap })
     ]).then(function () {
       busy(btn, false);
@@ -8088,25 +8627,12 @@ window.__supaReady = new Promise(function (resolve) {
     $('btnCanteenSave').addEventListener('click', function () {
       var btn = this;
       busy(btn, true, '保存中…');
-      api('api_admin_canteen_save', { p_token: S.token, p_content: $('canteenInput').value })
+      api('api_admin_canteen_save', { p_token: S.token, p_content: richVal('richCanteen', 'canteenInput') })
         .then(function () { busy(btn, false); toast('菜单已保存', 'ok'); },
               function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
     });
 
-    $('btnCanteenImg').addEventListener('click', function () { $('canteenFile').click(); });
-    $('canteenFile').addEventListener('change', function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        compressImage(reader.result, function (url) {
-          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
-          insertAtCursor($('canteenInput'), '\n![图片](' + url + ')\n');
-        });
-      };
-      reader.readAsDataURL(f);
-      this.value = '';
-    });
+    bindImagePicker($('btnCanteenImg'), $('canteenFile'), lazyRich('richCanteen'));
 
     $('btnTtAdd').addEventListener('click', addTtRow);
     $('btnTtSave').addEventListener('click', saveTtAll);
@@ -8330,35 +8856,9 @@ window.__supaReady = new Promise(function (resolve) {
     });
     $('btnAdSchNew').addEventListener('click', function () { openAdSchForm(null); });
 
-    $('btnAdImg').addEventListener('click', function () { $('adFile').click(); });
-    $('adFile').addEventListener('change', function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        compressImage(reader.result, function (url) {
-          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
-          insertAtCursor($('adContent'), '\n![图片](' + url + ')\n');
-        });
-      };
-      reader.readAsDataURL(f);
-      this.value = '';
-    });
+    bindImagePicker($('btnAdImg'), $('adFile'), lazyRich('richAd'));
 
-    $('btnAd2Img').addEventListener('click', function () { $('ad2File').click(); });
-    $('ad2File').addEventListener('change', function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        compressImage(reader.result, function (url) {
-          if (url.length > 800000) { toast('这张图太大了', 'err'); return; }
-          insertAtCursor($('ad2Content'), '\n![图片](' + url + ')\n');
-        });
-      };
-      reader.readAsDataURL(f);
-      this.value = '';
-    });
+    bindImagePicker($('btnAd2Img'), $('ad2File'), lazyRich('richAd2'));
 
     $('adSchList').addEventListener('click', function (e) {
       var b = e.target.closest('[data-sact]');
@@ -8644,20 +9144,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (it) openPayDetail(it.dataset.pay);
     });
 
-    $('btnAppImg').addEventListener('click', function () { $('appFile').click(); });
-    $('appFile').addEventListener('change', function (e) {
-      var f = e.target.files && e.target.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        compressImage(reader.result, function (url) {
-          if (url.length > 800000) { toast('这张图太大了，换一张小一点的', 'err'); return; }
-          insertAtCursor($('setAppreciation'), '\n![图片](' + url + ')\n');
-        });
-      };
-      reader.readAsDataURL(f);
-      this.value = '';
-    });
+    bindImagePicker($('btnAppImg'), $('appFile'), lazyRich('richApp'));
 
     $('saveNotice1').addEventListener('click', function () { saveNotice('login_notice', 'noticeLogin', this, '登录公告'); });
     $('saveNotice2').addEventListener('click', function () { saveNotice('login_popup', 'noticePopup', this, '弹窗公告'); });
@@ -8691,6 +9178,27 @@ window.__supaReady = new Promise(function (resolve) {
       var b = e.target.closest('.chip-btn');
       if (!b) return;
       togglePerm(b.dataset.uid, b.dataset.tid || '');
+    });
+
+    $('btnHwNew').addEventListener('click', function () { openHwProjectForm(null); });
+    $('btnHwReload').addEventListener('click', function () { loadHwAdmin(); });
+    $('hwlibList').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-hwact]');
+      if (!b) return;
+      var act = b.getAttribute('data-hwact');
+      var pid = b.getAttribute('data-pid') || '';
+      var bid = b.getAttribute('data-bid') || '';
+      var pj = hwProjectById(pid);
+      if (act === 'fold') { S.hwOpen[pid] = !S.hwOpen[pid]; renderHwAdmin(); return; }
+      if (act === 'pedit' && pj) return openHwProjectForm(pj);
+      if (act === 'pdel') return deleteHwProject(pid);
+      if (act === 'badd') return openHwBranchForm(pid, null);
+      if (act === 'bedit' && pj) {
+        var br = (pj.branches || []).filter(function (x) { return x.id === bid; })[0];
+        if (br) return openHwBranchForm(pid, br);
+        return;
+      }
+      if (act === 'bdel') return deleteHwBranch(bid);
     });
 
     $('cubeList').addEventListener('click', function (e) {
@@ -8764,6 +9272,13 @@ window.__supaReady = new Promise(function (resolve) {
       }
 
       if (e.target.closest('[data-open-news]')) { openModule('news', '班级热点'); return; }
+      if (e.target.closest('[data-rank-open]')) { openRankFromClass(); return; }
+
+      var hwp = e.target.closest('[data-hwp]');
+      if (hwp) { renderHwLibBranches(hwp.getAttribute('data-hwp')); return; }
+
+      var hwb = e.target.closest('[data-hwb]');
+      if (hwb) { renderHwLibContent(hwb.getAttribute('data-hwb')); return; }
 
       var rk = e.target.closest('[data-rank]');
       if (rk) { renderRankDetail(rk.getAttribute('data-rank')); return; }
@@ -8772,6 +9287,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (op && op.dataset.open === 'fb') { openFeedback(); return; }
       if (op && op.dataset.open === 'promo') { openPromo(); return; }
       if (op && op.dataset.open === 'cube') { openModule('cube', '魔方'); return; }
+      if (op && op.dataset.open === 'hwlib') { openModule('hwlib', '作业'); return; }
       if (op && op.dataset.open === 'ver') { renderVersion(); return; }
 
       if (e.target.closest('[data-theme]')) {
