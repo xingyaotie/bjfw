@@ -127,7 +127,8 @@ button{font-family:inherit;cursor:pointer}
 #userSearchWrap.collapsed .search-box input{opacity:0;padding:0;width:0}
 /* 键盘弹起来时，底栏和搜索圆点别被顶到键盘上面；
    正在搜索框里打字时例外，不然看不到自己输的字 */
-body.kb-open #appTabbar{display:none!important}
+/* 键盘弹出时不藏底栏，只是让它跟着上移，避免「点着点着导航栏没了」 */
+body.kb-open #appTabbar{bottom:calc(0px + env(safe-area-inset-bottom,0px))!important}
 body.kb-open #modView{bottom:0!important}
 body.kb-open #userSearchWrap{opacity:0;pointer-events:none}
 body.kb-open.kb-search #userSearchWrap{opacity:1;pointer-events:auto}
@@ -308,7 +309,7 @@ body.glass-nav #appTabbar{
   left:18px;right:18px;
   bottom:calc(12px + env(safe-area-inset-bottom,0px));
   height:58px;padding-bottom:0;border-radius:22px;
-  background:rgba(255,255,255,.16);
+  background:rgba(255,255,255,.10);
   -webkit-backdrop-filter:blur(26px) saturate(190%);
   backdrop-filter:blur(26px) saturate(190%);
   box-shadow:0 10px 34px rgba(17,24,39,.16), inset 0 1px 0 rgba(255,255,255,.5)}
@@ -747,6 +748,8 @@ body.theme-heicheng .cube-opt small,
 body.theme-heicheng .me-row .ms{ color:#9BA1A8; }
 body.theme-heicheng .input,
 body.theme-heicheng .textarea{ background:#111010; border-color:#2B2118; color:#E6E7E9; }
+body.theme-heicheng textarea.input,
+body.theme-heicheng input.input{ color:#E6E7E9; }
 body.theme-heicheng .input::placeholder,
 body.theme-heicheng .textarea::placeholder{ color:#6E7378; }
 body.theme-heicheng table th{ background:#141210; color:#9BA1A8; border-color:#2B2118; }
@@ -805,6 +808,61 @@ body.theme-heicheng .fatal,
 body.theme-heicheng .login-card{ background:#0E0D0C; }
 body.theme-heicheng .login-card h1{ color:#FFB05E; }
 
+/* ---- 黑橙：按钮 / 弹窗 / 勋章 / 资料 / 推广时间轴 / 站内信 ---- */
+body.theme-heicheng .btn{ background:#17140F; color:#E6E7E9; border:1px solid #2B2118; }
+body.theme-heicheng .btn.primary{ background:linear-gradient(135deg,#FF8A2B,#E0630A); color:#160C03; border:none; }
+body.theme-heicheng .btn.danger{ background:#2A0D0D; color:#FF9A8A; border-color:#5A1414; }
+body.theme-heicheng .modal-head{ background:#15120E; border-color:#2B2118; }
+body.theme-heicheng .modal-head h3{ color:#FFB05E; }
+body.theme-heicheng .modal-body{ color:#E6E7E9; }
+body.theme-heicheng .modal-foot{ background:#0E0D0C; border-color:#2B2118; }
+body.theme-heicheng .medal{ background:#111010; border-color:#2B2118; color:#E6E7E9; }
+body.theme-heicheng .medal .mn{ color:#FFB05E; }
+body.theme-heicheng .medal .ms{ color:#FF7A18; }
+body.theme-heicheng .medal .mq{ color:#9BA1A8; }
+body.theme-heicheng .pf-label{ color:#9BA1A8; }
+body.theme-heicheng .pf-val{ color:#E6E7E9; }
+body.theme-heicheng .pf-hint{ color:#9BA1A8; }
+body.theme-heicheng .pf-row{ border-color:#211A14; }
+body.theme-heicheng .cred{ background:#12100E; border-color:#2B2118; color:#E6E7E9; }
+body.theme-heicheng .toast{ background:rgba(32,27,22,.96); color:#FFE7C8; }
+body.theme-heicheng .news-item h4{ color:#FFB05E; }
+body.theme-heicheng .news-item p{ color:#E6E7E9; }
+body.theme-heicheng .news-item .time,
+body.theme-heicheng .time{ color:#8E9298; }
+body.theme-heicheng .empty strong{ color:#FFB05E; }
+body.theme-heicheng .toolbar,
+body.theme-heicheng .table-foot{ border-color:#211A14; background:transparent; }
+body.theme-heicheng .tl-text{ color:#E6E7E9; }
+body.theme-heicheng .tl-date{ color:#9BA1A8; }
+body.theme-heicheng .tl-item{ border-left-color:#2B2118; }
+body.theme-heicheng .tl-item::before{ background:#FF7A18; box-shadow:0 0 0 3px rgba(255,122,24,.16); }
+body.theme-heicheng .tl-meta{ color:#FFB05E; background:#241505; border-color:#4A2A0C; }
+body.theme-heicheng .promo-tl-axis{ border-color:#2B2118; color:#9BA1A8; }
+body.theme-heicheng .promo-tl-today{ border-color:#FF7A18; }
+body.theme-heicheng .promo-tl-now{ background:#FF7A18; color:#160C03; }
+body.theme-heicheng .promo-bar{ color:#0B0A08; }
+body.theme-heicheng .promo-undated .chip-btn{ color:#E6E7E9; }
+body.theme-heicheng .member-head{ background:#120F0C; border-color:#2B2118; color:#FFB05E; }
+body.theme-heicheng .member-head small{ color:#9BA1A8; }
+body.theme-heicheng .quote-box{ background:#120F0C; border-left-color:#FF7A18; color:#9BA1A8; }
+body.theme-heicheng .pick-bar{ background:#241505; border-color:#4A2A0C; color:#FFB05E; }
+body.theme-heicheng .fb-replies,
+body.theme-heicheng .fb-reply{ border-color:#211A14; }
+body.theme-heicheng .fb-reply{ background:#12100E; color:#E6E7E9; }
+body.theme-heicheng .fb-body{ color:#E6E7E9; }
+body.theme-heicheng .rank-row .rk{ color:#9BA1A8; }
+body.theme-heicheng .me-hero .nm{ color:#FFB05E; }
+body.theme-heicheng .status-card b{ color:#FFB05E; }
+body.theme-heicheng .status-card small{ color:#9BA1A8; }
+body.theme-heicheng .status-card.on{ border-color:#FF7A18; box-shadow:0 0 0 3px rgba(255,122,24,.14); }
+body.theme-heicheng .status-banner{ background:#241505; color:#FFB05E; border-color:#4A2A0C; }
+body.theme-heicheng .app-search-sec,
+body.theme-heicheng .app-search-tip{ color:#9BA1A8; }
+body.theme-heicheng .app-brand em{ color:#9BA1A8; }
+body.theme-heicheng .suggest .sg{ color:#E6E7E9; }
+body.theme-heicheng .suggest .sg small{ color:#9BA1A8; }
+
 /* 黑橙：搜索框、公共/全部按钮的边都是橙色 */
 body.theme-heicheng .app-search-box{ border:1px solid rgba(255,122,24,.55);
   box-shadow:0 8px 24px rgba(0,0,0,.7), 0 0 0 1px rgba(255,122,24,.12) inset; }
@@ -814,10 +872,11 @@ body.theme-heicheng .forum-cat-head{ background:#120F0C; border-color:rgba(255,1
 
 /* 黑橙：我的页面底部导航要看得清（玻璃在纯黑上会「消失」） */
 body.theme-heicheng.glass-nav #appTabbar{
-  background:rgba(18,15,12,.80);
-  border:1px solid rgba(255,122,24,.35);
-  box-shadow:0 0 0 1px rgba(0,0,0,.9), 0 12px 36px rgba(0,0,0,.75),
-             inset 0 1px 0 rgba(255,162,75,.18);
+  background:rgba(20,17,14,.66);
+  border:1px solid rgba(255,122,24,.20);
+  box-shadow:0 12px 36px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,162,75,.14);
+  -webkit-backdrop-filter:blur(22px) saturate(160%);
+  backdrop-filter:blur(22px) saturate(160%);
 }
 body.theme-heicheng #appTabbar .tab-pill{
   background:rgba(255,122,24,.24);
@@ -827,15 +886,14 @@ body.theme-heicheng #mePanel,
 body.theme-heicheng #adminPanel{ position:relative; z-index:1; }
 
 /* 悬浮导航外面一圈黑边（所有主题通用） */
+/* 白底：不要边框，只靠玻璃和投影 */
 body.glass-nav #appTabbar{
-  border:1px solid rgba(0,0,0,.45);
-  box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 12px 36px rgba(17,24,39,.20),
-             inset 0 1px 0 rgba(255,255,255,.5);
+  border:none;
+  box-shadow:0 12px 36px rgba(17,24,39,.18), inset 0 1px 0 rgba(255,255,255,.5);
 }
 body.theme-wujin.glass-nav #appTabbar{
-  border-color:rgba(0,0,0,.75);
-  box-shadow:0 0 0 1px rgba(0,0,0,.55), 0 12px 36px rgba(0,0,0,.6),
-             inset 0 1px 0 rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 12px 36px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
 }
 body.theme-light{ background:var(--bg); }
 body.theme-light #appView{ background:var(--bg); }
@@ -5031,21 +5089,60 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   function hwlibDeniedHtml() {
-    return '<div class="empty" style="padding:56px 20px">' +
+    var me = S.me || {};
+    var plan = me.member_plan_name
+      ? '你现在的方案：' + me.member_plan_name
+      : '你现在还没有会员方案';
+    return '<div class="empty" style="padding:44px 20px">' +
       '<strong>还没有作业权限</strong>' +
-      '作业是会员权益，开通后就能在这里看讲解和参考答案。' +
+      '作业是会员权益。管理员要在「会员 → 方案」里勾上「查看作业」，并且把你分到那个方案。' +
+      '<div class="hint" style="margin-top:10px;font-size:12.5px">' + esc(plan) + '</div>' +
+      '<div style="margin-top:16px"><button class="btn ghost sm" type="button" id="hwRefresh">刷新权限</button></div>' +
     '</div>';
   }
 
-  function renderHwLib() {
+  /* 进作业页先把资料刷一遍：管理员刚勾的「查看作业」不用重新登录就生效 */
+  function refreshMeQuietly(cb) {
+    api('api_resume', { p_token: S.token }).then(function (r) {
+      if (r && r.ok) {
+        if (r.token) S.token = r.token;
+        if (r.profile) S.me = r.profile;
+        saveSession(S.token, S.me);
+        applyTheme();
+      }
+      cb();
+    }, function () { cb(); });
+  }
+
+  function paintHwDenied() {
+    $('modBody').innerHTML = hwlibDeniedHtml();
+    var btn = $('hwRefresh');
+    if (btn) {
+      btn.onclick = function () {
+        var b = this;
+        busy(b, true, '刷新中…');
+        refreshMeQuietly(function () { renderHwLib(true); });
+      };
+    }
+  }
+
+  /* 进作业页先刷新一次资料，再决定给不给看 */
+  function renderHwLib(noRefresh) {
     hwlibState = { view: 'list', pid: '', bid: '', branches: [] };
     var body = $('modBody');
-    if (hwlibDenied()) { body.innerHTML = hwlibDeniedHtml(); return; }
+
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>检查权限…</div>';
+    if (!noRefresh) {
+      refreshMeQuietly(function () { renderHwLib(true); });
+      return;
+    }
+
+    if (hwlibDenied()) { paintHwDenied(); return; }
 
     body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     api('api_hw_list', { p_token: S.token }).then(function (r) {
       if (currentMod !== 'hwlib') return;
-      if (r.allowed === false) { body.innerHTML = hwlibDeniedHtml(); return; }
+      if (r.allowed === false) { paintHwDenied(); return; }
       var items = r.items || [];
       if (!items.length) {
         body.innerHTML = '<div class="empty"><strong>还没有作业</strong>管理员添加后会出现在这里</div>';
@@ -7466,6 +7563,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 管理端：作业 ---------- */
   function loadHwAdmin() {
     if (!$('hwlibList')) return;
+    S.hwOpen = S.hwOpen || {};
     $('hwlibList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     api('api_admin_hw_overview', { p_token: S.token }).then(function (r) {
       S.hwProj = r.items || [];
