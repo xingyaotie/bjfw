@@ -325,7 +325,8 @@ body.app-mode #modView{bottom:calc(56px + env(safe-area-inset-bottom,0px))!impor
 body.app-mode.glass-nav #modView{bottom:0!important}
 body.app-mode.glass-nav #modBody{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
 body.app-mode .wrap{padding-bottom:96px}
-body.app-mode.glass-nav .wrap{padding-bottom:110px}
+body.app-mode.glass-nav .wrap{padding-bottom:120px}
+body.theme-heicheng.app-mode.glass-nav .wrap{padding-bottom:132px}
 body.app-mode #userSearchWrap{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
 body.app-mode .actions{bottom:78px!important}
 
@@ -517,6 +518,30 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   font-family:ui-monospace,Consolas,monospace;font-size:13px;line-height:2;color:var(--ink);word-break:break-all}
 .row{display:flex;gap:8px}
 .row .btn{flex:none;height:40px}
+
+/* 主题分组：白 / 黑 中间一条线 */
+.theme-group{display:flex;align-items:flex-start;gap:8px}
+.theme-tag{flex:none;font-size:11px;letter-spacing:2px;color:var(--muted);
+  padding-top:7px;min-width:14px}
+.theme-line{height:1px;background:var(--line);margin:10px 0}
+.badge.black-orange{background:#2A1403;color:#FFB05E;border-color:#6B3208}
+
+/* 论坛引用 / 发帖页 */
+.quote-box{border-left:3px solid var(--red);background:var(--bg);border-radius:0 8px 8px 0;
+  padding:7px 10px;margin:2px 0 8px;font-size:12.5px;color:var(--muted);line-height:1.6;
+  word-break:break-all}
+.quote-box b{color:var(--ink2);font-weight:600}
+.compose-bar{display:flex;align-items:center;gap:12px;margin:4px 0 10px}
+.compose-plus{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  color:var(--red);font-size:24px;line-height:1;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(17,24,39,.06)}
+.compose-plus:active{transform:scale(.96)}
+.compose-menu .cube-opt{margin-bottom:10px}
+.compose-menu .ico{font-size:18px;font-weight:700}
+.pick-bar{display:flex;align-items:center;gap:10px;justify-content:space-between;
+  background:#FFF6E8;border:1px solid #F3DCB8;color:#8A5A00;border-radius:10px;
+  padding:9px 12px;font-size:13px;margin-bottom:10px}
+.like-names{font-size:12px;color:var(--muted);font-weight:400}
 
 /* 图文编辑：插入图片后的缩略图预览 */
 .img-preview{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
@@ -779,6 +804,39 @@ body.theme-heicheng .suggest .sg:hover{ background:#151210; }
 body.theme-heicheng .fatal,
 body.theme-heicheng .login-card{ background:#0E0D0C; }
 body.theme-heicheng .login-card h1{ color:#FFB05E; }
+
+/* 黑橙：搜索框、公共/全部按钮的边都是橙色 */
+body.theme-heicheng .app-search-box{ border:1px solid rgba(255,122,24,.55);
+  box-shadow:0 8px 24px rgba(0,0,0,.7), 0 0 0 1px rgba(255,122,24,.12) inset; }
+body.theme-heicheng .seg button{ border-color:rgba(255,122,24,.38); }
+body.theme-heicheng .seg button.on{ border-color:#FF7A18; color:#FFB05E; }
+body.theme-heicheng .forum-cat-head{ background:#120F0C; border-color:rgba(255,122,24,.3); }
+
+/* 黑橙：我的页面底部导航要看得清（玻璃在纯黑上会「消失」） */
+body.theme-heicheng.glass-nav #appTabbar{
+  background:rgba(18,15,12,.80);
+  border:1px solid rgba(255,122,24,.35);
+  box-shadow:0 0 0 1px rgba(0,0,0,.9), 0 12px 36px rgba(0,0,0,.75),
+             inset 0 1px 0 rgba(255,162,75,.18);
+}
+body.theme-heicheng #appTabbar .tab-pill{
+  background:rgba(255,122,24,.24);
+  box-shadow:0 0 0 1px rgba(255,122,24,.25), 0 6px 18px rgba(0,0,0,.6);
+}
+body.theme-heicheng #mePanel,
+body.theme-heicheng #adminPanel{ position:relative; z-index:1; }
+
+/* 悬浮导航外面一圈黑边（所有主题通用） */
+body.glass-nav #appTabbar{
+  border:1px solid rgba(0,0,0,.45);
+  box-shadow:0 0 0 1px rgba(0,0,0,.35), 0 12px 36px rgba(17,24,39,.20),
+             inset 0 1px 0 rgba(255,255,255,.5);
+}
+body.theme-wujin.glass-nav #appTabbar{
+  border-color:rgba(0,0,0,.75);
+  box-shadow:0 0 0 1px rgba(0,0,0,.55), 0 12px 36px rgba(0,0,0,.6),
+             inset 0 1px 0 rgba(255,255,255,.08);
+}
 body.theme-light{ background:var(--bg); }
 body.theme-light #appView{ background:var(--bg); }
 body.theme-light .card,
@@ -1931,8 +1989,17 @@ window.__supaReady = new Promise(function (resolve) {
   /* 只存 token 供刷新后清理；不自动登录，所以没有 loadSession */
   function saveSession(token, profile) {
     try { localStorage.setItem(SESSION, JSON.stringify({ token: token, profile: profile, ts: Date.now() })); } catch (e) {}
+    /* 顺手把 token 交给安卓端：定时查未读、发系统通知要用 */
+    if (window.XkyctpShell && window.XkyctpShell.saveToken) {
+      try { window.XkyctpShell.saveToken(token || ''); } catch (e) {}
+    }
   }
-  function clearSession() { try { localStorage.removeItem(SESSION); } catch (e) {} }
+  function clearSession() {
+    try { localStorage.removeItem(SESSION); } catch (e) {}
+    if (window.XkyctpShell && window.XkyctpShell.saveToken) {
+      try { window.XkyctpShell.saveToken(''); } catch (e) {}
+    }
+  }
 
   /* ---------- toast / 弹窗 ---------- */
   function toast(msg, type) {
@@ -2171,6 +2238,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'cube') return cubeState.view === 'home';
     if (currentMod === 'more') return moreState.view === 'info';
     if (currentMod === 'hwlib') return false;
+    if (currentMod === 'compose') return false;
     return false;                    /* 会员、我的资料这些二级页要能返回 */
   }
   function syncAppChrome() {
@@ -3063,6 +3131,13 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'more') {
       if (moreState.view === 'fb' || moreState.view === 'promo' || moreState.view === 'ver') return renderMore();
     }
+    if (currentMod === 'compose') {
+      var ta = $('composeBody');
+      if (ta) composeState.body = ta.value;
+      currentMod = 'forum';
+      $('modTitle').textContent = '论坛';
+      return renderForum();
+    }
     if (currentMod === 'hwlib') {
       if (hwlibState.view === 'content') return renderHwLibBranches(hwlibState.pid);
       if (hwlibState.view === 'branches') return renderHwLib();
@@ -3087,6 +3162,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'forum') return renderForum();
     if (currentMod === 'more') return renderMore();
     if (currentMod === 'hwlib') return renderHwLib();
+    if (currentMod === 'compose') return renderComposePage();
   }
 
   /* ================= 搜索页 ================= */
@@ -3842,8 +3918,25 @@ window.__supaReady = new Promise(function (resolve) {
     return '';
   }
 
+  var postLikers = {};
+
+  function likersInline(p) {
+    var list = p.likers || [];
+    if (!list.length) return '';
+    var names = list.map(function (x) { return x.name; }).join('、');
+    var more = (p.like_count || 0) > list.length ? ' 等 ' + p.like_count + ' 人' : '';
+    return names + more;
+  }
+
   function forumPostCard(p, isAdmin) {
     postReaders[p.id] = p.readers || [];
+    postLikers[p.id] = p.likers || [];
+    var quote = p.quote_text
+      ? '<div class="quote-box"><b>' + esc(p.quote_author || '') + '</b>：' +
+          esc(String(p.quote_text).slice(0, 10)) +
+          (String(p.quote_text).length > 10 ? '…' : '') + '</div>'
+      : '';
+    var likeNames = likersInline(p);
     return '<div class="news-item" data-post="' + esc(p.id) + '">' +
       '<div class="fb-head">' +
         (p.cat_name ? '<span class="badge gold" style="height:18px;font-size:11px">' + esc(p.cat_name) + '</span>' : '') +
@@ -3853,6 +3946,7 @@ window.__supaReady = new Promise(function (resolve) {
         (p.is_mine ? '<span class="badge gray" style="height:18px;font-size:11px">我</span>' : '') +
         '<span class="time">' + esc(p.created_at) + '</span>' +
       '</div>' +
+      quote +
       '<div class="fb-body">' + esc(p.body) + '</div>' +
       '<div style="margin-top:8px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">' +
         '<button type="button" class="link" data-expand="' + esc(p.id) + '">' +
@@ -3860,6 +3954,9 @@ window.__supaReady = new Promise(function (resolve) {
         '<button type="button" class="link" data-like="' + esc(p.id) + '" style="' +
           (p.liked ? 'color:var(--red);font-weight:600' : '') + '">' +
           (p.liked ? '♥ 已赞 ' : '♡ 点赞 ') + (p.like_count || 0) + '</button>' +
+        (likeNames
+          ? '<button type="button" class="link like-names" data-likers="' + esc(p.id) + '">' + esc(likeNames) + '</button>'
+          : '') +
         (isAdmin ? '<button type="button" class="link danger" data-postdel="' + esc(p.id) + '">删除帖子</button>' : '') +
         '<span class="hint" data-readers="' + esc(p.id) + '" style="font-size:12px">' + readersText(p.readers, p.id) + '</span>' +
       '</div>' +
@@ -3918,6 +4015,43 @@ window.__supaReady = new Promise(function (resolve) {
         '</div>';
 
       markForumRead(items);
+
+      /* 正在选引用：点一条就带回去 */
+      if (composeState.picking) {
+        var pickBar = document.createElement('div');
+        pickBar.className = 'pick-bar';
+        pickBar.innerHTML = '<span>点一条帖子，把它引用到你的帖子里</span>' +
+          '<button type="button" class="link" id="pickCancel">取消</button>';
+        var host = body.querySelector('#forumList');
+        if (host && host.parentNode) host.parentNode.insertBefore(pickBar, host);
+        if ($('pickCancel')) {
+          $('pickCancel').onclick = function () {
+            composeState.picking = false;
+            currentMod = 'compose';
+            $('modTitle').textContent = '发帖';
+            renderComposePage();
+            syncAppChrome();
+          };
+        }
+        if (host) {
+          host.addEventListener('click', function (e) {
+            if (!composeState.picking) return;
+            var card = e.target.closest('[data-post]');
+            if (!card) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var picked = items.filter(function (x) { return x.id === card.getAttribute('data-post'); })[0];
+            if (picked) pickQuote(picked);
+          }, true);
+        }
+      }
+
+      /* 跟评不超过 3 条：直接铺开，不用点 */
+      items.forEach(function (x) {
+        if (!x.reply_count || x.reply_count > 3) return;
+        var rbox = body.querySelector('[data-replies="' + x.id + '"]');
+        if (rbox) loadForumReplies(x.id, rbox);
+      });
 
       body.querySelector('.seg').addEventListener('click', function (e) {
         var b = e.target.closest('[data-fscope]');
@@ -4083,58 +4217,248 @@ window.__supaReady = new Promise(function (resolve) {
     }, function () {});
   }
 
-  /* 发帖弹窗（可选类别） */
+  /* 发帖页（整页，不再弹窗）：＋ 里可以 @ 人、引用帖子 */
+  var composeState = { body: '', cat: '', quote: null, mentions: [], picking: false, left: 3 };
+  var composeCats = [];
+
   function openForumCompose(left) {
-    var opts = forumCats || [];
-    var defCat = (forumScope !== 'all' && forumScope !== 'public') ? forumScope : '';
+    composeState = {
+      body: '',
+      cat: (forumScope !== 'all' && forumScope !== 'public') ? forumScope : '',
+      quote: null,
+      mentions: [],
+      picking: false,
+      left: left
+    };
+    composeCats = forumCats || [];
+    currentMod = 'compose';
+    $('modTitle').textContent = '发帖';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    slideIn($('modView'), 'right');
+    renderComposePage();
+    syncAppChrome();
+  }
 
-    var m = modal('发帖',
-      '<label class="field"><span>内容（最多 200 字）</span>' +
-        '<textarea class="textarea" id="forumBody" rows="5" maxlength="200" placeholder="说点什么…"></textarea>' +
-        '<span class="hint" id="forumCount" style="font-size:12px">0 / 200</span></label>' +
-      '<div class="field"><span>发到哪个区</span>' +
-        '<div class="chips" id="fpCat">' +
-          '<button type="button" class="chip-btn ' + (defCat === '' ? 'on' : '') + '" data-pcat="">公共</button>' +
-          opts.map(function (c) {
-            return '<button type="button" class="chip-btn ' + (defCat === c.id ? 'on' : '') +
-              '" data-pcat="' + esc(c.id) + '">' + esc(c.name) + '</button>';
-          }).join('') +
+  function renderComposePage() {
+    var st = composeState;
+    var quoteHtml = '';
+    if (st.quote) {
+      quoteHtml = '<div class="quote-box" style="margin-bottom:10px">' +
+        '<b>引用 ' + esc(st.quote.author) + '</b>：' +
+        esc(String(st.quote.text).slice(0, 10)) +
+        (String(st.quote.text).length > 10 ? '\u2026' : '') +
+        ' <button type="button" class="link danger" data-quote-del="1">去掉</button></div>';
+    }
+
+    $('modBody').innerHTML =
+      '<div style="max-width:640px;margin:0 auto">' +
+        quoteHtml +
+        '<label class="field"><span>内容（最多 200 字）</span>' +
+          '<textarea class="textarea" id="composeBody" rows="7" maxlength="200"' +
+            ' placeholder="说点什么\u2026">' + esc(st.body) + '</textarea>' +
+          '<span class="hint" id="composeCount" style="font-size:12px">' + st.body.length + ' / 200</span></label>' +
+        '<div class="field"><span>发到哪个区</span>' +
+          '<div class="chips" id="composeCat">' +
+            '<button type="button" class="chip-btn ' + (st.cat === '' ? 'on' : '') + '" data-pcat="">公共</button>' +
+            composeCats.map(function (c) {
+              return '<button type="button" class="chip-btn ' + (st.cat === c.id ? 'on' : '') +
+                '" data-pcat="' + esc(c.id) + '">' + esc(c.name) + '</button>';
+            }).join('') +
+          '</div>' +
         '</div>' +
-      '</div>' +
-      '<p class="hint" style="font-size:12.5px">今天还能发 ' + left + ' 条；连续空行不要超过 2 行。</p>',
-      '<button class="btn ghost" type="button" data-close>取消</button>' +
-      '<button class="btn primary" id="forumSend" type="button">发布</button>', 480);
+        (st.mentions.length
+          ? '<div class="chips" style="margin:0 0 10px">' + st.mentions.map(function (m) {
+              return '<button type="button" class="chip-btn on" data-mention-del="' + esc(m.id) + '">@' +
+                esc(m.name) + ' \u2715</button>';
+            }).join('') + '</div>'
+          : '') +
+        '<div class="compose-bar">' +
+          '<button type="button" class="compose-plus" id="composePlus" aria-label="添加">\uff0b</button>' +
+          '<button type="button" class="btn primary" id="composeSend">发布</button>' +
+        '</div>' +
+        '<p class="hint" style="font-size:12.5px">今天还能发 ' + st.left +
+          ' 条；连续空行不要超过 2 行。</p>' +
+      '</div>';
 
-    var pickCat = defCat;
-    m.querySelector('#fpCat').addEventListener('click', function (e) {
-      var b = e.target.closest('[data-pcat]');
-      if (!b) return;
-      pickCat = b.dataset.pcat || '';
-      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
-    });
-
-    var ta = m.querySelector('#forumBody');
+    var ta = $('composeBody');
     ta.addEventListener('input', function () {
-      m.querySelector('#forumCount').textContent = ta.value.length + ' / 200';
+      composeState.body = ta.value;
+      var c = $('composeCount');
+      if (c) c.textContent = ta.value.length + ' / 200';
     });
     ta.focus();
 
-    m.querySelector('#forumSend').onclick = function () {
-      var btn = this;
-      var v = ta.value;
-      if (!v.trim()) return toast('写点内容吧', 'err');
-      busy(btn, true, '发布中…');
-      api('api_forum_post', { p_token: S.token, p_body: v, p_cat_id: pickCat || null }).then(function () {
-        busy(btn, false);
-        closeModal();
-        toast('已发布', 'ok');
-        renderForum();
-      }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
+    $('composeCat').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pcat]');
+      if (!b) return;
+      composeState.cat = b.getAttribute('data-pcat') || '';
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+    });
+
+    var qd = $('modBody').querySelector('[data-quote-del]');
+    if (qd) qd.onclick = function () { composeState.quote = null; renderComposePage(); };
+
+    Array.prototype.forEach.call($('modBody').querySelectorAll('[data-mention-del]'), function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute('data-mention-del');
+        composeState.mentions = composeState.mentions.filter(function (m) { return m.id !== id; });
+        renderComposePage();
+      };
+    });
+
+    $('composePlus').onclick = openComposeAddMenu;
+    $('composeSend').onclick = sendCompose;
+  }
+
+  /* ＋ 号：@ 某人 / 引用帖子 */
+  function openComposeAddMenu() {
+    var m = modal('添加',
+      '<div class="compose-menu">' +
+        '<button type="button" class="cube-opt" id="cmAt">' +
+          '<span class="ico">@</span><span><b>@ 某人</b><small>提醒一个人来看</small></span>' +
+          '<span class="arrow">\u203a</span></button>' +
+        '<button type="button" class="cube-opt" id="cmQuote">' +
+          '<span class="ico">\u201c</span><span><b>引用帖子</b><small>回论坛里点一条</small></span>' +
+          '<span class="arrow">\u203a</span></button>' +
+      '</div>', '', 420);
+
+    m.querySelector('#cmAt').onclick = function () { closeModal(); openMentionPicker(); };
+    m.querySelector('#cmQuote').onclick = function () {
+      closeModal();
+      startQuotePick();
     };
+  }
+
+  function startQuotePick() {
+    var ta = $('composeBody');
+    if (ta) composeState.body = ta.value;
+    composeState.picking = true;
+    currentMod = 'forum';
+    $('modTitle').textContent = '论坛';
+    renderForum();
+    syncAppChrome();
+  }
+
+  /* @ 选人：搜人 → 点一个 → 插进正文 */
+  function openMentionPicker() {
+    var m = modal('@ 某人',
+      '<input class="input" id="mentionKw" placeholder="搜名字 / 登录名" style="margin-bottom:10px">' +
+      '<div id="mentionList" style="max-height:300px;overflow:auto"><div class="hint" style="padding:10px">输入名字开始搜</div></div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 460);
+
+    var box = m.querySelector('#mentionList');
+    var inp = m.querySelector('#mentionKw');
+    var seq = 0;
+
+    function paint(items) {
+      if (!items.length) { box.innerHTML = '<div class="hint" style="padding:10px">没搜到</div>'; return; }
+      box.innerHTML = items.map(function (u) {
+        return '<button type="button" class="me-row" data-pick-mention="' + esc(u.id) + '"' +
+          ' data-name="' + esc(u.name) + '">' +
+          '<span class="mi">' + esc(String(u.name || '?').slice(0, 1)) + '</span>' +
+          '<span style="flex:1">' + esc(u.name) + '</span><span class="arrow">\u203a</span></button>';
+      }).join('');
+    }
+
+    function search() {
+      var kw = inp.value.trim();
+      if (!kw) return;
+      var my = ++seq;
+      api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
+        if (my !== seq) return;
+        paint((r.items || []).slice(0, 10));
+      }, function () {});
+    }
+
+    inp.addEventListener('input', debounce(search, 220));
+    inp.focus();
+
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-pick-mention]');
+      if (!b) return;
+      var id = b.getAttribute('data-pick-mention');
+      var name = b.getAttribute('data-name');
+      if (!composeState.mentions.some(function (x) { return x.id === id; })) {
+        composeState.mentions.push({ id: id, name: name });
+      }
+      var ta = $('composeBody');
+      if (ta) composeState.body = ta.value;
+      composeState.body = (composeState.body ? composeState.body.replace(/\s*$/, ' ') : '') + '@' + name + ' ';
+      closeModal();
+      if (currentMod === 'compose') renderComposePage();
+    });
+  }
+
+  function sendCompose() {
+    var btn = $('composeSend');
+    var ta = $('composeBody');
+    var v = ta ? ta.value : composeState.body;
+    if (!v || !v.trim()) return toast('写点内容吧', 'err');
+    composeState.body = v;
+
+    busy(btn, true, '发布中\u2026');
+    api('api_forum_post', {
+      p_token: S.token,
+      p_body: v,
+      p_cat_id: composeState.cat || null,
+      p_quote_id: composeState.quote ? composeState.quote.id : null,
+      p_mentions: composeState.mentions.map(function (m) { return m.id; })
+    }).then(function (r) {
+      busy(btn, false);
+      toast(r && r.mentioned ? ('已发布，提醒了 ' + r.mentioned + ' 人') : '已发布', 'ok');
+      currentMod = 'forum';
+      $('modTitle').textContent = '论坛';
+      renderForum();
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message, 'err', 3800);
+    });
+  }
+
+  /* 点一条帖子来引用 */
+  function pickQuote(post) {
+    if (!post) return;
+    composeState.quote = { id: post.id, text: post.body || '', author: post.author || '' };
+    composeState.picking = false;
+    currentMod = 'compose';
+    $('modTitle').textContent = '发帖';
+    renderComposePage();
+    syncAppChrome();
+  }
+
+  /* 点赞名单（前 3 个直接显示，点开看全部） */
+  function openLikers(pid) {
+    var m = modal('点赞名单', '<div class="loading"><span class="spinner"></span>加载中\u2026</div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 420);
+    var body = m.querySelector('.modal-body');
+
+    api('api_forum_likers', { p_token: S.token, p_post_id: pid }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) { body.innerHTML = '<div class="hint" style="padding:12px">还没有人点赞</div>'; return; }
+      body.innerHTML = items.map(function (x) {
+        return '<div class="perm-row" style="padding:8px 0">' +
+          '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(x.name) +
+            (x.role === 'vip' ? ' <span class="badge gold" style="height:17px;font-size:10px">VIP</span>' : '') +
+          '</div>' +
+          '<span class="hint" style="font-size:11.5px">' + esc(x.created_at || '') + '</span>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
   }
 
   function toggleForumReplies(pid, box) {
     if (!box.hidden) { box.hidden = true; return; }
+    loadForumReplies(pid, box);
+  }
+
+  function loadForumReplies(pid, box) {
     box.hidden = false;
     box.innerHTML = '<div class="loading" style="padding:10px"><span class="spinner"></span>加载中…</div>';
 
@@ -7668,15 +7992,31 @@ window.__supaReady = new Promise(function (resolve) {
         '<b style="font-size:13.5px;color:var(--ink)">vip专属主题</b>' +
         '<span class="hint" style="font-size:12px">整站换色，跟乌金同一个逻辑</span>' +
       '</div>' +
-      '<div class="chips">' +
-        THEME_LIST.filter(function (t) {
-          if (t[0] !== 'heicheng') return true;
-          var me = S.me || {};
-          return me.role === 'admin' || !!me.black_orange;
-        }).map(function (t) {
-          return '<button type="button" class="chip-btn ' + (cur === t[0] ? 'on' : '') + '" data-theme="' + t[0] + '">' + t[1] + '</button>';
-        }).join('') +
-      '</div>' +
+      (function () {
+        var me = S.me || {};
+        var light = [], dark = [];
+        THEME_LIST.forEach(function (t) {
+          if (t[0] === 'wujin' || t[0] === 'heicheng') {
+            if (t[0] === 'heicheng' && !(me.role === 'admin' || me.black_orange)) return;
+            dark.push(t);
+          } else {
+            light.push(t);
+          }
+        });
+        var chip = function (t) {
+          return '<button type="button" class="chip-btn ' + (cur === t[0] ? 'on' : '') +
+            '" data-theme="' + t[0] + '">' + t[1] + '</button>';
+        };
+        return '<div class="theme-group">' +
+            '<span class="theme-tag">白</span>' +
+            '<div class="chips">' + light.map(chip).join('') + '</div>' +
+          '</div>' +
+          '<div class="theme-line"></div>' +
+          '<div class="theme-group">' +
+            '<span class="theme-tag">黑</span>' +
+            '<div class="chips">' + dark.map(chip).join('') + '</div>' +
+          '</div>';
+      })() +
 
       '<div style="text-align:right;margin-top:10px">' +
         '<button type="button" class="btn ghost sm" data-theme-off="1" style="height:30px">关闭配色</button>' +
@@ -9098,6 +9438,9 @@ window.__supaReady = new Promise(function (resolve) {
       }
     });
     $('forumAdminList').addEventListener('click', function (e) {
+      var lkn2 = e.target.closest('[data-likers]');
+      if (lkn2) { openLikers(lkn2.getAttribute('data-likers')); return; }
+
       var lk2 = e.target.closest('[data-like]');
       if (lk2) {
         api('api_forum_like', { p_token: S.token, p_post_id: lk2.dataset.like }).then(function (r) {
@@ -9252,6 +9595,9 @@ window.__supaReady = new Promise(function (resolve) {
 
       var mdt = e.target.closest('[data-medal-id]');
       if (mdt) { openMedalDetail(mdt.dataset.medalId); return; }
+
+      var lkNames = e.target.closest('[data-likers]');
+      if (lkNames) { openLikers(lkNames.getAttribute('data-likers')); return; }
 
       var like = e.target.closest('[data-like]');
       if (like) {
