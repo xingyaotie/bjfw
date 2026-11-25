@@ -191,6 +191,7 @@ body.theme-wujin .switch .slider{background:#3A3122}
 
 /* 弹窗 */
 .mask{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;
+  padding-bottom:98px;
   background:rgba(17,24,39,.45);opacity:0;transition:.2s}
 .mask.show{opacity:1}
 .modal{width:100%;max-height:calc(100vh - 40px);display:flex;flex-direction:column;background:#fff;
@@ -269,7 +270,7 @@ body.theme-wujin .switch .slider{background:#3A3122}
 
 /* ===== App 模式（APK）：底部导航 ===== */
 /* 不用边框，靠底色和投影做出层次；深色主题整条跟着变深 */
-#appTabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:810;pointer-events:auto;
+#appTabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:9200;pointer-events:auto;
   background:var(--card);
   box-shadow:0 -10px 26px rgba(17,24,39,.06);
   height:calc(56px + env(safe-area-inset-bottom,0px));
@@ -526,6 +527,23 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
   padding-top:7px;min-width:14px}
 .theme-line{height:1px;background:var(--line);margin:10px 0}
 .badge.black-orange{background:#2A1403;color:#FFB05E;border-color:#6B3208}
+
+/* 缓存提示：先显示旧的，再同步 */
+.cache-tip{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
+  background:var(--bg);border:1px solid var(--line);border-radius:8px;
+  padding:6px 10px;margin-bottom:10px}
+.cache-tip.is-off{color:#8A5A00;background:#FFF6E8;border-color:#F3DCB8}
+body.theme-heicheng .cache-tip{background:#12100E;border-color:#2B2118;color:#9BA1A8}
+body.theme-heicheng .cache-tip.is-off{background:#241505;border-color:#4A2A0C;color:#FFB05E}
+
+/* 胶囊移动时轻微「弹」一下：用独立的 scale，不动位置 */
+@keyframes pillPop{
+  0%{scale:1 1}
+  35%{scale:1.12 .93}
+  70%{scale:.98 1.02}
+  100%{scale:1 1}
+}
+#appTabbar .tab-pill.pop{animation:pillPop .38s cubic-bezier(.22,.61,.36,1)}
 
 /* 论坛引用 / 发帖页 */
 .quote-box{border-left:3px solid var(--red);background:var(--bg);border-radius:0 8px 8px 0;
@@ -1761,6 +1779,53 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
   <!-- App 模式：我的 -->
   <main class="wrap" id="mePanel" hidden></main>
 
+  <!-- 附属端：只做作业和菜单 -->
+  <main class="wrap" id="staffPanel" hidden>
+    <div class="tabs" id="staffTabs">
+      <button class="tab active" data-stab="hw" type="button">作业管理</button>
+      <button class="tab" data-stab="menu" type="button">菜单管理</button>
+    </div>
+
+    <section id="stab-hw">
+      <div class="panel-head">
+        <div><h2>作业管理</h2>
+          <div class="hint">发出去学生就能在「班级 → 班级作业」看到</div></div>
+        <span class="hint" id="stHwCount"></span>
+      </div>
+      <div class="card" style="padding:16px">
+        <label class="field"><span>作业内容</span>
+          <textarea class="textarea" id="stHwInput" rows="4"
+            placeholder="例如：数学 练习册 P32–P35，明天早读前交。英语背诵 Unit 3。"></textarea>
+        </label>
+        <div style="text-align:right">
+          <button class="btn primary" id="stHwPublish" type="button">发布作业</button>
+        </div>
+
+        <div class="panel-head" style="margin:16px 0 8px">
+          <div><h2 style="font-size:14px">已发布的作业</h2></div>
+        </div>
+        <div class="news" id="stHwList"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+      </div>
+    </section>
+
+    <section id="stab-menu" hidden>
+      <div class="panel-head">
+        <div><h2>菜单管理</h2>
+          <div class="hint">学生点「班级 → 本周食堂菜单」看到的就是这里的内容</div></div>
+        <button class="btn primary sm" id="stMenuSave" type="button" style="height:34px;padding:0 14px">保存菜单</button>
+      </div>
+      <div class="card" style="padding:16px">
+        <textarea class="textarea" id="stCanteenInput" rows="10"
+          placeholder="例如：&#10;周一：红烧肉、青菜&#10;周二：番茄炒蛋、排骨汤"></textarea>
+        <div class="row" style="margin-top:8px">
+          <button class="btn ghost sm" id="stCanteenImg" type="button">插入图片</button>
+          <input type="file" id="stCanteenFile" accept="image/*" style="display:none">
+        </div>
+        <div class="img-preview" id="stCanteenPrev" style="display:none"></div>
+      </div>
+    </section>
+  </main>
+
   <!-- App 模式：底部导航（按钮由 JS 按角色生成） -->
   <nav id="appTabbar"></nav>
 
@@ -2257,9 +2322,16 @@ window.__supaReady = new Promise(function (resolve) {
       if (btns[i].getAttribute('data-atab') === APP_TAB) { idx = i; break; }
     }
     if (idx < 0) return;
-    /* 宽度固定成「一格减 10」，只改 translateX：移动过程不会拉长/压扁 */
+    /* 宽度固定成「一格减 10」，只改 translateX；换 tab 时轻轻弹一下 */
     pill.style.width = 'calc(100% / ' + n + ' - 10px)';
     pill.style.transform = 'translateX(calc(' + idx + ' * (100% + 10px)))';
+
+    if (pill.getAttribute('data-idx') !== String(idx)) {
+      pill.setAttribute('data-idx', String(idx));
+      pill.classList.remove('pop');
+      void pill.offsetWidth;          /* 强制重排，动画才会重播 */
+      pill.classList.add('pop');
+    }
   }
 
   function syncTabPill() {
@@ -2485,7 +2557,7 @@ window.__supaReady = new Promise(function (resolve) {
           '</div>' +
         '</div>' +
         '<div class="me-rows">' +
-          appMeRow(MI_ICON.profile, '我的资料', '性别、生日、签名、勋章', 'profile') +
+          appMeRow(MI_ICON.profile, '设置', '资料、勋章、清除缓存', 'profile') +
           (isAdmin || memberHidden ? '' : appMeRow(MI_ICON.member, '会员', '方案与专属主题', 'member')) +
           appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封新通知' : '', 'mail') +
           (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
@@ -2868,11 +2940,26 @@ window.__supaReady = new Promise(function (resolve) {
 
     var name = profile.display_name || profile.username;
     $('loginView').hidden = true;
+    $('staffPanel').hidden = true;
     $('appView').hidden = false;
     $('userName').textContent = name;
     $('userDot').textContent = (name || '我').slice(0, 1);
 
-    if (profile.role === 'admin') {
+    if (profile.role === 'staff') {
+      $('brandSub').textContent = '2026级 · 附属端';
+      $('userPanel').hidden = true;
+      $('adminPanel').hidden = true;
+      $('mePanel').hidden = true;
+      $('modView').hidden = true;
+      $('staffPanel').hidden = false;
+      $('btnMember').hidden = true;
+      $('btnFirstAid').hidden = true;
+      $('userSearchWrap').style.display = 'none';
+      document.body.classList.remove('app-mode');
+      document.body.classList.remove('glass-nav');
+      showActions(false);
+      stInit();
+    } else if (profile.role === 'admin') {
       $('brandSub').textContent = '2026级 · 管理端';
       $('userPanel').hidden = true;
       $('adminPanel').hidden = false;
@@ -2897,9 +2984,9 @@ window.__supaReady = new Promise(function (resolve) {
     // 配色跟着账号走：登录后按 profile 里的 theme / snow_bg 应用
     applyTheme();
 
-    loadMailBadge();
+    if (profile.role !== 'staff') loadMailBadge();
 
-    if (TAB_UI) { buildTabbar(); appTab(appHomeTab()); }
+    if (TAB_UI && profile.role !== 'staff') { buildTabbar(); appTab(appHomeTab()); }
 
     var welcome = function () {
       if (profile.role === 'vip') showVipWelcome(name);
@@ -2918,7 +3005,7 @@ window.__supaReady = new Promise(function (resolve) {
     };
 
     var afterLogin = function () {
-      if (profile.role === 'admin') {
+      if (profile.role === 'admin' || profile.role === 'staff') {
         setTimeout(afterNoticeFinal, 260);
       } else {
         setTimeout(function () { showAdThen(afterNoticeFinal); }, 200);
@@ -3067,6 +3154,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (db && t) api('api_logout', { p_token: t }).catch(function () {});
     $('appView').hidden = true;
     $('loginView').hidden = false;
+    $('staffPanel').hidden = true;
     $('username').value = '';
     $('password').value = '';
     showLogin();
@@ -3691,38 +3779,49 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* 版本信息：原来散在「更多」里的四块都收在这儿 */
+  function vendorsHtml(items) {
+    if (!items.length) return '<div class="hint" style="text-align:center;padding:8px">暂时没有加盟商</div>';
+    return items.map(function (v) {
+      var ico = '<span class="ico">' + LINE_ICON.vendor + '</span>';
+      var body = '<span><b>' + esc(v.name) + '</b>' +
+        (v.sub ? '<small>' + esc(v.sub) + '</small>' : '') + '</span>';
+
+      if (v.status === 'run') {
+        return '<a class="cube-opt" href="' + esc(v.url) + '" target="_blank" rel="noopener"' +
+          ' style="margin-bottom:12px;text-decoration:none;color:inherit">' +
+          ico + body + '<span class="arrow">›</span></a>';
+      }
+      if (v.status === 'soon') {
+        return '<div class="cube-opt" style="margin-bottom:12px;opacity:.62;cursor:not-allowed">' +
+          ico + body +
+          '<span class="badge" style="margin-left:auto;height:20px;font-size:11px;' +
+            'color:#8A6100;background:#FDF6E3;border-color:#F2E3B8">即将上架</span></div>';
+      }
+      return '<div class="cube-opt" style="margin-bottom:12px;opacity:.45;cursor:not-allowed">' +
+        ico + body +
+        '<span class="badge gray" style="margin-left:auto;height:20px;font-size:11px">已停运</span></div>';
+    }).join('');
+  }
+
   function loadVendors() {
     var box = $('vendorList');
     if (!box) return;
 
+    var cached = cacheGet('vendors', 7 * 24 * 3600 * 1000);
+    if (cached && cached.length) {
+      box.innerHTML = vendorsHtml(cached);
+    }
+
     api('api_vendors', { p_token: S.token }).then(function (r) {
       var items = r.items || [];
-      if (!items.length) {
-        box.innerHTML = '<div class="hint" style="text-align:center;padding:8px">暂时没有加盟商</div>';
-        return;
-      }
-      box.innerHTML = items.map(function (v) {
-        var ico = '<span class="ico">' + LINE_ICON.vendor + '</span>';
-        var body = '<span><b>' + esc(v.name) + '</b>' +
-          (v.sub ? '<small>' + esc(v.sub) + '</small>' : '') + '</span>';
-
-        if (v.status === 'run') {
-          return '<a class="cube-opt" href="' + esc(v.url) + '" target="_blank" rel="noopener"' +
-            ' style="margin-bottom:12px;text-decoration:none;color:inherit">' +
-            ico + body + '<span class="arrow">›</span></a>';
-        }
-        if (v.status === 'soon') {
-          return '<div class="cube-opt" style="margin-bottom:12px;opacity:.62;cursor:not-allowed">' +
-            ico + body +
-            '<span class="badge" style="margin-left:auto;height:20px;font-size:11px;' +
-              'color:#8A6100;background:#FDF6E3;border-color:#F2E3B8">即将上架</span></div>';
-        }
-        return '<div class="cube-opt" style="margin-bottom:12px;opacity:.45;cursor:not-allowed">' +
-          ico + body +
-          '<span class="badge gray" style="margin-left:auto;height:20px;font-size:11px">已停运</span></div>';
-      }).join('');
+      cacheSet('vendors', items);
+      var now = $('vendorList');
+      if (now) now.innerHTML = vendorsHtml(items);
     }, function (e) {
-      box.innerHTML = '<div class="hint" style="text-align:center;padding:8px">' + esc(e.message) + '</div>';
+      var now = $('vendorList');
+      if (now && !(cached && cached.length)) {
+        now.innerHTML = '<div class="hint" style="text-align:center;padding:8px">' + esc(e.message) + '</div>';
+      }
     });
   }
 
@@ -4022,108 +4121,132 @@ window.__supaReady = new Promise(function (resolve) {
     '</div>';
   }
 
+  function paintForumPage(r, stale) {
+    var body = $('modBody');
+    var items = r.items || [];
+    var left = Math.max(0, (r.my_limit || 3) - (r.my_today || 0));
+    var cat = r.cat;
+
+    var head = '';
+    if (cat) {
+      head =
+        '<div class="forum-cat-head">' +
+          '<div class="fc-name">' + esc(cat.name) + '</div>' +
+          '<div class="fc-sub">' + (cat.sub ? esc(cat.sub) : '') +
+            ' <span style="opacity:.8">· 此贴区由「' + esc(cat.creator) + '」创建</span>' +
+          '</div>' +
+        '</div>';
+    }
+
+    body.innerHTML =
+      '<div style="max-width:640px;margin:0 auto">' +
+        (stale ? '<div class="cache-tip"><span class="spinner" style="width:12px;height:12px"></span>正在更新…</div>' : '') +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">' +
+          '<div class="seg" style="margin:0">' +
+            '<button type="button" data-fscope="all" class="' + (forumScope === 'all' ? 'on' : '') + '">全部</button>' +
+            '<button type="button" data-fscope="public" class="' + (forumScope === 'public' ? 'on' : '') + '">公共</button>' +
+          '</div>' +
+          '<button class="btn ghost sm" id="forumCatsBtn" type="button" style="height:32px">寻找类别</button>' +
+          '<button class="btn ghost sm" id="forumMsgBtn" type="button" style="height:32px;position:relative">' +
+            '🔔 消息<span id="forumMsgDot" class="dot-badge" hidden></span></button>' +
+          '<button class="btn primary sm" id="forumNew" type="button" style="margin-left:auto;height:32px;padding:0 16px"' +
+            (r.muted ? ' disabled' : '') + '>＋ 发帖</button>' +
+        '</div>' +
+        head +
+        '<div id="forumList">' +
+          (items.length
+            ? items.map(function (x) { return forumPostCard(x, false); }).join('')
+            : '<div class="empty"><strong>这里还没有帖子</strong>' +
+                (r.muted ? '你被禁言了' : '点右上角「发帖」发第一条') + '</div>') +
+        '</div>' +
+        '<div class="hint" style="text-align:center;margin-top:14px;font-size:12px">' +
+          (r.muted ? '你被禁言了' : '今天还能发 ' + left + ' 条') + '</div>' +
+      '</div>';
+
+    markForumRead(items);
+
+    body.querySelector('.seg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fscope]');
+      if (!b) return;
+      forumScope = b.dataset.fscope;
+      renderForum();
+    });
+
+    $('forumCatsBtn').onclick = openForumCats;
+    $('forumMsgBtn').onclick = openForumLikes;
+    checkForumMsgDot();
+
+    if (!r.muted) $('forumNew').onclick = function () { openForumCompose(left); };
+
+    /* 正在选引用：点一条就带回去 */
+    if (composeState.picking) {
+      var pickBar = document.createElement('div');
+      pickBar.className = 'pick-bar';
+      pickBar.innerHTML = '<span>点一条帖子，把它引用到你的帖子里</span>' +
+        '<button type="button" class="link" id="pickCancel">取消</button>';
+      var host = body.querySelector('#forumList');
+      if (host && host.parentNode) host.parentNode.insertBefore(pickBar, host);
+      if ($('pickCancel')) {
+        $('pickCancel').onclick = function () {
+          composeState.picking = false;
+          currentMod = 'compose';
+          $('modTitle').textContent = '发帖';
+          renderComposePage();
+          syncAppChrome();
+        };
+      }
+      if (host) {
+        host.addEventListener('click', function (e) {
+          if (!composeState.picking) return;
+          var card = e.target.closest('[data-post]');
+          if (!card) return;
+          e.preventDefault();
+          e.stopPropagation();
+          var picked = items.filter(function (x) { return x.id === card.getAttribute('data-post'); })[0];
+          if (picked) pickQuote(picked);
+        }, true);
+      }
+    }
+
+    /* 跟评不超过 3 条：直接铺开，不用点 */
+    items.forEach(function (x) {
+      if (!x.reply_count || x.reply_count > 3) return;
+      var rbox = body.querySelector('[data-replies="' + x.id + '"]');
+      if (rbox) loadForumReplies(x.id, rbox);
+    });
+  }
+
   function renderForum() {
     var body = $('modBody');
-    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    var key = 'forum_' + forumScope;
+    var cached = cacheGet(key, 7 * 24 * 3600 * 1000);
+
+    /* 先拿上次的列表画出来：进去马上有东西看，不用等 */
+    if (cached && cached.items) {
+      paintForumPage(cached, true);
+    } else {
+      body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    }
 
     Promise.all([
       api('api_forum_cats', { p_token: S.token }).then(function (r) { forumCats = r.items || []; return forumCats; },
-        function () { forumCats = []; return []; }),
+        function () { forumCats = forumCats || []; return forumCats; }),
       api('api_forum_list', { p_token: S.token, p_scope: forumScope })
     ]).then(function (res) {
       if (currentMod !== 'forum') return;           /* 已经切页，丢弃这次结果 */
       var r = res[1];
-      var items = r.items || [];
-      var left = Math.max(0, (r.my_limit || 3) - (r.my_today || 0));
-      var cat = r.cat;
-
-      var head = '';
-      if (cat) {
-        head =
-          '<div class="forum-cat-head">' +
-            '<div class="fc-name">' + esc(cat.name) + '</div>' +
-            '<div class="fc-sub">' + (cat.sub ? esc(cat.sub) : '') +
-              ' <span style="opacity:.8">· 此贴区由「' + esc(cat.creator) + '」创建</span>' +
-            '</div>' +
-          '</div>';
-      }
-
-      body.innerHTML =
-        '<div style="max-width:640px;margin:0 auto">' +
-          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">' +
-            '<div class="seg" style="margin:0">' +
-              '<button type="button" data-fscope="all" class="' + (forumScope === 'all' ? 'on' : '') + '">全部</button>' +
-              '<button type="button" data-fscope="public" class="' + (forumScope === 'public' ? 'on' : '') + '">公共</button>' +
-            '</div>' +
-            '<button class="btn ghost sm" id="forumCatsBtn" type="button" style="height:32px">寻找类别</button>' +
-            '<button class="btn ghost sm" id="forumMsgBtn" type="button" style="height:32px;position:relative">' +
-              '🔔 消息<span id="forumMsgDot" class="dot-badge" hidden></span></button>' +
-            '<button class="btn primary sm" id="forumNew" type="button" style="margin-left:auto;height:32px;padding:0 16px"' +
-              (r.muted ? ' disabled' : '') + '>＋ 发帖</button>' +
-          '</div>' +
-          head +
-          '<div id="forumList">' +
-            (items.length
-              ? items.map(function (x) { return forumPostCard(x, false); }).join('')
-              : '<div class="empty"><strong>这里还没有帖子</strong>' +
-                  (r.muted ? '你被禁言了' : '点右上角「发帖」发第一条') + '</div>') +
-          '</div>' +
-          '<div class="hint" style="text-align:center;margin-top:14px;font-size:12px">' +
-            (r.muted ? '你被禁言了' : '今天还能发 ' + left + ' 条') + '</div>' +
-        '</div>';
-
-      markForumRead(items);
-
-      /* 正在选引用：点一条就带回去 */
-      if (composeState.picking) {
-        var pickBar = document.createElement('div');
-        pickBar.className = 'pick-bar';
-        pickBar.innerHTML = '<span>点一条帖子，把它引用到你的帖子里</span>' +
-          '<button type="button" class="link" id="pickCancel">取消</button>';
-        var host = body.querySelector('#forumList');
-        if (host && host.parentNode) host.parentNode.insertBefore(pickBar, host);
-        if ($('pickCancel')) {
-          $('pickCancel').onclick = function () {
-            composeState.picking = false;
-            currentMod = 'compose';
-            $('modTitle').textContent = '发帖';
-            renderComposePage();
-            syncAppChrome();
-          };
-        }
-        if (host) {
-          host.addEventListener('click', function (e) {
-            if (!composeState.picking) return;
-            var card = e.target.closest('[data-post]');
-            if (!card) return;
-            e.preventDefault();
-            e.stopPropagation();
-            var picked = items.filter(function (x) { return x.id === card.getAttribute('data-post'); })[0];
-            if (picked) pickQuote(picked);
-          }, true);
-        }
-      }
-
-      /* 跟评不超过 3 条：直接铺开，不用点 */
-      items.forEach(function (x) {
-        if (!x.reply_count || x.reply_count > 3) return;
-        var rbox = body.querySelector('[data-replies="' + x.id + '"]');
-        if (rbox) loadForumReplies(x.id, rbox);
-      });
-
-      body.querySelector('.seg').addEventListener('click', function (e) {
-        var b = e.target.closest('[data-fscope]');
-        if (!b) return;
-        forumScope = b.dataset.fscope;
-        renderForum();
-      });
-
-      $('forumCatsBtn').onclick = openForumCats;
-      $('forumMsgBtn').onclick = openForumLikes;
-      checkForumMsgDot();
-
-      if (!r.muted) $('forumNew').onclick = function () { openForumCompose(left); };
+      cacheSet(key, r);
+      paintForumPage(r, false);
     }, function (e) {
+      if (currentMod !== 'forum') return;
+      if (cached && cached.items) {
+        var tip = document.createElement('div');
+        tip.className = 'cache-tip is-off';
+        tip.textContent = '连不上服务器，先显示上次的内容';
+        body.insertBefore(tip, body.firstChild);
+        toast('网络不太好，先显示缓存内容', 'err', 2600);
+        return;
+      }
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
   }
@@ -4273,6 +4396,51 @@ window.__supaReady = new Promise(function (resolve) {
         if (el) el.innerHTML = readersText(list, pid);
       });
     }, function () {});
+  }
+
+  /* ================= 本地缓存（秒开用） ================= */
+  var CACHE_PREFIX = 'xbh_cache_1_';
+
+  function cacheSet(key, value) {
+    try { localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ t: Date.now(), v: value })); } catch (e) {}
+  }
+  function cacheGet(key, maxAgeMs) {
+    try {
+      var raw = localStorage.getItem(CACHE_PREFIX + key);
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      if (!o || !o.v) return null;
+      if (maxAgeMs && (Date.now() - (o.t || 0)) > maxAgeMs) return null;
+      return o.v;
+    } catch (e) { return null; }
+  }
+  function cacheBytes() {
+    var n = 0;
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(CACHE_PREFIX) === 0) {
+          n += (k.length + String(localStorage.getItem(k) || '').length) * 2;
+        }
+      }
+    } catch (e) {}
+    return n;
+  }
+  function cacheText() {
+    var mb = cacheBytes() / 1048576;
+    if (mb < 0.001) return '0.001 MB';
+    return mb.toFixed(3) + ' MB';
+  }
+  function cacheClearAll() {
+    var keys = [];
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(CACHE_PREFIX) === 0) keys.push(k);
+      }
+      keys.forEach(function (k) { localStorage.removeItem(k); });
+    } catch (e) {}
+    return keys.length;
   }
 
   /* 发帖页（整页，不再弹窗）：＋ 里可以 @ 人、引用帖子 */
@@ -5441,7 +5609,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'hw') adminClassPane('');
     if (name === 'cube') loadCubeAdmin();
     if (name === 'debug') { loadDebugAdmin(); loadPayAdmin(); }
-    if (name === 'hwlib') { S.hwOpen = S.hwOpen || {}; loadHwAdmin(); }
+    if (name === 'hwlib') { S.hwOpen = S.hwOpen || {}; loadHwLibAdmin(); }
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
     if (name === 'forum') { loadForumAdmin(); loadMutePanel(); loadForumCatsAdmin(); }
@@ -5977,7 +6145,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 用户端：我的资料 ---------- */
   function openProfileModule() {
     currentMod = 'profile';
-    $('modTitle').textContent = '我的资料';
+    $('modTitle').textContent = '设置';
     $('mePanel').hidden = true;
     $('userPanel').hidden = true;
     $('adminPanel').hidden = true;
@@ -6055,6 +6223,17 @@ window.__supaReady = new Promise(function (resolve) {
             '<div class="pf-label" style="margin-bottom:10px">我的勋章</div>' +
             medalFoldHtml(medals) +
           '</div>' +
+
+          '<div class="card" style="padding:16px;margin-top:14px">' +
+            '<div class="pf-label" style="margin-bottom:10px">缓存</div>' +
+            '<div class="pf-row">' +
+              '<div class="pf-main">' +
+                '<div class="pf-val" id="pfCacheSize">' + cacheText() + '</div>' +
+                '<div class="pf-hint">论坛、加盟商这些页面会存一份在手机上，打开更快；清掉后下次要重新下载</div>' +
+              '</div>' +
+              '<button class="btn ghost sm" id="pfCacheClear" type="button" style="height:34px;flex:none">清除缓存</button>' +
+            '</div>' +
+          '</div>' +
         '</div>';
 
       var picked = u.gender;
@@ -6096,6 +6275,18 @@ window.__supaReady = new Promise(function (resolve) {
         }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
       };
 
+      body.querySelector('#pfCacheClear').onclick = function () {
+        var btn = this;
+        busy(btn, true, '清理中…');
+        var n = cacheClearAll();
+        setTimeout(function () {
+          busy(btn, false);
+          var el = $('pfCacheSize');
+          if (el) el.textContent = cacheText();
+          toast(n ? ('已清除 ' + n + ' 项缓存') : '本来就是空的', 'ok');
+        }, 200);
+      };
+
       body.querySelector('#pfSaveBio').onclick = function () {
         var btn = this;
         var v = body.querySelector('#pfBio').value;
@@ -6109,6 +6300,81 @@ window.__supaReady = new Promise(function (resolve) {
     }, function (e) {
       body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
+  }
+
+  /* ================= 附属端：作业管理 + 菜单管理 ================= */
+  var richStaffMenu = null;
+
+  function stInit() {
+    stTab('hw');
+  }
+
+  function stTab(name) {
+    ['hw', 'menu'].forEach(function (k) {
+      var el = $('stab-' + k);
+      if (el) el.hidden = (k !== name);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('#staffTabs .tab'), function (b) {
+      b.classList.toggle('active', b.getAttribute('data-stab') === name);
+    });
+    if (name === 'hw') stLoadHw();
+    if (name === 'menu') stLoadMenu();
+  }
+
+  function stLoadHw() {
+    var box = $('stHwList');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_list_homework', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      var c = $('stHwCount');
+      if (c) c.textContent = items.length ? ('共 ' + items.length + ' 条') : '';
+      box.innerHTML = items.length ? items.map(function (h) {
+        return '<div class="news-item" data-id="' + esc(h.id) + '">' +
+          '<div class="hd"><h4>' + esc(fmtAbs(h.created_at)) + '</h4>' +
+            '<span class="time">' + fmt(h.created_at) + '</span></div>' +
+          '<p>' + esc(h.content) + '</p>' +
+          '<div class="ops"><button class="link danger" type="button" data-sthwdel="' + esc(h.id) + '">删除这条作业</button></div>' +
+        '</div>';
+      }).join('') : '<div class="empty"><strong>还没有作业</strong>在上面写一条发出去</div>';
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function stPublishHw() {
+    var el = $('stHwInput');
+    var v = el.value.trim();
+    if (!v) { toast('请先写作业内容', 'err'); el.focus(); return; }
+    var btn = $('stHwPublish');
+    busy(btn, true, '发布中…');
+    api('api_admin_save_homework', { p_token: S.token, p_content: v }).then(function () {
+      busy(btn, false);
+      el.value = '';
+      toast('作业已发布', 'ok');
+      stLoadHw();
+    }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+  }
+
+  function stLoadMenu() {
+    var el = $('stCanteenInput');
+    if (!el) return;
+    api('api_canteen_get', { p_token: S.token }).then(function (r) {
+      el.value = r.content || '';
+      richStaffMenu = richBind(el, $('stCanteenPrev'));
+    }, function () {
+      richStaffMenu = richBind(el, $('stCanteenPrev'));
+    });
+  }
+
+  function stSaveMenu() {
+    var btn = $('stMenuSave');
+    var v = richStaffMenu ? richStaffMenu.value() : ($('stCanteenInput').value || '');
+    busy(btn, true, '保存中…');
+    api('api_admin_canteen_save', { p_token: S.token, p_content: v }).then(function () {
+      busy(btn, false);
+      toast('菜单已保存', 'ok');
+    }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
   }
 
   function reloadProfile() {
@@ -6780,7 +7046,7 @@ window.__supaReady = new Promise(function (resolve) {
 
     $('identityList').innerHTML = list.map(function (u) {
       var me = S.me && u.id === S.me.id;
-      var chips = [['user', '普通'], ['vip', '高级'], ['admin', '管理员']].map(function (p) {
+      var chips = [['user', '普通'], ['vip', '高级'], ['admin', '管理员'], ['staff', '附属端']].map(function (p) {
         return '<button type="button" class="chip-btn ' + (u.role === p[0] ? 'on' : '') + '" data-uid="' + esc(u.id) + '" data-role="' + p[0] + '">' +
           p[1] + '</button>';
       }).join('');
@@ -7561,19 +7827,19 @@ window.__supaReady = new Promise(function (resolve) {
 
 
   /* ---------- 管理端：作业 ---------- */
-  function loadHwAdmin() {
+  function loadHwLibAdmin() {
     if (!$('hwlibList')) return;
     S.hwOpen = S.hwOpen || {};
     $('hwlibList').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
     api('api_admin_hw_overview', { p_token: S.token }).then(function (r) {
       S.hwProj = r.items || [];
-      renderHwAdmin();
+      renderHwLibAdmin();
     }, function (e) {
       $('hwlibList').innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
   }
 
-  function renderHwAdmin() {
+  function renderHwLibAdmin() {
     var box = $('hwlibList');
     if (!box) return;
     var list = S.hwProj || [];
@@ -7634,7 +7900,7 @@ window.__supaReady = new Promise(function (resolve) {
       busy(btn, true, '保存中…');
       api('api_admin_hw_save_project', { p_token: S.token, p_id: edit ? item.id : null, p_name: v })
         .then(function () {
-          busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadHwAdmin();
+          busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok'); loadHwLibAdmin();
         }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
     };
   }
@@ -7672,7 +7938,7 @@ window.__supaReady = new Promise(function (resolve) {
       }).then(function () {
         busy(btn, false); closeModal(); toast(edit ? '已保存' : '已创建', 'ok');
         S.hwOpen[pid] = true;
-        loadHwAdmin();
+        loadHwLibAdmin();
       }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
     };
   }
@@ -7683,7 +7949,7 @@ window.__supaReady = new Promise(function (resolve) {
       api('api_admin_hw_delete_project', { p_token: S.token, p_id: id }).then(function () {
         delete S.hwOpen[id];
         toast('已删除', 'ok');
-        loadHwAdmin();
+        loadHwLibAdmin();
       }, function (e) { toast(e.message, 'err'); });
     });
   }
@@ -7693,7 +7959,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (!yes) return;
       api('api_admin_hw_delete_branch', { p_token: S.token, p_id: id }).then(function () {
         toast('已删除', 'ok');
-        loadHwAdmin();
+        loadHwLibAdmin();
       }, function (e) { toast(e.message, 'err'); });
     });
   }
@@ -9621,8 +9887,30 @@ window.__supaReady = new Promise(function (resolve) {
       togglePerm(b.dataset.uid, b.dataset.tid || '');
     });
 
+    $('staffTabs').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-stab]');
+      if (b) stTab(b.getAttribute('data-stab'));
+    });
+    $('stHwPublish').addEventListener('click', stPublishHw);
+    $('stHwList').addEventListener('click', function (e) {
+      var d = e.target.closest('[data-sthwdel]');
+      if (!d) return;
+      var id = d.getAttribute('data-sthwdel');
+      confirmBox('删除作业', '确定删除这条作业吗？', '删除后学生端也会同步消失。', '删除').then(function (yes) {
+        if (!yes) return;
+        api('api_admin_delete_homework', { p_token: S.token, p_id: id }).then(function () {
+          toast('已删除', 'ok');
+          stLoadHw();
+        }, function (err) { toast(err.message, 'err'); });
+      });
+    });
+    $('stMenuSave').addEventListener('click', stSaveMenu);
+    bindImagePicker($('stCanteenImg'), $('stCanteenFile'), {
+      add: function (url) { if (richStaffMenu) richStaffMenu.add(url); }
+    });
+
     $('btnHwNew').addEventListener('click', function () { openHwProjectForm(null); });
-    $('btnHwReload').addEventListener('click', function () { loadHwAdmin(); });
+    $('btnHwReload').addEventListener('click', function () { loadHwLibAdmin(); });
     $('hwlibList').addEventListener('click', function (e) {
       var b = e.target.closest('[data-hwact]');
       if (!b) return;
@@ -9630,7 +9918,7 @@ window.__supaReady = new Promise(function (resolve) {
       var pid = b.getAttribute('data-pid') || '';
       var bid = b.getAttribute('data-bid') || '';
       var pj = hwProjectById(pid);
-      if (act === 'fold') { S.hwOpen[pid] = !S.hwOpen[pid]; renderHwAdmin(); return; }
+      if (act === 'fold') { S.hwOpen[pid] = !S.hwOpen[pid]; renderHwLibAdmin(); return; }
       if (act === 'pedit' && pj) return openHwProjectForm(pj);
       if (act === 'pdel') return deleteHwProject(pid);
       if (act === 'badd') return openHwBranchForm(pid, null);
