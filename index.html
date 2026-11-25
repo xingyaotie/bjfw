@@ -2352,6 +2352,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (notice && $('modView')) $('modView').insertBefore(notice, $('modBody'));
     buildTabbar();
     syncTabPill();
+    snapWatch();
     window.addEventListener('resize', function () { syncTabPill(); syncNoticeWidth(); });
     var mb = $('modBody');
     if (mb && window.MutationObserver) {
@@ -3807,7 +3808,7 @@ window.__supaReady = new Promise(function (resolve) {
     var box = $('vendorList');
     if (!box) return;
 
-    var cached = cacheGet('vendors', 7 * 24 * 3600 * 1000);
+    var cached = cacheGet('vendors');
     if (cached && cached.length) {
       box.innerHTML = vendorsHtml(cached);
     }
@@ -4219,7 +4220,7 @@ window.__supaReady = new Promise(function (resolve) {
   function renderForum() {
     var body = $('modBody');
     var key = 'forum_' + forumScope;
-    var cached = cacheGet(key, 7 * 24 * 3600 * 1000);
+    var cached = cacheGet(key);
 
     /* 先拿上次的列表画出来：进去马上有东西看，不用等 */
     if (cached && cached.items) {
@@ -4402,9 +4403,11 @@ window.__supaReady = new Promise(function (resolve) {
   var CACHE_PREFIX = 'xbh_cache_1_';
 
   function cacheSet(key, value) {
+    if (!IS_APP) return;                     /* 网页版不缓存，永远拿最新的 */
     try { localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ t: Date.now(), v: value })); } catch (e) {}
   }
   function cacheGet(key, maxAgeMs) {
+    if (!IS_APP) return null;                /* 网页版不读缓存 */
     try {
       var raw = localStorage.getItem(CACHE_PREFIX + key);
       if (!raw) return null;
@@ -4415,6 +4418,7 @@ window.__supaReady = new Promise(function (resolve) {
     } catch (e) { return null; }
   }
   function cacheBytes() {
+    if (!IS_APP) return 0;
     var n = 0;
     try {
       for (var i = 0; i < localStorage.length; i++) {
@@ -4427,10 +4431,131 @@ window.__supaReady = new Promise(function (resolve) {
     return n;
   }
   function cacheText() {
-    var mb = cacheBytes() / 1048576;
+    var mb = (cacheBytes() + Snap.bytes()) / 1048576;
     if (mb < 0.001) return '0.001 MB';
     return mb.toFixed(3) + ' MB';
   }
+  /* ================= 整页快照缓存（IndexedDB，永不过期） =================
+     每进一个页面，就把渲染好的整段 HTML 存下来（连图片一起）；
+     下次进来先铺上次的，再等接口回来替换。设置里清缓存才清掉。 */
+  var Snap = {
+    db: null,
+    mem: {},
+    ready: null,
+    init: function () {
+      var self = this;
+      if (!IS_APP) { this.ready = Promise.resolve(); return; }
+      this.ready = new Promise(function (res) {
+        try {
+          var req = indexedDB.open('xbh_page_cache', 1);
+          req.onupgradeneeded = function () {
+            try { req.result.createObjectStore('snap'); } catch (e) {}
+          };
+          req.onsuccess = function () {
+            self.db = req.result;
+            self.loadAll().then(res, res);
+          };
+          req.onerror = function () { res(); };
+        } catch (e) { res(); }
+      });
+    },
+    loadAll: function () {
+      var self = this;
+      return new Promise(function (res) {
+        try {
+          var st = self.db.transaction('snap', 'readonly').objectStore('snap');
+          var cur = st.openCursor();
+          cur.onsuccess = function (e) {
+            var c = e.target.result;
+            if (c) { self.mem[c.key] = c.value; c.continue(); } else res();
+          };
+          cur.onerror = function () { res(); };
+        } catch (e) { res(); }
+      });
+    },
+    get: function (key) { return (IS_APP && key) ? (this.mem[key] || null) : null; },
+    set: function (key, html) {
+      if (!IS_APP) return;
+      if (!key || !html || html.length < 200) return;
+      var rec = { html: html, t: Date.now() };
+      this.mem[key] = rec;
+      if (!this.db) return;
+      try { this.db.transaction('snap', 'readwrite').objectStore('snap').put(rec, key); } catch (e) {}
+    },
+    clear: function () {
+      this.mem = {};
+      if (this.db) {
+        try { this.db.transaction('snap', 'readwrite').objectStore('snap').clear(); } catch (e) {}
+      }
+    },
+    bytes: function () {
+      var n = 0;
+      for (var k in this.mem) {
+        if (Object.prototype.hasOwnProperty.call(this.mem, k)) {
+          n += (k.length + String(this.mem[k].html || '').length) * 2;
+        }
+      }
+      return n;
+    }
+  };
+  Snap.init();
+
+  /* 当前页面算一个 key：同一个页面（含二级页）只存一份 */
+  function routeKey() {
+    if (!currentMod) return '';
+    if (currentMod === 'rank') return 'p:rank:' + rankState.view + ':' + (rankState.id || '');
+    if (currentMod === 'class') return 'p:class:' + hwState.view;
+    if (currentMod === 'homework') return 'p:homework:' + hwState.view;
+    if (currentMod === 'cube') {
+      return 'p:cube:' + cubeState.view + ':' + (cubeState.projectId || '') + ':' + (cubeState.branchId || '');
+    }
+    if (currentMod === 'hwlib') {
+      return 'p:hwlib:' + hwlibState.view + ':' + (hwlibState.pid || '') + ':' + (hwlibState.bid || '');
+    }
+    if (currentMod === 'more') return 'p:more:' + moreState.view;
+    return 'p:' + currentMod;
+  }
+
+  var snapTimer = null;
+  var snapBusy = false;
+
+  function snapTipHtml() {
+    return '<div class="cache-tip"><span class="spinner" style="width:12px;height:12px"></span>正在更新…</div>';
+  }
+
+  function snapWatch() {
+    if (!IS_APP) return;                     /* 网页版不需要 */
+    var body = $('modBody');
+    if (!body || !window.MutationObserver) return;
+
+    new MutationObserver(function () {
+      var b = $('modBody');
+      if (!b || !currentMod) return;
+
+      /* 一出现「加载中」，就先用上次的快照顶上 */
+      if (!snapBusy && b.querySelector('.loading')) {
+        var rec = Snap.get(routeKey());
+        if (rec && rec.html) {
+          snapBusy = true;
+          b.innerHTML = snapTipHtml() + rec.html;
+          snapBusy = false;
+          return;
+        }
+      }
+
+      /* 内容稳定 500ms 后存一份（正在更新 / 加载中不存） */
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(function () {
+        var el = $('modBody');
+        if (!el || !currentMod) return;
+        if (el.querySelector('.loading') || el.querySelector('.cache-tip')) return;
+        var html = el.innerHTML;
+        if (html.length < 200) return;
+        Snap.set(routeKey(), html);
+      }, 500);
+    }).observe(body, { childList: true });
+  }
+
   function cacheClearAll() {
     var keys = [];
     try {
@@ -4440,6 +4565,7 @@ window.__supaReady = new Promise(function (resolve) {
       }
       keys.forEach(function (k) { localStorage.removeItem(k); });
     } catch (e) {}
+    Snap.clear();
     return keys.length;
   }
 
@@ -6224,7 +6350,7 @@ window.__supaReady = new Promise(function (resolve) {
             medalFoldHtml(medals) +
           '</div>' +
 
-          '<div class="card" style="padding:16px;margin-top:14px">' +
+          (IS_APP ? '<div class="card" style="padding:16px;margin-top:14px">' +
             '<div class="pf-label" style="margin-bottom:10px">缓存</div>' +
             '<div class="pf-row">' +
               '<div class="pf-main">' +
@@ -6233,7 +6359,7 @@ window.__supaReady = new Promise(function (resolve) {
               '</div>' +
               '<button class="btn ghost sm" id="pfCacheClear" type="button" style="height:34px;flex:none">清除缓存</button>' +
             '</div>' +
-          '</div>' +
+          '</div>' : '') +
         '</div>';
 
       var picked = u.gender;
@@ -6275,7 +6401,8 @@ window.__supaReady = new Promise(function (resolve) {
         }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
       };
 
-      body.querySelector('#pfCacheClear').onclick = function () {
+      var cacheBtn = body.querySelector('#pfCacheClear');
+      if (cacheBtn) cacheBtn.onclick = function () {
         var btn = this;
         busy(btn, true, '清理中…');
         var n = cacheClearAll();
