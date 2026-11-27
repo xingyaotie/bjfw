@@ -529,9 +529,10 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 .badge.black-orange{background:#2A1403;color:#FFB05E;border-color:#6B3208}
 
 /* 缓存提示：先显示旧的，再同步 */
-.cache-tip{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
-  background:var(--bg);border:1px solid var(--line);border-radius:8px;
-  padding:6px 10px;margin-bottom:10px}
+.cache-tip{position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:950;
+  display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
+  background:var(--bg);border:1px solid var(--line);border-radius:999px;
+  padding:6px 12px;margin:0;pointer-events:none;box-shadow:0 4px 14px rgba(17,24,39,.10)}
 .cache-tip.is-off{color:#8A5A00;background:#FFF6E8;border-color:#F3DCB8}
 body.theme-heicheng .cache-tip{background:#12100E;border-color:#2B2118;color:#9BA1A8}
 body.theme-heicheng .cache-tip.is-off{background:#241505;border-color:#4A2A0C;color:#FFB05E}
@@ -1143,6 +1144,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       <button class="tab" data-tab="medal" type="button">勋章设置</button>
       <button class="tab" data-tab="vendor" type="button">加盟商</button>
       <button class="tab" data-tab="member" type="button">会员</button>
+      <button class="tab" data-tab="coupon" type="button">兑换券</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="rank" type="button">排行榜</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
@@ -1580,6 +1582,18 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
         <button class="btn primary sm" id="btnMemberNew" type="button" style="height:32px;padding:0 14px">＋ 新建方案</button>
       </div>
       <div class="card"><div class="news" id="memberList"><div class="loading"><span class="spinner"></span>加载中…</div></div></div>
+    </section>
+
+    <!-- VIP 兑换券 -->
+    <section id="tab-coupon" hidden>
+      <div class="panel-head">
+        <div><h2>VIP 兑换券</h2>
+          <div class="hint">建好后会生成一张带二维码的图片，发给同学扫一下就能兑换</div></div>
+        <button class="btn primary sm" id="btnCouponNew" type="button" style="height:34px;padding:0 14px">＋ 添加</button>
+      </div>
+      <div class="card"><div class="news" id="couponList">
+        <div class="loading"><span class="spinner"></span>加载中…</div>
+      </div></div>
     </section>
 
     <!-- 广告推销 -->
@@ -2284,7 +2298,7 @@ window.__supaReady = new Promise(function (resolve) {
     }
   };
 
-  var MOD_TITLE = { search: '搜索', 'class': '班级', news: '班级热点', homework: '班级事项', forum: '论坛', rank: '排行榜', more: '更多', hwlib: '作业' };
+  var MOD_TITLE = { search: '搜索', 'class': '班级', news: '班级热点', homework: '班级事项', forum: '论坛', rank: '排行榜', more: '更多', hwlib: '作业', couponNew: '新建兑换券', redeem: '兑换 VIP' };
   /* 底栏布局：网页和 App 用同一套，不再分两边 */
   var TAB_UI = true;
 
@@ -2353,6 +2367,7 @@ window.__supaReady = new Promise(function (resolve) {
     buildTabbar();
     syncTabPill();
     snapWatch();
+    adminSnapWatch();
     window.addEventListener('resize', function () { syncTabPill(); syncNoticeWidth(); });
     var mb = $('modBody');
     if (mb && window.MutationObserver) {
@@ -2370,6 +2385,8 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'more') return moreState.view === 'info';
     if (currentMod === 'hwlib') return false;
     if (currentMod === 'compose') return false;
+    if (currentMod === 'couponNew') return false;
+    if (currentMod === 'redeem') return false;
     return false;                    /* 会员、我的资料这些二级页要能返回 */
   }
   function syncAppChrome() {
@@ -2561,6 +2578,7 @@ window.__supaReady = new Promise(function (resolve) {
           appMeRow(MI_ICON.profile, '设置', '资料、勋章、清除缓存', 'profile') +
           (isAdmin || memberHidden ? '' : appMeRow(MI_ICON.member, '会员', '方案与专属主题', 'member')) +
           appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封新通知' : '', 'mail') +
+          ((me.role === 'admin' || me.role === 'staff') ? '' : appMeRow(MI_ICON.member, '扫码兑换', '扫 VIP 兑换券', 'redeem')) +
           (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
           appMeRow(MI_ICON.tools, '更多工具', '背景音乐等', 'tools') +
           appMeRow(MI_ICON.update, '检查更新', '看看有没有新版本', 'update') +
@@ -2576,6 +2594,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (act === 'profile') return openProfileModule();
       if (act === 'member')  return openMemberModule();
       if (act === 'mail')    return openMailbox();
+      if (act === 'redeem')  return openRedeemPage();
       if (act === 'aid')     return openFirstAid();
       if (act === 'tools')   return openTools();
       if (act === 'update')  return checkAppUpdate();
@@ -2723,7 +2742,17 @@ window.__supaReady = new Promise(function (resolve) {
   var homeNoticeText = '';
   var homeNoticeW = -1;
   function renderHomeNotice(text) {
-    homeNoticeText = String(text || '').trim();
+    var t = String(text || '').trim();
+    /* 生日当天：公告最前面加一句生日快乐 */
+    var me = S.me || {};
+    if (me.birth_month && me.birth_day) {
+      var now = new Date();
+      if (Number(me.birth_month) === (now.getMonth() + 1) && Number(me.birth_day) === now.getDate()) {
+        var nm = me.display_name || me.username || '同学';
+        t = '🎂 ' + nm + ' 生日快乐！　　' + t;
+      }
+    }
+    homeNoticeText = t;
     homeNoticeW = -1;
     renderMarquee('homeNotice', 'homeNoticeText', homeNoticeText);
     syncNoticeWidth();
@@ -3277,6 +3306,17 @@ window.__supaReady = new Promise(function (resolve) {
     }
     if (currentMod === 'more') {
       if (moreState.view === 'fb' || moreState.view === 'promo' || moreState.view === 'ver') return renderMore();
+    }
+    if (currentMod === 'couponNew') { leaveCouponPage(); return; }
+    if (currentMod === 'redeem') {
+      stopRedeemScan();
+      currentMod = '';
+      $('modView').hidden = true;
+      $('mePanel').hidden = false;
+      document.body.style.overflow = '';
+      document.body.classList.remove('app-mod');
+      renderAppMe();
+      return;
     }
     if (currentMod === 'compose') {
       var ta = $('composeBody');
@@ -4417,6 +4457,55 @@ window.__supaReady = new Promise(function (resolve) {
       return o.v;
     } catch (e) { return null; }
   }
+  function cacheDel(key) {
+    try { localStorage.removeItem(CACHE_PREFIX + key); } catch (e) {}
+  }
+
+  /* 按需加载本地脚本（二维码库只在用到时才下载，不拖慢首页） */
+  var _loadedScripts = {};
+  function loadLocalScript(src, cb) {
+    if (_loadedScripts[src]) { if (cb) cb(); return; }
+    var el = document.createElement('script');
+    el.src = src;
+    el.async = true;
+    el.onload = function () { _loadedScripts[src] = true; if (cb) cb(); };
+    el.onerror = function () { toast('组件加载失败，检查网络后再试', 'err', 3000); };
+    document.head.appendChild(el);
+  }
+
+  /* 管理端各页也存一份，切回去先看上次的 */
+  function adminSnapWatch() {
+    if (!IS_APP || !window.MutationObserver) return;
+    var panel = $('adminPanel');
+    if (!panel) return;
+    var timer = null;
+
+    function sections() {
+      return Array.prototype.slice.call(panel.querySelectorAll('section[id^="tab-"]'));
+    }
+
+    new MutationObserver(function () {
+      /* 出现「加载中」就先用快照顶上 */
+      sections().forEach(function (sec) {
+        if (sec.hidden) return;
+        if (!sec.querySelector('.loading')) return;
+        if (sec.querySelector('.cache-tip')) return;
+        var rec = Snap.get('a:' + sec.id);
+        if (rec && rec.html) sec.innerHTML = '<div class="cache-tip">正在更新…</div>' + rec.html;
+      });
+
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        sections().forEach(function (sec) {
+          if (sec.hidden) return;
+          if (sec.querySelector('.loading') || sec.querySelector('.cache-tip')) return;
+          var html = sec.innerHTML;
+          if (html.length > 200) Snap.set('a:' + sec.id, html);
+        });
+      }, 700);
+    }).observe(panel, { childList: true, subtree: true });
+  }
+
   function cacheBytes() {
     if (!IS_APP) return 0;
     var n = 0;
@@ -4812,11 +4901,22 @@ window.__supaReady = new Promise(function (resolve) {
 
   function loadForumReplies(pid, box) {
     box.hidden = false;
-    box.innerHTML = '<div class="loading" style="padding:10px"><span class="spinner"></span>加载中…</div>';
 
+    var cachedRep = cacheGet('rep_' + pid);
+    if (cachedRep) paintForumReplies(pid, box, cachedRep);
+    else box.innerHTML = '<div class="loading" style="padding:10px"><span class="spinner"></span>加载中…</div>';
 
     api('api_forum_replies', { p_token: S.token, p_post_id: pid }).then(function (r) {
       var items = r.items || [];
+      cacheSet('rep_' + pid, items);
+      paintForumReplies(pid, box, items);
+    }, function (e) {
+      if (!cachedRep) box.innerHTML = '<div class="empty" style="padding:8px">' + esc(e.message) + '</div>';
+    });
+  }
+
+  function paintForumReplies(pid, box, items) {
+    {
       box.innerHTML =
         (items.length
           ? items.map(function (x) {
@@ -4843,12 +4943,11 @@ window.__supaReady = new Promise(function (resolve) {
         api('api_forum_reply', { p_token: S.token, p_post_id: pid, p_body: v }).then(function () {
           busy(send, false);
           toast('已跟评', 'ok');
+          cacheDel('rep_' + pid);
           renderForum();
         }, function (e) { busy(send, false); toast(e.message, 'err', 3800); });
       };
-    }, function (e) {
-      box.innerHTML = '<div class="empty" style="padding:8px">' + esc(e.message) + '</div>';
-    });
+    }
   }
 
   /* ---------- 管理端：论坛 ---------- */
@@ -5723,7 +5822,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'hwlib', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'hwlib', 'coupon', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -5742,6 +5841,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'medal') loadMedalAdmin();
     if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
+    if (name === 'coupon') loadCouponAdmin();
     if (name === 'ad') { loadAdAdmin(); loadAdFreeList(); }
     if (name === 'rank') loadRankAdmin();
     if (name === 'notice') loadNoticeAdmin();
@@ -6533,7 +6633,7 @@ window.__supaReady = new Promise(function (resolve) {
     function fillYear() {
       var box = m.querySelector('#pkY');
       var html = '<div class="pk-item' + (state.y === null ? ' on' : '') + '" data-y="0">不填</div>';
-      for (var y = nowYear; y >= 2012; y--) {
+      for (var y = 2022; y >= 2009; y--) {
         html += '<div class="pk-item' + (state.y === y ? ' on' : '') + '" data-y="' + y + '">' + y + ' 年</div>';
       }
       box.innerHTML = html;
@@ -7409,6 +7509,7 @@ window.__supaReady = new Promise(function (resolve) {
               ? '发给全体'
               : '发给：' + ((x.targets && x.targets.length) ? x.targets.join('、') : '（收件人已删除）')) +
             (x.reply_count ? ' · ' + x.reply_count + ' 条回复' : '') +
+            '<button type="button" class="link danger" data-admaildel="' + esc(x.id) + '" style="margin-left:auto">删除</button>' +
           '</div></div>';
       }).join('');
     }, function (e) {
@@ -7952,6 +8053,362 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
+
+  /* ================= VIP 兑换券 ================= */
+  var couponDraft = { view: 'form', item: null, img: '' };
+  var couponPlans = [];
+  var redeemState = { view: 'scan', info: null, stream: null, timer: null };
+
+  function loadCouponAdmin() {
+    var box = $('couponList');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_coupon_list', { p_token: S.token }).then(function (r) {
+      S.coupons = r.items || [];
+      renderCouponAdmin();
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderCouponAdmin() {
+    var box = $('couponList');
+    var list = S.coupons || [];
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有兑换券</strong>点右上角「＋ 添加」建一张</div>';
+      return;
+    }
+    box.innerHTML = list.map(function (c) {
+      return '<div class="news-item" style="display:flex;align-items:center;gap:12px">' +
+        '<div style="flex:1;min-width:0">' +
+          '<b style="font-size:14px;color:var(--ink)">' + esc(c.name) + '</b>' +
+          ' <span class="badge gray" style="height:18px;font-size:11px">' + esc(c.code) + '</span>' +
+          '<div class="hint" style="margin-top:4px">' +
+            esc(c.plan_name) + 'VIP · ' + c.days + ' 天 · ' + esc(c.created_at) +
+            (c.used ? ' · <span style="color:var(--red)">已被 ' + esc(c.used_by || '某人') + ' 用掉</span>' : ' · 未使用') +
+          '</div>' +
+        '</div>' +
+        (c.used ? '' : '<button type="button" class="link" data-couponimg="' + esc(c.id) + '">看图片</button>') +
+        '<button type="button" class="link danger" data-coupondel="' + esc(c.id) + '">删除</button>' +
+      '</div>';
+    }).join('');
+  }
+
+  function couponById(id) {
+    return (S.coupons || []).filter(function (x) { return x.id === id; })[0];
+  }
+
+  function openCouponCreate() {
+    couponDraft = { view: 'form', item: null, img: '' };
+    currentMod = 'couponNew';
+    $('modTitle').textContent = '新建兑换券';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    slideIn($('modView'), 'right');
+
+    couponPlans = [];
+    renderCouponCreate();
+    api('api_member_page', { p_token: S.token }).then(function (r) {
+      couponPlans = r.plans || [];
+      if (currentMod === 'couponNew' && couponDraft.view === 'form') renderCouponCreate();
+    }, function () {});
+  }
+
+  function renderCouponCreate() {
+    var body = $('modBody');
+    if (couponDraft.view === 'result') {
+      body.innerHTML =
+        '<div style="max-width:560px;margin:0 auto;text-align:center">' +
+          '<div class="hint" style="margin-bottom:10px">图片已生成，长按或点「保存图片」就能存到相册</div>' +
+          '<img src="' + couponDraft.img + '" style="width:100%;max-width:420px;border-radius:12px;border:1px solid var(--line)">' +
+          '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+            '<a class="btn primary" download="' + esc(couponDraft.item ? couponDraft.item.code : 'coupon') + '.png" href="' + couponDraft.img + '">保存图片</a>' +
+            '<button class="btn ghost" type="button" id="couponBackList">返回列表</button>' +
+          '</div>' +
+        '</div>';
+      $('couponBackList').onclick = function () { leaveCouponPage(); };
+      return;
+    }
+
+    body.innerHTML =
+      '<div style="max-width:560px;margin:0 auto">' +
+        '<label class="field"><span>兑换券名称<em>*</em></span>' +
+          '<input class="input" id="cpName" maxlength="40" placeholder="例如：元旦福利券"></label>' +
+        '<label class="field"><span>兑换券编号<em>*</em></span>' +
+          '<input class="input" id="cpCode" maxlength="40" placeholder="例如：NEW2026（4-40 位字母/数字/-/_）" style="text-transform:uppercase"></label>' +
+        '<label class="field"><span>兑换的会员方案<em>*</em></span>' +
+          '<select class="input" id="cpPlan">' +
+            (couponPlans.length
+              ? couponPlans.map(function (p) {
+                  return '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>';
+                }).join('')
+              : '<option value="">（先在会员里建一个方案）</option>') +
+          '</select></label>' +
+        '<label class="field"><span>天数<em>*</em></span>' +
+          '<input class="input" id="cpDays" type="number" min="1" max="3650" value="30"></label>' +
+        '<div style="text-align:right;margin-top:6px">' +
+          '<button class="btn ghost" type="button" id="couponCancel" style="margin-right:8px">取消</button>' +
+          '<button class="btn primary" type="button" id="couponCreate">创建</button>' +
+        '</div>' +
+      '</div>';
+
+    $('couponCancel').onclick = leaveCouponPage;
+    $('couponCreate').onclick = function () {
+      var btn = this;
+      var nm = $('cpName').value.trim();
+      var cd = $('cpCode').value.trim().toUpperCase();
+      var pid = $('cpPlan').value;
+      var days = parseInt($('cpDays').value, 10) || 0;
+      if (!nm) return toast('请填兑换券名称', 'err');
+      if (!/^[A-Z0-9_-]{4,40}$/.test(cd)) return toast('编号只能是 4-40 位字母、数字、- 或 _', 'err');
+      if (!pid) return toast('先在会员里建一个方案', 'err');
+      if (!days) return toast('请填天数', 'err');
+
+      busy(btn, true, '创建中…');
+      api('api_admin_coupon_save', {
+        p_token: S.token, p_name: nm, p_code: cd, p_plan_id: pid, p_days: days
+      }).then(function (r) {
+        var planName = '';
+        couponPlans.forEach(function (p) { if (p.id === pid) planName = p.name; });
+        var item = { id: r && r.id, name: nm, code: cd, plan_name: planName, days: days };
+        makeCouponImage(item, function (dataUrl) {
+          busy(btn, false);
+          couponDraft = { view: 'result', item: item, img: dataUrl };
+          renderCouponCreate();
+          loadCouponAdmin();
+          toast('已创建', 'ok');
+        });
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    };
+  }
+
+  /* 券面图片：名称 / 编号 / XXXVIP X天 / 二维码 */
+  function makeCouponImage(item, cb) {
+    loadLocalScript('./qrcode.js', function () {
+      try {
+        var qr = qrcode(0, 'M');
+        qr.addData('XKYCTP:' + item.code);
+        qr.make();
+
+        var W = 640, H = 900;
+        var c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        var g = c.getContext('2d');
+        g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+
+        g.fillStyle = '#C8102E';
+        g.fillRect(0, 0, W, 10);
+
+        g.textAlign = 'center';
+        g.fillStyle = '#1F2328';
+        g.font = 'bold 40px sans-serif';
+        g.fillText(item.name, W / 2, 100);
+
+        g.fillStyle = '#6B7280';
+        g.font = '26px monospace';
+        g.fillText('编号：' + item.code, W / 2, 152);
+
+        g.fillStyle = '#C8102E';
+        g.font = 'bold 34px sans-serif';
+        g.fillText(item.plan_name + 'VIP  ' + item.days + '天', W / 2, 214);
+
+        var n = qr.getModuleCount();
+        var cell = Math.floor(400 / n);
+        var size = cell * n;
+        var ox = Math.round((W - size) / 2), oy = 260;
+
+        g.fillStyle = '#ffffff';
+        g.fillRect(ox - 12, oy - 12, size + 24, size + 24);
+        g.fillStyle = '#000000';
+        for (var r = 0; r < n; r++) {
+          for (var col = 0; col < n; col++) {
+            if (!qr.isDark(r, col)) continue;
+            g.fillRect(ox + col * cell, oy + r * cell, cell, cell);
+          }
+        }
+
+        g.fillStyle = '#9AA0A6';
+        g.font = '20px sans-serif';
+        g.textAlign = 'center';
+        g.fillText('扫一扫兑换 · 兑换后作废', W / 2, oy + size + 60);
+
+        cb(c.toDataURL('image/png'));
+      } catch (e) {
+        toast('生成图片失败：' + e, 'err', 3000);
+      }
+    });
+  }
+
+  function leaveCouponPage() {
+    currentMod = '';
+    $('modView').hidden = true;
+    $('adminPanel').hidden = false;
+    document.body.style.overflow = '';
+    document.body.classList.remove('app-mod');
+    switchTab('coupon');
+  }
+
+  /* ---------- 用户端：扫码兑换 ---------- */
+  function openRedeemPage() {
+    if (!S.me || S.me.role === 'admin' || S.me.role === 'staff') return;
+    redeemState = { view: 'scan', info: null, stream: null, timer: null };
+    currentMod = 'redeem';
+    $('modTitle').textContent = '兑换 VIP';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    slideIn($('modView'), 'right');
+    renderRedeemPage();
+  }
+
+  function renderRedeemPage() {
+    var body = $('modBody');
+    var st = redeemState;
+
+    if (st.view === 'done') {
+      body.innerHTML =
+        '<div style="max-width:520px;margin:0 auto;text-align:center;padding-top:30px">' +
+          '<div style="font-size:44px">🎉</div>' +
+          '<h2 style="font-size:20px;color:var(--ink);margin:10px 0">兑换成功</h2>' +
+          '<div class="hint">' + esc(st.info.plan_name) + 'VIP · ' + st.info.days + ' 天</div>' +
+          '<div class="hint" style="margin-top:6px">到期时间：' + esc(st.info.vip_until || '') + '</div>' +
+          '<div style="margin-top:20px"><button class="btn primary" type="button" id="redeemAgain">再兑一张</button></div>' +
+        '</div>';
+      $('redeemAgain').onclick = function () { stopRedeemScan(); redeemState = { view: 'scan', info: null, stream: null, timer: null }; renderRedeemPage(); };
+      return;
+    }
+
+    if (st.view === 'preview') {
+      body.innerHTML =
+        '<div style="max-width:520px;margin:0 auto">' +
+          '<div class="card" style="padding:18px">' +
+            '<div class="pf-label">兑换券</div>' +
+            '<div class="pf-val" style="font-size:17px;font-weight:700">' + esc(st.info.name) + '</div>' +
+            '<div class="hint" style="margin-top:6px">编号：' + esc(st.info.code) + '</div>' +
+            '<div class="hint" style="margin-top:2px">' + esc(st.info.plan_name) + 'VIP · ' + st.info.days + ' 天</div>' +
+          '</div>' +
+          '<div style="text-align:center;margin-top:18px">' +
+            '<button class="btn primary" id="redeemGo" type="button" style="min-width:180px">确认兑换</button>' +
+          '</div>' +
+          '<p class="hint" style="text-align:center;font-size:12.5px;margin-top:12px">*兑换后兑换券将会作废，请决定好后再兑换</p>' +
+          '<div style="text-align:center;margin-top:10px"><button class="btn ghost sm" type="button" id="redeemBackScan">换个券</button></div>' +
+        '</div>';
+      $('redeemBackScan').onclick = function () { redeemState.view = 'scan'; renderRedeemPage(); };
+      $('redeemGo').onclick = redeemConfirm;
+      return;
+    }
+
+    body.innerHTML =
+      '<div style="max-width:520px;margin:0 auto">' +
+        '<div class="card" style="padding:14px">' +
+          '<video id="redeemVideo" playsinline muted style="width:100%;border-radius:10px;background:#000;min-height:200px"></video>' +
+          '<div class="hint" style="text-align:center;margin-top:8px">把兑换券上的二维码放进框里</div>' +
+        '</div>' +
+        '<div class="card" style="padding:14px;margin-top:14px">' +
+          '<div class="pf-label" style="margin-bottom:8px">扫不出来？手动输入编号</div>' +
+          '<div class="row">' +
+            '<input class="input" id="redeemCode" maxlength="40" placeholder="券上的编号" style="text-transform:uppercase">' +
+            '<button class="btn primary" id="redeemManual" type="button">查询</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    $('redeemManual').onclick = function () {
+      var v = $('redeemCode').value.trim();
+      if (!v) return toast('先输入编号', 'err');
+      redeemPreview(v);
+    };
+    startRedeemScan();
+  }
+
+  function startRedeemScan() {
+    stopRedeemScan();
+    loadLocalScript('./jsQR.js', function () {
+      if (currentMod !== 'redeem' || redeemState.view !== 'scan') return;
+      var video = $('redeemVideo');
+      if (!video || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        toast('这台设备不能调摄像头，直接输编号吧', 'err', 3000);
+        return;
+      }
+      if (window.XkyctpShell && window.XkyctpShell.askCamera) { try { window.XkyctpShell.askCamera(); } catch (e) {} }
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+        .then(function (stream) {
+          redeemState.stream = stream;
+          video.srcObject = stream;
+          video.play();
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+          redeemState.timer = setInterval(function () {
+            if (currentMod !== 'redeem' || redeemState.view !== 'scan') return stopRedeemScan();
+            if (!video.videoWidth) return;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            try {
+              var data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              var hit = (window.jsQR || jsQR)(data.data, canvas.width, canvas.height);
+              if (hit && hit.data) handleRedeemPayload(hit.data);
+            } catch (e) {}
+          }, 500);
+        })
+        .catch(function () {
+          toast('摄像头打不开，直接输编号吧', 'err', 3000);
+        });
+    });
+  }
+
+  function stopRedeemScan() {
+    if (redeemState.timer) { clearInterval(redeemState.timer); redeemState.timer = null; }
+    if (redeemState.stream) {
+      try { redeemState.stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+      redeemState.stream = null;
+    }
+  }
+
+  function handleRedeemPayload(text) {
+    var m = /^XKYCTP[:|]([A-Za-z0-9_-]{4,40})$/.exec(String(text || '').trim());
+    if (!m) { toast('这不是班级平台的兑换券', 'err', 2200); return; }
+    stopRedeemScan();
+    redeemPreview(m[1]);
+  }
+
+  function redeemPreview(code) {
+    var codeUp = String(code || '').trim().toUpperCase();
+    stopRedeemScan();
+    $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>查询中…</div>';
+    api('api_coupon_preview', { p_token: S.token, p_code: codeUp }).then(function (r) {
+      redeemState = { view: 'preview', info: r, stream: null, timer: null };
+      renderRedeemPage();
+    }, function (e) {
+      toast(e.message, 'err', 3200);
+      redeemState = { view: 'scan', info: null, stream: null, timer: null };
+      renderRedeemPage();
+    });
+  }
+
+  function redeemConfirm() {
+    var btn = $('redeemGo');
+    busy(btn, true, '兑换中…');
+    api('api_coupon_redeem', { p_token: S.token, p_code: redeemState.info.code }).then(function (r) {
+      busy(btn, false);
+      redeemState = { view: 'done', info: r, stream: null, timer: null };
+      renderRedeemPage();
+      api('api_resume', { p_token: S.token }).then(function (rr) {
+        if (rr && rr.ok && rr.profile) { S.me = rr.profile; saveSession(S.token, S.me); applyTheme(); }
+      }, function () {});
+      toast('兑换成功', 'ok');
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message, 'err', 3600);
+    });
+  }
 
   /* ---------- 管理端：作业 ---------- */
   function loadHwLibAdmin() {
@@ -9772,7 +10229,46 @@ window.__supaReady = new Promise(function (resolve) {
       $('mailAll').classList.remove('on');
       $('mailTargets').hidden = false;
     });
+    $('btnCouponNew').addEventListener('click', openCouponCreate);
+    $('couponList').addEventListener('click', function (e) {
+      var img = e.target.closest('[data-couponimg]');
+      if (img) {
+        var c = couponById(img.getAttribute('data-couponimg'));
+        if (!c) return;
+        makeCouponImage({ name: c.name, code: c.code, plan_name: c.plan_name, days: c.days }, function (url) {
+          modal('兑换券图片',
+            '<div style="text-align:center"><img src="' + url + '" style="width:100%;max-width:380px;border-radius:12px">' +
+            '<div class="hint" style="margin-top:10px">长按图片可以保存</div></div>',
+            '<a class="btn primary" download="' + esc(c.code) + '.png" href="' + url + '">保存图片</a>' +
+            '<button class="btn ghost" type="button" data-close>关闭</button>', 460);
+        });
+        return;
+      }
+      var del = e.target.closest('[data-coupondel]');
+      if (del) {
+        confirmBox('删除兑换券', '删除后这张券就不能再兑换了。', '', '删除').then(function (yes) {
+          if (!yes) return;
+          api('api_admin_coupon_delete', { p_token: S.token, p_id: del.getAttribute('data-coupondel') }).then(function () {
+            toast('已删除', 'ok'); loadCouponAdmin();
+          }, function (err) { toast(err.message, 'err'); });
+        });
+      }
+    });
+
     $('btnSendMail').addEventListener('click', sendMail);
+    $('mailSentList').addEventListener('click', function (e) {
+      var d = e.target.closest('[data-admaildel]');
+      if (!d) return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      confirmBox('删除这封信', '删除后所有收到的人都看不到了。', '', '删除').then(function (yes) {
+        if (!yes) return;
+        api('api_admin_delete_mail', { p_token: S.token, p_id: d.getAttribute('data-admaildel') }).then(function () {
+          toast('已删除', 'ok');
+          loadMailSent();
+        }, function (err) { toast(err.message, 'err'); });
+      });
+    });
     $('mailSentList').addEventListener('click', function (e) {
       var it = e.target.closest('[data-mail]');
       if (it) openMailDetail(it.dataset.mail);
