@@ -528,11 +528,40 @@ tr.sel .pick{border-color:var(--red);background:var(--red);color:#fff}
 .theme-line{height:1px;background:var(--line);margin:10px 0}
 .badge.black-orange{background:#2A1403;color:#FFB05E;border-color:#6B3208}
 
+/* 音乐胶囊：在底栏上方，点 ✕ 才会消失 */
+.music-pill{position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:9300;
+  display:flex;align-items:center;gap:8px;padding:7px 8px 7px 12px;border-radius:999px;
+  background:rgba(17,24,39,.86);color:#fff;font-size:12.5px;
+  box-shadow:0 8px 24px rgba(17,24,39,.28);backdrop-filter:blur(8px)}
+body.glass-nav .music-pill{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+.music-pill .mp-ico{font-size:14px}
+.music-pill .mp-btn{width:26px;height:26px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.16);color:#fff;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}
+
+/* 搜索页：搜索框下面的下载入口 */
+.apk-dl{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 14px;
+  border:1px dashed var(--line);border-radius:12px;background:var(--card);
+  color:var(--ink2);text-decoration:none;font-size:13.5px}
+.apk-dl small{color:var(--muted);font-size:11.5px;display:block;margin-top:2px}
+.apk-dl .arrow{margin-left:auto;color:var(--muted)}
+body.theme-heicheng .apk-dl{background:#111010;border-color:#2B2118}
+
+/* 扫码框：方框 + 从上往下的扫描线 */
+.scan-wrap{position:relative;border-radius:12px;overflow:hidden;background:#000;min-height:230px}
+.scan-wrap video{width:100%;display:block;min-height:230px;object-fit:cover}
+.scan-frame{position:absolute;left:50%;top:50%;width:62%;max-width:250px;aspect-ratio:1/1;
+  transform:translate(-50%,-50%);border-radius:14px;
+  box-shadow:0 0 0 2000px rgba(0,0,0,.28), inset 0 0 0 2px rgba(255,255,255,.9)}
+.scan-line{position:absolute;left:6%;right:6%;top:6%;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#22c55e,transparent);animation:scanMove 2s linear infinite}
+@keyframes scanMove{0%{top:6%}100%{top:92%}}
+
 /* 缓存提示：先显示旧的，再同步 */
-.cache-tip{position:fixed;left:50%;top:62px;transform:translateX(-50%);z-index:950;
-  display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
+.cache-slot{height:34px}
+.cache-tip{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);
   background:var(--bg);border:1px solid var(--line);border-radius:999px;
-  padding:6px 12px;margin:0;pointer-events:none;box-shadow:0 4px 14px rgba(17,24,39,.10)}
+  padding:6px 12px;margin:0 0 6px;pointer-events:none}
 .cache-tip.is-off{color:#8A5A00;background:#FFF6E8;border-color:#F3DCB8}
 body.theme-heicheng .cache-tip{background:#12100E;border-color:#2B2118;color:#9BA1A8}
 body.theme-heicheng .cache-tip.is-off{background:#241505;border-color:#4A2A0C;color:#FFB05E}
@@ -2228,7 +2257,42 @@ window.__supaReady = new Promise(function (resolve) {
     toast('登录已过期，请重新登录', 'err');
     showLogin();
   }
+  /* 只读接口：10 秒内同一个请求直接用上次结果，反复进页面不再重复刷 */
+  var READ_TTL = 10000;
+  var _readCache = {};
+  var READ_RPCS = {
+    api_forum_list: 1, api_forum_cats: 1, api_forum_replies: 1, api_forum_my_likes: 1,
+    api_hw_list: 1, api_hw_detail: 1, api_rank_boards: 1, api_rank_board: 1,
+    api_list_announcements: 1, api_list_homework: 1, api_timetable_get: 1, api_canteen_get: 1,
+    api_vendors: 1, api_member_page: 1, api_cube_my_tutorials: 1, api_cube_tutorial_content: 1,
+    api_debug_list: 1, api_debug_detail: 1, api_my_coupons: 1, api_list_mails: 1,
+    api_admin_coupon_list: 1, api_admin_mail_list: 1, api_admin_list_users: 1
+  };
+
+  function apiKey(fn, params) {
+    var p = params || {};
+    var keys = Object.keys(p).filter(function (k) { return k !== 'p_token'; }).sort();
+    var parts = [];
+    keys.forEach(function (k) { parts.push(k + '=' + String(p[k])); });
+    return fn + '|' + parts.join('&');
+  }
+
   function api(fn, params) {
+    var p = params || {};
+    if (!READ_RPCS[fn]) {
+      _readCache = {};                 /* 写了东西就把读缓存清掉，保证马上看到新数据 */
+      return apiRaw(fn, p);
+    }
+    var k = apiKey(fn, p);
+    var hit = _readCache[k];
+    if (hit && (Date.now() - hit.t) < READ_TTL) return Promise.resolve(hit.v);
+    return apiRaw(fn, p).then(function (v) {
+      _readCache[k] = { t: Date.now(), v: v };
+      return v;
+    });
+  }
+
+  function apiRaw(fn, params) {
     if (!db) return Promise.reject(new Error('还没连上数据库'));
     return db.rpc(fn, params || {}).then(function (res) {
       if (res.error) throw new Error(humanize(res.error));
@@ -2367,7 +2431,6 @@ window.__supaReady = new Promise(function (resolve) {
     buildTabbar();
     syncTabPill();
     snapWatch();
-    adminSnapWatch();
     window.addEventListener('resize', function () { syncTabPill(); syncNoticeWidth(); });
     var mb = $('modBody');
     if (mb && window.MutationObserver) {
@@ -2580,7 +2643,7 @@ window.__supaReady = new Promise(function (resolve) {
           appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封新通知' : '', 'mail') +
           ((me.role === 'admin' || me.role === 'staff') ? '' : appMeRow(MI_ICON.member, '扫码兑换', '扫 VIP 兑换券', 'redeem')) +
           (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
-          appMeRow(MI_ICON.tools, '更多工具', '背景音乐等', 'tools') +
+          appMeRow(MI_ICON.tools, '背景音乐', '打开后单曲循环', 'tools') +
           appMeRow(MI_ICON.update, '检查更新', '看看有没有新版本', 'update') +
           appMeRow(MI_ICON.logout, '退出登录', '下次进来要重新输入密码', 'logout', 'danger') +
         '</div>' +
@@ -2849,19 +2912,7 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* 顶栏「更多」：邮箱 + 音乐开关 */
   function openTools() {
-    var me = S.me || {};
-    var isAdmin = me.role === 'admin';
-    var unread = S.mails ? S.mails.length : 0;
-
-    var m = modal('更多',
-      '<div class="tool-row" id="toolMail">' +
-        '<span class="ti">✉</span>' +
-        '<div style="flex:1"><div class="tt">' + (isAdmin ? '学生回复' : '信箱') + '</div>' +
-          '<div class="td">' + (isAdmin
-            ? '学生回复站内信的地方'
-            : (unread ? '有 ' + unread + ' 封公告' : '班级公告和通知')) + '</div></div>' +
-        '<span style="color:var(--muted)">›</span>' +
-      '</div>' +
+    var m = modal('背景音乐',
       '<div class="tool-row">' +
         '<span class="ti">🎵</span>' +
         '<div style="flex:1"><div class="tt">背景音乐</div>' +
@@ -2870,16 +2921,9 @@ window.__supaReady = new Promise(function (resolve) {
           '<input type="checkbox" id="bgmSwitch"' + (bgmPlaying() ? ' checked' : '') + '>' +
           '<span class="slider"></span>' +
         '</label>' +
-      '</div>',
+      '</div>' +
+      '<p class="hint" style="font-size:12px;margin-top:10px">播放时底部导航上方会出现一个小胶囊，点 ✕ 就能彻底关掉。</p>',
       '<button class="btn ghost" type="button" data-close>关闭</button>', 420);
-
-    var mailRow = m.querySelector('#toolMail');
-    if (mailRow) {
-      mailRow.onclick = function () {
-        closeModal();
-        if (isAdmin) openAdminInbox(); else openMailbox();
-      };
-    }
 
     var sw = m.querySelector('#bgmSwitch');
     sw.onclick = function () { setBgm(this.checked); };
@@ -2888,6 +2932,29 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* 音乐：手动开关，打开后单曲循环 */
   function bgmEl() { return $('bgm'); }
+
+  function showMusicPill() {
+    if ($('musicPill')) { updateMusicPill(); return; }
+    var el = document.createElement('div');
+    el.id = 'musicPill';
+    el.className = 'music-pill';
+    el.innerHTML = '<span class="mp-ico">🎵</span><span>背景音乐</span>' +
+      '<button type="button" class="mp-btn" id="mpToggle">⏸</button>' +
+      '<button type="button" class="mp-btn" id="mpClose">✕</button>';
+    document.body.appendChild(el);
+    el.querySelector('#mpToggle').onclick = function () { setBgm(!bgmPlaying()); };
+    el.querySelector('#mpClose').onclick = function () { setBgm(false); hideMusicPill(); };
+  }
+
+  function hideMusicPill() {
+    var el = $('musicPill');
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+  }
+
+  function updateMusicPill() {
+    var b = $('mpToggle');
+    if (b) b.textContent = bgmPlaying() ? '⏸' : '▶';
+  }
 
   function bgmPlaying() {
     var a = bgmEl();
@@ -2908,6 +2975,8 @@ window.__supaReady = new Promise(function (resolve) {
     } else {
       a.pause();
     }
+    if (on) showMusicPill();
+    updateMusicPill();
     var sw = $('bgmSwitch');
     if (sw) sw.checked = on;
   }
@@ -3379,6 +3448,12 @@ window.__supaReady = new Promise(function (resolve) {
           }).join('') +
         '</div>' +
         '<div id="appSearchOut"></div>' +
+        (IS_APP ? '' :
+          '<a class="apk-dl" href="https://xingyaotie.github.io/bjfw/xkyctp.apk" target="_blank" rel="noopener">' +
+            '<span style="font-size:18px">📱</span>' +
+            '<span>下载安卓版 App<small>装上不用每次登录，打开更快</small></span>' +
+            '<span class="arrow">↓</span>' +
+          '</a>') +
       '</div>';
 
     var input = $('appSearchInput');
@@ -3850,11 +3925,13 @@ window.__supaReady = new Promise(function (resolve) {
 
     var cached = cacheGet('vendors');
     if (cached && cached.length) {
+      S.vendors = cached;
       box.innerHTML = vendorsHtml(cached);
     }
 
     api('api_vendors', { p_token: S.token }).then(function (r) {
       var items = r.items || [];
+      S.vendors = items;
       cacheSet('vendors', items);
       var now = $('vendorList');
       if (now) now.innerHTML = vendorsHtml(items);
@@ -4607,9 +4684,11 @@ window.__supaReady = new Promise(function (resolve) {
 
   var snapTimer = null;
   var snapBusy = false;
+  var snapRestored = {};
 
   function snapTipHtml() {
-    return '<div class="cache-tip"><span class="spinner" style="width:12px;height:12px"></span>正在更新…</div>';
+    return '<div class="cache-slot"><div class="cache-tip">' +
+      '<span class="spinner" style="width:12px;height:12px"></span>正在更新…</div></div>';
   }
 
   function snapWatch() {
@@ -4623,9 +4702,11 @@ window.__supaReady = new Promise(function (resolve) {
 
       /* 一出现「加载中」，就先用上次的快照顶上 */
       if (!snapBusy && b.querySelector('.loading')) {
-        var rec = Snap.get(routeKey());
+        var key0 = routeKey();
+        var rec = Snap.get(key0);
         if (rec && rec.html) {
           snapBusy = true;
+          snapRestored[key0] = true;
           b.innerHTML = snapTipHtml() + rec.html;
           snapBusy = false;
           return;
@@ -4638,9 +4719,14 @@ window.__supaReady = new Promise(function (resolve) {
         var el = $('modBody');
         if (!el || !currentMod) return;
         if (el.querySelector('.loading') || el.querySelector('.cache-tip')) return;
-        var html = el.innerHTML;
+        var key = routeKey();
+        /* 铺过快照的页面：更新完补一个等高占位，页面位置不动 */
+        if (snapRestored[key] && (!el.firstElementChild || !el.firstElementChild.classList.contains('cache-slot'))) {
+          el.insertAdjacentHTML('afterbegin', '<div class="cache-slot"></div>');
+        }
+        var html = el.innerHTML.split('<div class="cache-slot"></div>').join('');
         if (html.length < 200) return;
-        Snap.set(routeKey(), html);
+        Snap.set(key, html);
       }, 500);
     }).observe(body, { childList: true });
   }
@@ -4655,6 +4741,7 @@ window.__supaReady = new Promise(function (resolve) {
       keys.forEach(function (k) { localStorage.removeItem(k); });
     } catch (e) {}
     Snap.clear();
+    _readCache = {};                 /* 连 10 秒读缓存一起清，清完立刻重新拉 */
     return keys.length;
   }
 
@@ -5143,7 +5230,7 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   function clearThemeClass() {
-    ['wujin', 'danxia', 'tianlan', 'hantan'].forEach(function (k) {
+    ['wujin', 'danxia', 'tianlan', 'hantan', 'heicheng'].forEach(function (k) {
       document.body.classList.remove('theme-' + k);
     });
     document.body.classList.remove('theme-light');
@@ -5482,15 +5569,8 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   function hwlibDeniedHtml() {
-    var me = S.me || {};
-    var plan = me.member_plan_name
-      ? '你现在的方案：' + me.member_plan_name
-      : '你现在还没有会员方案';
-    return '<div class="empty" style="padding:44px 20px">' +
-      '<strong>还没有作业权限</strong>' +
-      '作业是会员权益。管理员要在「会员 → 方案」里勾上「查看作业」，并且把你分到那个方案。' +
-      '<div class="hint" style="margin-top:10px;font-size:12.5px">' + esc(plan) + '</div>' +
-      '<div style="margin-top:16px"><button class="btn ghost sm" type="button" id="hwRefresh">刷新权限</button></div>' +
+    return '<div class="empty" style="padding:56px 20px">' +
+      '<strong>你没有权限</strong>' +
     '</div>';
   }
 
@@ -8200,26 +8280,27 @@ window.__supaReady = new Promise(function (resolve) {
         var g = c.getContext('2d');
         g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
 
-        g.fillStyle = '#C8102E';
-        g.fillRect(0, 0, W, 10);
-
         g.textAlign = 'center';
+        g.fillStyle = '#9AA0A6';
+        g.font = '24px sans-serif';
+        g.fillText('xkyctp班级平台', W / 2, 66);
+
         g.fillStyle = '#1F2328';
         g.font = 'bold 40px sans-serif';
-        g.fillText(item.name, W / 2, 100);
+        g.fillText(item.name, W / 2, 130);
 
         g.fillStyle = '#6B7280';
         g.font = '26px monospace';
-        g.fillText('编号：' + item.code, W / 2, 152);
+        g.fillText('编号：' + item.code, W / 2, 182);
 
-        g.fillStyle = '#C8102E';
+        g.fillStyle = '#1F2328';
         g.font = 'bold 34px sans-serif';
-        g.fillText(item.plan_name + 'VIP  ' + item.days + '天', W / 2, 214);
+        g.fillText(item.plan_name + 'VIP  ' + item.days + '天', W / 2, 244);
 
         var n = qr.getModuleCount();
         var cell = Math.floor(400 / n);
         var size = cell * n;
-        var ox = Math.round((W - size) / 2), oy = 260;
+        var ox = Math.round((W - size) / 2), oy = 292;
 
         g.fillStyle = '#ffffff';
         g.fillRect(ox - 12, oy - 12, size + 24, size + 24);
@@ -8308,8 +8389,14 @@ window.__supaReady = new Promise(function (resolve) {
     body.innerHTML =
       '<div style="max-width:520px;margin:0 auto">' +
         '<div class="card" style="padding:14px">' +
-          '<video id="redeemVideo" playsinline muted style="width:100%;border-radius:10px;background:#000;min-height:200px"></video>' +
-          '<div class="hint" style="text-align:center;margin-top:8px">把兑换券上的二维码放进框里</div>' +
+          '<div class="scan-wrap">' +
+            '<video id="redeemVideo" playsinline muted></video>' +
+            '<div class="scan-frame"><i class="scan-line"></i></div>' +
+          '</div>' +
+          '<div class="row" style="margin-top:10px;align-items:center">' +
+            '<button class="btn ghost sm" id="torchBtn" type="button" style="height:34px">💡 手电筒</button>' +
+            '<span class="hint" style="font-size:12px">把二维码放进方框里</span>' +
+          '</div>' +
         '</div>' +
         '<div class="card" style="padding:14px;margin-top:14px">' +
           '<div class="pf-label" style="margin-bottom:8px">扫不出来？手动输入编号</div>' +
@@ -8318,7 +8405,14 @@ window.__supaReady = new Promise(function (resolve) {
             '<button class="btn primary" id="redeemManual" type="button">查询</button>' +
           '</div>' +
         '</div>' +
+        '<div class="card" style="padding:14px;margin-top:14px">' +
+          '<div class="pf-label" style="margin-bottom:8px">我兑换过的</div>' +
+          '<div id="myCoupons"><div class="hint" style="padding:6px 0">加载中…</div></div>' +
+        '</div>' +
       '</div>';
+
+    $('torchBtn').onclick = toggleTorch;
+    loadMyCoupons();
 
     $('redeemManual').onclick = function () {
       var v = $('redeemCode').value.trim();
@@ -8326,6 +8420,44 @@ window.__supaReady = new Promise(function (resolve) {
       redeemPreview(v);
     };
     startRedeemScan();
+  }
+
+  function toggleTorch() {
+    var st = redeemState;
+    if (!st.stream) return toast('先让摄像头打开', 'err');
+    var track = st.stream.getVideoTracks()[0];
+    if (!track) return;
+    st.torch = !st.torch;
+    try {
+      track.applyConstraints({ advanced: [{ torch: !!st.torch }] }).then(function () {
+        toast(st.torch ? '手电筒已打开' : '手电筒已关闭', 'ok', 1500);
+      }, function () {
+        toast('这台手机不支持手电筒', 'err', 2000);
+      });
+    } catch (e) {
+      toast('这台手机不支持手电筒', 'err', 2000);
+    }
+  }
+
+  function loadMyCoupons() {
+    var box = $('myCoupons');
+    if (!box) return;
+    api('api_my_coupons', { p_token: S.token }).then(function (r) {
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="hint" style="padding:6px 0">还没有兑换过</div>';
+        return;
+      }
+      box.innerHTML = items.map(function (c) {
+        return '<div class="perm-row" style="padding:8px 0">' +
+          '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(c.name) +
+            '<small>' + esc(c.code) + ' · ' + esc(c.plan_name) + 'VIP ' + c.days + ' 天</small></div>' +
+          '<span class="hint" style="font-size:11.5px">' + esc(c.used_at) + '</span>' +
+        '</div>';
+      }).join('');
+    }, function () {
+      box.innerHTML = '<div class="hint" style="padding:6px 0">加载失败</div>';
+    });
   }
 
   function startRedeemScan() {
@@ -10020,15 +10152,19 @@ window.__supaReady = new Promise(function (resolve) {
         if (!kw) { hidePageSuggest(); return; }
 
         pageSuggestTimer = setTimeout(function () {
-          if (!S.vendors) {
-            api('api_vendors', { p_token: S.token }).then(function (vr) {
-              S.vendors = vr.items || [];
-            }, function () { S.vendors = []; });
-          }
-          api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
-            showPageSuggest(kw, r.items || []);
-          }, function () {
-            showPageSuggest(kw, []);      // 找不到人也先显示功能选项
+          /* 等加盟商数据回来再出建议，不然搜索里永远看不到加盟商 */
+          var vp = S.vendors
+            ? Promise.resolve()
+            : api('api_vendors', { p_token: S.token }).then(function (vr) {
+                S.vendors = vr.items || [];
+              }, function () { S.vendors = []; });
+
+          vp.then(function () {
+            return api('api_find_user', { p_token: S.token, p_name: kw }).then(function (r) {
+              showPageSuggest(kw, r.items || []);
+            }, function () {
+              showPageSuggest(kw, []);      // 找不到人也先显示功能选项
+            });
           });
         }, 220);
       });
