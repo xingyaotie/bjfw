@@ -565,6 +565,72 @@ body.theme-heicheng .apk-dl{background:#111010;border-color:#2B2118}
 .cache-tip.is-off{color:#8A5A00;background:#FFF6E8;border-color:#F3DCB8}
 body.theme-heicheng .cache-tip{background:#12100E;border-color:#2B2118;color:#9BA1A8}
 body.theme-heicheng .cache-tip.is-off{background:#241505;border-color:#4A2A0C;color:#FFB05E}
+.cache-tip.is-done{color:#0E7B4F;background:#EAF8F1;border-color:#BFE8D3}
+body.theme-heicheng .cache-tip.is-done{background:#0E2418;border-color:#1E4A30;color:#5FD79A}
+.cache-tip .ok-ico{font-weight:800;font-size:13px}
+
+/* 论坛翻页：手机在底部，大屏在右边 */
+.forum-wrap{max-width:640px;margin:0 auto}
+.forum-pager{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin:16px 0 4px}
+.forum-pager .pg-nums{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.forum-pager button{height:32px;min-width:32px;padding:0 8px;border-radius:9px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink2);font-size:13px;cursor:pointer;font-family:inherit}
+.forum-pager button.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+.forum-pager button:disabled{opacity:.35;cursor:default}
+.forum-pager .pg-gap{color:var(--muted);align-self:center;font-size:12px}
+.forum-pager .pg-tip{width:100%;text-align:center;font-size:12px;color:var(--muted)}
+@media (min-width:900px){
+  .forum-wrap{max-width:760px;padding-right:62px}
+  .forum-pager{position:fixed;right:16px;top:50%;transform:translateY(-50%);
+    flex-direction:column;flex-wrap:nowrap;margin:0;z-index:40;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 6px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);max-height:78vh;overflow:auto}
+  .forum-pager .pg-nums{flex-direction:column;flex-wrap:nowrap}
+  .forum-pager .pg-tip{display:none}
+}
+
+/* 签到页 + 日历 */
+.ci-wrap{max-width:560px;margin:0 auto}
+.ci-top{display:flex;gap:10px;align-items:stretch;margin-bottom:14px}
+.ci-hero{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.ci-hero .big{font-size:34px;font-weight:800;color:var(--ink);line-height:1.15}
+.ci-hero .big small{font-size:14px;font-weight:600;color:var(--muted);margin-left:2px}
+.ci-hero .sm{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+.ci-side{display:flex;flex-direction:column;gap:8px;width:104px;flex:none}
+.ci-side .btn{width:100%;height:auto;min-height:40px;padding:8px 6px;font-size:13px;line-height:1.25}
+.ci-cal{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+.ci-cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ci-cal-head b{font-size:15px;color:var(--ink)}
+.ci-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.ci-w{text-align:center;font-size:11px;color:var(--muted);padding-bottom:2px}
+.ci-d{height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--ink2);background:var(--bg)}
+.ci-d.on{background:#EAF8F1;color:#0E7B4F;font-weight:700;border:1px solid #BFE8D3}
+.ci-d.today{box-shadow:inset 0 0 0 2px var(--ink)}
+.ci-d.mute{background:transparent;color:transparent}
+body.theme-heicheng .ci-d{background:#171310}
+body.theme-heicheng .ci-d.on{background:#0E2418;color:#5FD79A;border-color:#1E4A30}
+.ci-sec{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}
+.ci-sec h3{font-size:14.5px;color:var(--ink);margin:0 0 8px}
+.ci-rw{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px;color:var(--ink2)}
+.ci-rw:last-child{border-bottom:0}
+.ci-rw .rw-d{font-weight:700;color:var(--ink);flex:none;min-width:64px}
+.ci-fr{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.ci-fr:last-child{border-bottom:0}
+.ci-fr .nm{flex:1;min-width:0;color:var(--ink)}
+.ci-fr .st{font-size:12px;color:var(--muted)}
+.ci-shop-item{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+.ci-shop-item .ic{font-size:24px}
+.ci-shop-item .nm{flex:1;min-width:0;font-size:14px;color:var(--ink)}
+.ci-shop-item .sub{font-size:12px;color:var(--muted);margin-top:2px}
+.ci-empty{font-size:13px;color:var(--muted);padding:6px 0}
+
+/* 兑换券管理：未兑换 / 已兑换 两段 */
+.news-sec-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
+  color:var(--ink2);margin:2px 0 8px}
+.news-sec-title .n{font-size:11.5px;font-weight:600;color:var(--muted);
+  background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+.news-sec-title.is-used{color:var(--muted);margin-top:18px}
 
 /* 胶囊移动时轻微「弹」一下：用独立的 scale，不动位置 */
 @keyframes pillPop{
@@ -1174,6 +1240,7 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       <button class="tab" data-tab="vendor" type="button">加盟商</button>
       <button class="tab" data-tab="member" type="button">会员</button>
       <button class="tab" data-tab="coupon" type="button">兑换券</button>
+      <button class="tab" data-tab="checkin" type="button">签到</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="rank" type="button">排行榜</button>
       <button class="tab" data-tab="notice" type="button">公告</button>
@@ -1623,6 +1690,31 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       <div class="card"><div class="news" id="couponList">
         <div class="loading"><span class="spinner"></span>加载中…</div>
       </div></div>
+    </section>
+
+    <!-- 签到 -->
+    <section id="tab-checkin" hidden>
+      <div class="panel-head">
+        <div><h2>签到</h2>
+          <div class="hint">看每个人今天签没签、连续多少天；连续签到奖励写在这里，学生端签到页能看到</div></div>
+        <button class="btn ghost sm" id="btnCiAdminReload" type="button" style="height:34px">刷新</button>
+      </div>
+
+      <div class="card" style="padding:16px;margin-bottom:16px">
+        <div class="panel-head" style="margin:0 0 10px">
+          <div><h3 style="font-size:15px">连续签到奖励</h3>
+            <div class="hint">奖励线下由管理员发放，这里只写文字说明</div></div>
+          <button class="btn ghost sm" id="btnCiRwAdd" type="button" style="height:32px">＋ 加一条</button>
+        </div>
+        <div id="ciRwBox"></div>
+        <div style="text-align:right;margin-top:12px">
+          <button class="btn primary" id="btnCiRwSave" type="button">保存奖励</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="ciAdminBox"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+      </div>
     </section>
 
     <!-- 广告推销 -->
@@ -2153,8 +2245,15 @@ window.__supaReady = new Promise(function (resolve) {
 
   /* ---------- 会话 ---------- */
   /* 只存 token 供刷新后清理；不自动登录，所以没有 loadSession */
+  var SESSION_DAYS = 7;            /* 网页端登录后 7 天内自动进站；App 端另外续期 */
   function saveSession(token, profile) {
-    try { localStorage.setItem(SESSION, JSON.stringify({ token: token, profile: profile, ts: Date.now() })); } catch (e) {}
+    try {
+      var days = IS_APP ? 30 : SESSION_DAYS;
+      localStorage.setItem(SESSION, JSON.stringify({
+        token: token, profile: profile, ts: Date.now(),
+        exp: Date.now() + days * 86400000
+      }));
+    } catch (e) {}
     /* 顺手把 token 交给安卓端：定时查未读、发系统通知要用 */
     if (window.XkyctpShell && window.XkyctpShell.saveToken) {
       try { window.XkyctpShell.saveToken(token || ''); } catch (e) {}
@@ -2313,12 +2412,12 @@ window.__supaReady = new Promise(function (resolve) {
      并记进 localStorage，之后刷新也保持。网页版完全不受影响。 */
   var IS_APP = (function () {
     try {
-      if (/[?&]app=1(&|$)/.test(String(location.search || '')) ||
-          /xkyctp/i.test(String(navigator.userAgent || ''))) {
-        localStorage.setItem('xbh_app', '1');
-        return true;
-      }
-      return localStorage.getItem('xbh_app') === '1';
+      var isApp = /[?&]app=1(&|$)/.test(String(location.search || '')) ||
+                  /xkyctp/i.test(String(navigator.userAgent || ''));
+      /* 以前会把 App 标记写进 localStorage，网页被粘住后就再也看不到下载入口了。
+         现在只认当场地址 / UA，顺手把旧标记清掉。 */
+      if (!isApp) localStorage.removeItem('xbh_app');
+      return isApp;
     } catch (e) { return false; }
   })();
 
@@ -2482,6 +2581,7 @@ window.__supaReady = new Promise(function (resolve) {
 
     /* 点底部 tab 一律回到这个模块的一级页面（排行榜详情、魔方里层都要退回来） */
     rankFrom = '';
+    if (t === 'forum') forumPage = 1;      /* 点论坛永远先看最新那页 */
     if (t === 'rank') { rankState.view = 'list'; rankState.id = ''; }
 
     /* 那三个浮动按钮只属于「用户管理」，一离开就必须消失 */
@@ -2598,7 +2698,9 @@ window.__supaReady = new Promise(function (resolve) {
     aid:     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.4"/><path d="M8.6 7V5.5A1.5 1.5 0 0 1 10.1 4h3.8a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M12 11v5M9.5 13.5h5"/></svg>',
     tools:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 18V6.4l9-1.9v11"/><circle cx="6.8" cy="18" r="2.7"/><circle cx="15.8" cy="15.5" r="2.7"/></svg>',
     logout:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4h3.2A1.8 1.8 0 0 1 20 5.8v12.4A1.8 1.8 0 0 1 18.2 20H15"/><path d="m10 8-4 4 4 4"/><path d="M6 12h9"/></svg>',
-    update:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 12a8.2 8.2 0 1 1-2.5-5.9"/><path d="M20.4 4.2v4.4h-4.4"/></svg>'
+    update:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 12a8.2 8.2 0 1 1-2.5-5.9"/><path d="M20.4 4.2v4.4h-4.4"/></svg>',
+    checkin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="5" width="17.6" height="15.8" rx="2.4"/><path d="M8 3v4M16 3v4M3.4 10h17.2"/><path d="m8.4 15.4 2.2 2.2 4.6-4.6"/></svg>',
+    friend:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.6" cy="8.6" r="3.2"/><path d="M3.4 19a5.4 5.4 0 0 1 10.4 0"/><circle cx="17.2" cy="9.6" r="2.5"/><path d="M15.6 18.8a4.6 4.6 0 0 1 4.9-3.5"/></svg>'
   };
 
   function appMeRow(icon, title, sub, act, cls) {
@@ -2640,6 +2742,8 @@ window.__supaReady = new Promise(function (resolve) {
         '<div class="me-rows">' +
           appMeRow(MI_ICON.profile, '设置', '资料、勋章、清除缓存', 'profile') +
           (isAdmin || memberHidden ? '' : appMeRow(MI_ICON.member, '会员', '方案与专属主题', 'member')) +
+          appMeRow(MI_ICON.checkin, '签到', '日历、连胜、商城', 'checkin') +
+          appMeRow(MI_ICON.friend, '好友', '好友、情谊与友情连胜', 'friends') +
           appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封新通知' : '', 'mail') +
           ((me.role === 'admin' || me.role === 'staff') ? '' : appMeRow(MI_ICON.member, '扫码兑换', '扫 VIP 兑换券', 'redeem')) +
           (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
@@ -2656,6 +2760,8 @@ window.__supaReady = new Promise(function (resolve) {
       var act = b.getAttribute('data-meact');
       if (act === 'profile') return openProfileModule();
       if (act === 'member')  return openMemberModule();
+      if (act === 'checkin') return openCheckinPage();
+      if (act === 'friends') return openFriendsPage();
       if (act === 'mail')    return openMailbox();
       if (act === 'redeem')  return openRedeemPage();
       if (act === 'aid')     return openFirstAid();
@@ -2741,7 +2847,11 @@ window.__supaReady = new Promise(function (resolve) {
       if (saved && saved.token) return resumeSession(saved.token);
     }
 
-    // 网页版不自动登录：每次打开或刷新页面都要重新输入登录名和密码
+    /* 网页版：登录后 7 天内自动进站，过期再输密码 */
+    var savedWeb = readSession();
+    if (savedWeb && savedWeb.token && (!savedWeb.exp || savedWeb.exp > Date.now())) {
+      return resumeSession(savedWeb.token);
+    }
     clearSession();
     clearThemeClass();
     showLogin();
@@ -3301,6 +3411,7 @@ window.__supaReady = new Promise(function (resolve) {
     currentMod = mod;
     if (mod === 'cube') { S.cubeLoaded = false; cubeState = { view: 'home', type: cubeState.type || 'top' }; }
     if (mod === 'homework') { hwState.view = 'home'; }
+    if (mod === 'forum') forumPage = 1;
     $('modTitle').textContent = name;
     $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
 
@@ -3418,6 +3529,8 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'forum') return renderForum();
     if (currentMod === 'more') return renderMore();
     if (currentMod === 'hwlib') return renderHwLib();
+    if (currentMod === 'checkin') return renderCheckinPage();
+    if (currentMod === 'friends') return renderFriendsPage();
     if (currentMod === 'compose') return renderComposePage();
   }
 
@@ -4119,6 +4232,8 @@ window.__supaReady = new Promise(function (resolve) {
   var postReaders = {};
   var forumScope = 'public';     // all / public / 类别 id（默认进公共贴区）
   var forumCats = [];
+  var forumPage = 1;             // 第 1 页 = 最新（倒序翻页）
+  var FORUM_PAGE_SIZE = 10;
 
   /* 已读的人名：渲染成真正的 <button>，onclick 直接调全局函数 */
   function readerBtn(x) {
@@ -4239,11 +4354,42 @@ window.__supaReady = new Promise(function (resolve) {
     '</div>';
   }
 
+  /* 页码条：1 是最新帖，往后越旧；手机在底部，大屏在右边 */
+  function forumPagerHtml(total) {
+    if (total <= 1) return '';
+    var cur = forumPage;
+    var win = [];
+    for (var i = 1; i <= total; i++) {
+      if (i === 1 || i === total || Math.abs(i - cur) <= 1) win.push(i);
+    }
+    var nums = [], prev = 0;
+    win.forEach(function (n) {
+      if (prev && n - prev > 1) nums.push('<span class="pg-gap">…</span>');
+      nums.push('<button type="button" class="pg-n' + (n === cur ? ' on' : '') +
+        '" data-fpage="' + n + '">' + n + '</button>');
+      prev = n;
+    });
+    return '<div class="forum-pager" id="forumPager">' +
+      '<button type="button" class="pg-arrow" data-fpage="' + (cur - 1) + '"' +
+        (cur <= 1 ? ' disabled' : '') + ' aria-label="上一页">▲</button>' +
+      '<div class="pg-nums">' + nums.join('') + '</div>' +
+      '<button type="button" class="pg-arrow" data-fpage="' + (cur + 1) + '"' +
+        (cur >= total ? ' disabled' : '') + ' aria-label="下一页">▼</button>' +
+      '<div class="pg-tip">第 ' + cur + ' / ' + total + ' 页</div>' +
+    '</div>';
+  }
+
   function paintForumPage(r, stale) {
     var body = $('modBody');
     var items = r.items || [];
     var left = Math.max(0, (r.my_limit || 3) - (r.my_today || 0));
     var cat = r.cat;
+
+    /* 10 条一页：第 1 页就是最新的 10 条 */
+    var total = Math.max(1, Math.ceil(items.length / FORUM_PAGE_SIZE));
+    if (forumPage > total) forumPage = total;
+    if (forumPage < 1) forumPage = 1;
+    var pageItems = items.slice((forumPage - 1) * FORUM_PAGE_SIZE, forumPage * FORUM_PAGE_SIZE);
 
     var head = '';
     if (cat) {
@@ -4257,7 +4403,7 @@ window.__supaReady = new Promise(function (resolve) {
     }
 
     body.innerHTML =
-      '<div style="max-width:640px;margin:0 auto">' +
+      '<div class="forum-wrap">' +
         (stale ? '<div class="cache-tip"><span class="spinner" style="width:12px;height:12px"></span>正在更新…</div>' : '') +
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">' +
           '<div class="seg" style="margin:0">' +
@@ -4272,11 +4418,12 @@ window.__supaReady = new Promise(function (resolve) {
         '</div>' +
         head +
         '<div id="forumList">' +
-          (items.length
-            ? items.map(function (x) { return forumPostCard(x, false); }).join('')
+          (pageItems.length
+            ? pageItems.map(function (x) { return forumPostCard(x, false); }).join('')
             : '<div class="empty"><strong>这里还没有帖子</strong>' +
                 (r.muted ? '你被禁言了' : '点右上角「发帖」发第一条') + '</div>') +
         '</div>' +
+        forumPagerHtml(total) +
         '<div class="hint" style="text-align:center;margin-top:14px;font-size:12px">' +
           (r.muted ? '你被禁言了' : '今天还能发 ' + left + ' 条') + '</div>' +
       '</div>';
@@ -4287,7 +4434,19 @@ window.__supaReady = new Promise(function (resolve) {
       var b = e.target.closest('[data-fscope]');
       if (!b) return;
       forumScope = b.dataset.fscope;
+      forumPage = 1;
       renderForum();
+    });
+
+    var pager = $('forumPager');
+    if (pager) pager.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-fpage]');
+      if (!b || b.disabled) return;
+      var n = parseInt(b.getAttribute('data-fpage'), 10);
+      if (!n || n < 1 || n > total || n === forumPage) return;
+      forumPage = n;
+      paintForumPage(r, false);
+      try { $('modBody').scrollTop = 0; } catch (err) {}
     });
 
     $('forumCatsBtn').onclick = openForumCats;
@@ -4327,7 +4486,7 @@ window.__supaReady = new Promise(function (resolve) {
     }
 
     /* 跟评不超过 3 条：直接铺开，不用点 */
-    items.forEach(function (x) {
+    pageItems.forEach(function (x) {
       if (!x.reply_count || x.reply_count > 3) return;
       var rbox = body.querySelector('[data-replies="' + x.id + '"]');
       if (rbox) loadForumReplies(x.id, rbox);
@@ -4686,9 +4845,32 @@ window.__supaReady = new Promise(function (resolve) {
   var snapBusy = false;
   var snapRestored = {};
 
-  function snapTipHtml() {
-    return '<div class="cache-slot"><div class="cache-tip">' +
-      '<span class="spinner" style="width:12px;height:12px"></span>正在更新…</div></div>';
+  function snapTipHtml(done) {
+    return '<div class="cache-slot"><div class="cache-tip' + (done ? ' is-done' : '') + '">' +
+      (done
+        ? '<span class="ok-ico">✓</span>更新完成'
+        : '<span class="spinner" style="width:12px;height:12px"></span>正在更新…') +
+      '</div></div>';
+  }
+
+  /* 更新完成：胶囊留在原位不动，只把文字换成「更新完成」 */
+  function snapMarkDone(key) {
+    var el = $('modBody');
+    if (!el) return;
+    var slot = el.firstElementChild && el.firstElementChild.classList.contains('cache-slot')
+      ? el.firstElementChild : null;
+    if (!slot) {
+      el.insertAdjacentHTML('afterbegin', snapTipHtml(true));
+      return;
+    }
+    var tip = slot.querySelector('.cache-tip');
+    if (tip) {
+      if (tip.classList.contains('is-done')) return;
+      tip.classList.add('is-done');
+      tip.innerHTML = '<span class="ok-ico">✓</span>更新完成';
+    } else {
+      slot.innerHTML = '<div class="cache-tip is-done"><span class="ok-ico">✓</span>更新完成</div>';
+    }
   }
 
   function snapWatch() {
@@ -4718,13 +4900,19 @@ window.__supaReady = new Promise(function (resolve) {
       snapTimer = setTimeout(function () {
         var el = $('modBody');
         if (!el || !currentMod) return;
-        if (el.querySelector('.loading') || el.querySelector('.cache-tip')) return;
         var key = routeKey();
-        /* 铺过快照的页面：更新完补一个等高占位，页面位置不动 */
-        if (snapRestored[key] && (!el.firstElementChild || !el.firstElementChild.classList.contains('cache-slot'))) {
-          el.insertAdjacentHTML('afterbegin', '<div class="cache-slot"></div>');
-        }
-        var html = el.innerHTML.split('<div class="cache-slot"></div>').join('');
+        if (el.querySelector('.loading')) return;
+        if (el.querySelector('.cache-tip:not(.is-done)')) return;   /* 还在更新，先不存 */
+
+        /* 铺过快照的页面：更新完把胶囊换成「更新完成」（等高，位置不动，也不消失） */
+        if (snapRestored[key]) snapMarkDone(key);
+
+        /* 存快照时把胶囊那一条整个去掉（下次进来再显示「正在更新」） */
+        var clone = el.cloneNode(true);
+        Array.prototype.forEach.call(clone.querySelectorAll('.cache-slot'), function (x) {
+          if (x.parentNode) x.parentNode.removeChild(x);
+        });
+        var html = clone.innerHTML;
         if (html.length < 200) return;
         Snap.set(key, html);
       }, 500);
@@ -5902,7 +6090,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'hwlib', 'coupon', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'hwlib', 'coupon', 'checkin', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -5922,6 +6110,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
     if (name === 'coupon') loadCouponAdmin();
+    if (name === 'checkin') loadCheckinAdmin();
     if (name === 'ad') { loadAdAdmin(); loadAdFreeList(); }
     if (name === 'rank') loadRankAdmin();
     if (name === 'notice') loadNoticeAdmin();
@@ -6986,10 +7175,22 @@ window.__supaReady = new Promise(function (resolve) {
     slideIn($('modView'), 'right');
     syncAppChrome();
 
-    api('api_user_profile', { p_token: S.token, p_user_id: uid }).then(function (r) {
+    Promise.all([
+      api('api_user_profile', { p_token: S.token, p_user_id: uid }),
+      api('api_friend_show', { p_token: S.token, p_uid: uid }).catch(function () { return null; }),
+      api('api_friend_list', { p_token: S.token }).catch(function () { return null; })
+    ]).then(function (arr) {
       if (currentMod !== 'userpage') return;
+      var r = arr[0], show = arr[1], mine = arr[2] || {};
+      var rel = friendRelOf(uid, mine);
       body.innerHTML = '<div style="max-width:600px;margin:0 auto">' +
-        profileCardHtml(r.user, r.medals, false) + '</div>';
+        profileCardHtml(r.user, r.medals, false) +
+        userFriendsHtml(uid, show, rel) +
+        '</div>';
+
+      body.querySelectorAll('[data-fadd]').forEach(function (b) {
+        b.onclick = function () { addFriend(b.getAttribute('data-fadd'), b); };
+      });
     }, function (e) {
       if (currentMod !== 'userpage') return;
       body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
@@ -8134,6 +8335,473 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
 
+  /* ================= 签到 / 商城 ================= */
+  var ciState = { info: null, y: 0, m: 0 };
+  var CI_WEEK = ['日', '一', '二', '三', '四', '五', '六'];
+
+  function ciPad(n) { return n < 10 ? '0' + n : String(n); }
+  function ciDayStr(y, m, d) { return y + '-' + ciPad(m) + '-' + ciPad(d); }
+  function ciToday() {
+    var t = new Date();
+    return ciDayStr(t.getFullYear(), t.getMonth() + 1, t.getDate());
+  }
+
+  function openCheckinPage() {
+    var t = new Date();
+    ciState.y = t.getFullYear();
+    ciState.m = t.getMonth() + 1;
+    currentMod = 'checkin';
+    $('modTitle').textContent = '签到';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    slideIn($('modView'), 'right');
+    renderCheckinPage();
+  }
+
+  function renderCheckinPage() {
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    loadCheckinInfo().then(function (d) {
+      if (currentMod !== 'checkin') return;
+      ciState.info = d;
+      paintCheckinPage(d);
+    }, function (e) {
+      if (currentMod !== 'checkin') return;
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function loadCheckinInfo() {
+    return api('api_checkin_info', { p_token: S.token });
+  }
+
+  function paintCheckinPage(d) {
+    var body = $('modBody');
+    var days = d.days || [];
+    var dayMap = {};
+    days.forEach(function (x) { dayMap[x] = 1; });
+
+    var today = d.today || ciToday();
+    var checkedToday = !!d.checked_today;
+    var streak = d.streak || 0;
+    var best = d.best || 0;
+    var gems = d.gems || 0;
+    var prot = d.protect || {};
+    var owned = prot.owned || 0;
+    var equipped = prot.equipped || 0;
+
+    /* 日历 */
+    var cal = ciCalendarHtml(dayMap, today);
+    var rewards = (d.rewards || []).filter(function (r) { return r && r.text; });
+
+    /* 好友连胜 */
+    var fr = d.friends || [];
+    var frHtml = fr.length
+      ? fr.map(function (f) {
+          return '<div class="ci-fr">' +
+            '<span class="mi" style="width:30px;height:30px;border-radius:50%;background:var(--bg);' +
+              'display:flex;align-items:center;justify-content:center;font-size:13px">' +
+              esc(String(f.name || '?').slice(0, 1)) + '</span>' +
+            '<span class="nm">' + esc(f.name) + '</span>' +
+            '<span class="st">情谊 ' + (f.intimacy || 0) + ' · 连胜 ' + (f.streak || 0) + ' 天' +
+              (f.checked_today ? ' · 今日已签' : ' · 今日未签') + '</span>' +
+          '</div>';
+        }).join('')
+      : '<div class="ci-empty">还没有好友。在搜索里点一个人，进主页点「加好友」。</div>';
+
+    body.innerHTML =
+      '<div class="ci-wrap">' +
+        '<div class="ci-top">' +
+          '<div class="ci-hero">' +
+            '<div class="big">' + streak + '<small>天</small></div>' +
+            '<div class="sm">连续签到 · 最长 ' + best + ' 天</div>' +
+            '<div class="sm">今天 ' + esc(today) + ' ' + (checkedToday ? '· 已签到 ✓' : '· 还没签到') + '</div>' +
+            '<div class="sm">宝石 ' + gems + ' · 忘签到保护 ' + equipped + '/' + owned + '（已装备/拥有）</div>' +
+          '</div>' +
+          '<div class="ci-side">' +
+            '<button type="button" class="btn ghost sm" id="ciShop">🛒 商城</button>' +
+            '<button type="button" class="btn primary sm" id="ciDo"' +
+              (checkedToday ? ' disabled' : '') + '>' + (checkedToday ? '已签到' : '签到') + '</button>' +
+          '</div>' +
+        '</div>' +
+        cal +
+        '<div class="ci-sec">' +
+          '<h3>连续签到奖励</h3>' +
+          (rewards.length
+            ? rewards.map(function (r) {
+                return '<div class="ci-rw"><span class="rw-d">' + (r.days || 0) + ' 天</span>' +
+                  '<span>' + esc(r.text) + '</span></div>';
+              }).join('')
+            : '<div class="ci-empty">管理员还没设置奖励</div>') +
+          '<div class="hint" style="font-size:12px;margin-top:8px">奖励由管理员线下发放</div>' +
+        '</div>' +
+        '<div class="ci-sec">' +
+          '<h3>好友与友情连胜</h3>' + frHtml +
+        '</div>' +
+      '</div>';
+
+    var shopBtn = $('ciShop');
+    if (shopBtn) shopBtn.onclick = openCheckinShop;
+
+    var doBtn = $('ciDo');
+    if (doBtn) doBtn.onclick = doCheckin;
+
+    body.querySelectorAll('[data-cimon]').forEach(function (b) {
+      b.onclick = function () {
+        var delta = parseInt(b.getAttribute('data-cimon'), 10);
+        var y = ciState.y, m = ciState.m + delta;
+        if (m < 1) { m = 12; y--; }
+        if (m > 12) { m = 1; y++; }
+        ciState.y = y; ciState.m = m;
+        paintCheckinPage(d);
+      };
+    });
+  }
+
+  function ciCalendarHtml(dayMap, today) {
+    var y = ciState.y, m = ciState.m;
+    var first = new Date(y, m - 1, 1).getDay();
+    var total = new Date(y, m, 0).getDate();
+    var t = new Date();
+    var isThisMonth = (t.getFullYear() === y && t.getMonth() + 1 === m);
+
+    var cell = '';
+    for (var i = 0; i < first; i++) cell += '<div class="ci-d mute"></div>';
+    for (var d = 1; d <= total; d++) {
+      var ds = ciDayStr(y, m, d);
+      var cls = 'ci-d';
+      if (dayMap[ds]) cls += ' on';
+      if (isThisMonth && d === t.getDate()) cls += ' today';
+      cell += '<div class="' + cls + '">' + d + '</div>';
+    }
+    var head = CI_WEEK.map(function (w) { return '<div class="ci-w">' + w + '</div>'; }).join('');
+
+    return '<div class="ci-cal">' +
+      '<div class="ci-cal-head">' +
+        '<button type="button" class="btn ghost sm" data-cimon="-1" style="height:30px;padding:0 10px">‹</button>' +
+        '<b>' + y + ' 年 ' + m + ' 月</b>' +
+        '<button type="button" class="btn ghost sm" data-cimon="1" style="height:30px;padding:0 10px">›</button>' +
+      '</div>' +
+      '<div class="ci-grid">' + head + cell + '</div>' +
+      '<div class="hint" style="font-size:11.5px;margin-top:9px">绿色=已签到，黑框=今天</div>' +
+    '</div>';
+  }
+
+  function doCheckin() {
+    var btn = $('ciDo');
+    if (!btn || btn.disabled) return;
+    if (ciState.info && ciState.info.checked_today) return toast('今天已经签过了', 'ok');
+    busy(btn, true, '签到中…');
+    api('api_checkin_do', { p_token: S.token }).then(function (r) {
+      busy(btn, false);
+      var used = (r && r.protected) || 0;
+      toast('签到成功' + (r && r.streak ? '，连续 ' + r.streak + ' 天' : ''), 'ok', 3000);
+      if (used > 0) toast('用掉 ' + used + ' 个忘签到保护，连胜没断', 'ok', 3600);
+      renderCheckinPage();
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message || '签到失败', 'err', 3600);
+    });
+  }
+
+  /* ---------- 商城 ---------- */
+  function openCheckinShop() {
+    var mo = modal('商城', '<div id="shopBox"><div class="loading"><span class="spinner"></span>加载中…</div></div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 460);
+    var box = mo.querySelector('#shopBox');
+
+    function paintShop() {
+      loadCheckinInfo().then(function (d) {
+        if (!document.body.contains(box)) return;
+        var prot = d.protect || {};
+        var owned = prot.owned || 0;
+        var equipped = prot.equipped || 0;
+        box.innerHTML =
+          '<div class="hint" style="margin-bottom:12px">宝石：<b style="color:var(--ink)">' + (d.gems || 0) + '</b>' +
+            '　·　发一条论坛评论 +10 宝石</div>' +
+          '<div class="ci-shop-item">' +
+            '<span class="ic">🛡</span>' +
+            '<div class="nm"><div>忘签到保护</div>' +
+              '<div class="sub">漏签那天自动消耗 1 个，连胜不断 · 已拥有 ' + owned + ' 个</div></div>' +
+            '<button type="button" class="btn primary sm" id="shopBuy" ' +
+              ((d.gems || 0) < 300 ? 'disabled' : '') + '>300 宝石购买</button>' +
+          '</div>' +
+          '<div class="ci-shop-item">' +
+            '<span class="ic">🎒</span>' +
+            '<div class="nm"><div>已装备：' + equipped + ' / 6</div>' +
+              '<div class="sub">最多装备 6 个（最多保护 6 天连胜）</div></div>' +
+            '<div style="display:flex;gap:6px;flex:none">' +
+              '<button type="button" class="btn ghost sm" id="shopMinus" ' + (equipped <= 0 ? 'disabled' : '') + '>−</button>' +
+              '<button type="button" class="btn ghost sm" id="shopPlus" ' +
+                (equipped >= Math.min(owned, 6) ? 'disabled' : '') + '>＋</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="hint" style="font-size:12px;margin-top:6px">签到页右上角「商城」随时可以进来。</div>';
+
+        var buy = box.querySelector('#shopBuy');
+        if (buy) buy.onclick = function () {
+          busy(buy, true, '购买中…');
+          api('api_shop_buy', { p_token: S.token }).then(function () {
+            busy(buy, false);
+            toast('买好了，记得在下面装备', 'ok');
+            paintShop();
+          }, function (e) {
+            busy(buy, false);
+            toast(e.message || '购买失败', 'err', 3200);
+          });
+        };
+
+        var minus = box.querySelector('#shopMinus');
+        if (minus) minus.onclick = function () { ciEquip(equipped - 1, paintShop); };
+        var plus = box.querySelector('#shopPlus');
+        if (plus) plus.onclick = function () { ciEquip(equipped + 1, paintShop); };
+      }, function (e) {
+        box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+      });
+    }
+
+    paintShop();
+  }
+
+  function ciEquip(n, cb) {
+    api('api_shop_equip', { p_token: S.token, p_n: n }).then(function () {
+      if (typeof cb === 'function') cb();
+    }, function (e) { toast(e.message || '装备失败', 'err', 3000); });
+  }
+
+  /* ---------- 我的 → 好友（页面在补丁 D 里） ---------- */
+  var CI_ADMIN = { rewards: [], users: [] };
+
+  function loadCheckinAdmin() {
+    var box = $('ciAdminBox');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_checkin', { p_token: S.token }).then(function (r) {
+      CI_ADMIN.rewards = r.rewards || [];
+      CI_ADMIN.users = r.users || [];
+      renderCiRewardEditor();
+      renderCiAdminUsers();
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function renderCiRewardEditor() {
+    var box = $('ciRwBox');
+    if (!box) return;
+    var list = CI_ADMIN.rewards || [];
+    box.innerHTML = list.length
+      ? list.map(function (r, i) {
+          return '<div class="row" style="gap:8px;margin-bottom:8px" data-rwrow="' + i + '">' +
+            '<input class="input" data-rwdays="' + i + '" type="number" min="1" max="3650" ' +
+              'value="' + (r.days || 1) + '" style="width:96px;height:36px;flex:none" placeholder="天数">' +
+            '<input class="input" data-rwtext="' + i + '" maxlength="120" value="' + esc(r.text || '') + '" ' +
+              'style="flex:1;height:36px" placeholder="奖励说明，例如：免写一次作业（找管理员领）">' +
+            '<button type="button" class="btn ghost sm" data-rwdel="' + i + '" style="height:36px;flex:none">删除</button>' +
+          '</div>';
+        }).join('')
+      : '<div class="hint" style="padding:4px 0 8px">还没有奖励。点右上角「＋ 加一条」，比如 7 天 → 免一次作业。</div>';
+  }
+
+  function currentCiRewards() {
+    var box = $('ciRwBox');
+    if (!box) return [];
+    var out = [];
+    Array.prototype.forEach.call(box.querySelectorAll('[data-rwrow]'), function (row) {
+      var i = row.getAttribute('data-rwrow');
+      var dEl = box.querySelector('[data-rwdays="' + i + '"]');
+      var tEl = box.querySelector('[data-rwtext="' + i + '"]');
+      var days = parseInt(dEl && dEl.value, 10) || 0;
+      var text = String((tEl && tEl.value) || '').trim();
+      if (days > 0 && text) out.push({ days: days, text: text });
+    });
+    return out;
+  }
+
+  function saveCiRewards(btn) {
+    var arr = currentCiRewards();
+    busy(btn, true, '保存中…');
+    api('api_checkin_rewards_set', { p_token: S.token, p_rewards: arr }).then(function (r) {
+      busy(btn, false);
+      CI_ADMIN.rewards = (r && r.rewards) || arr;
+      renderCiRewardEditor();
+      toast('奖励已保存', 'ok');
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message || '保存失败', 'err', 3600);
+    });
+  }
+
+  function renderCiAdminUsers() {
+    var box = $('ciAdminBox');
+    if (!box) return;
+    var users = CI_ADMIN.users || [];
+    if (!users.length) {
+      box.innerHTML = '<div class="empty"><strong>还没有学生</strong></div>';
+      return;
+    }
+    var done = users.filter(function (u) { return u.checked_today; }).length;
+    box.innerHTML =
+      '<div class="panel-head" style="margin:0 0 10px"><div>' +
+        '<h3 style="font-size:15px">今天签到 ' + done + ' / ' + users.length + ' 人</h3></div></div>' +
+      users.map(function (u) {
+        return '<div class="news-item" style="display:flex;align-items:center;gap:10px">' +
+          '<span class="badge ' + (u.checked_today ? 'st-done' : 'gray') + '" style="height:18px;font-size:11px">' +
+            (u.checked_today ? '已签' : '未签') + '</span>' +
+          '<span style="flex:1;min-width:0;font-size:13.5px;color:var(--ink)">' + esc(u.name) +
+            (u.dept ? ' <span class="hint">' + esc(u.dept) + '</span>' : '') + '</span>' +
+          '<span class="hint" style="font-size:12px;text-align:right">' +
+            '连续 ' + (u.streak || 0) + ' · 最长 ' + (u.best || 0) + '<br>' +
+            '保护 ' + (u.protect_equipped || 0) + '/' + (u.protect_owned || 0) +
+            (u.last ? ' · 上次 ' + esc(u.last) : '') +
+          '</span>' +
+        '</div>';
+      }).join('');
+  }
+
+  /* ================= 好友 ================= */
+  function friendRelOf(uid, list) {
+    if (!uid) return 'none';
+    if (S.me && S.me.id === uid) return 'self';
+    list = list || {};
+    if ((list.friends || []).some(function (x) { return x.uid === uid; })) return 'friend';
+    if ((list.sent || []).some(function (x) { return x.uid === uid; })) return 'sent';
+    if ((list.reqs || []).some(function (x) { return x.uid === uid; })) return 'recv';
+    return 'none';
+  }
+
+  function friendBtnHtml(uid, rel) {
+    if (rel === 'self') return '';
+    if (rel === 'friend') return '<span class="badge st-done" style="height:22px;font-size:11.5px">已是好友</span>';
+    if (rel === 'sent') return '<span class="badge gray" style="height:22px;font-size:11.5px">已申请，等对方同意</span>';
+    if (rel === 'recv') return '<button type="button" class="btn primary sm" data-fadd="' + esc(uid) + '" style="height:30px">对方申请了，点这里同意</button>';
+    return '<button type="button" class="btn primary sm" data-fadd="' + esc(uid) + '" style="height:30px">加好友</button>';
+  }
+
+  function userFriendsHtml(uid, show, rel) {
+    var fr = (show && show.friends) || [];
+    return '<div class="ci-sec" style="margin-top:14px">' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
+        '<h3 style="margin:0;flex:1">好友' + (fr.length ? '（' + fr.length + '）' : '') + '</h3>' +
+        friendBtnHtml(uid, rel) +
+      '</div>' +
+      (fr.length
+        ? fr.map(function (f) {
+            return '<div class="ci-fr">' +
+              '<span class="nm" data-uid="' + esc(f.uid) + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' +
+                esc(f.name) + '</span>' +
+              '<span class="st">情谊 ' + (f.intimacy || 0) + ' · 友情连胜 ' + (f.streak || 0) + ' 天</span>' +
+            '</div>';
+          }).join('')
+        : '<div class="ci-empty">还没有好友</div>') +
+    '</div>';
+  }
+
+  function openFriendsPage() {
+    currentMod = 'friends';
+    $('modTitle').textContent = '好友';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    slideIn($('modView'), 'right');
+    renderFriendsPage();
+  }
+
+  function renderFriendsPage() {
+    var body = $('modBody');
+    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_friend_list', { p_token: S.token }).then(function (r) {
+      if (currentMod !== 'friends') return;
+      paintFriendsPage(r || {});
+    }, function (e) {
+      if (currentMod !== 'friends') return;
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function paintFriendsPage(r) {
+    var body = $('modBody');
+    var fr = r.friends || [];
+    var reqs = r.reqs || [];
+    var sent = r.sent || [];
+
+    body.innerHTML =
+      '<div class="ci-wrap">' +
+        (reqs.length
+          ? '<div class="ci-sec">' +
+              '<h3>好友申请（' + reqs.length + '）</h3>' +
+              reqs.map(function (q) {
+                return '<div class="ci-fr">' +
+                  '<span class="nm">' + esc(q.name) + '</span>' +
+                  '<button type="button" class="btn primary sm" data-fans="' + esc(q.id) + '" data-ok="1" style="height:28px">同意</button>' +
+                  '<button type="button" class="btn ghost sm" data-fans="' + esc(q.id) + '" data-ok="0" style="height:28px">拒绝</button>' +
+                '</div>';
+              }).join('') +
+            '</div>'
+          : '') +
+        '<div class="ci-sec">' +
+          '<h3>我的好友（' + fr.length + '）</h3>' +
+          (fr.length
+            ? fr.map(function (f) {
+                return '<div class="ci-fr">' +
+                  '<span class="nm" data-uid="' + esc(f.uid) + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' +
+                    esc(f.name) + '</span>' +
+                  '<span class="st">情谊 ' + (f.intimacy || 0) + ' · 连胜 ' + (f.streak || 0) + ' 天' +
+                    (f.checked_today ? ' · 今日已签' : '') + '</span>' +
+                '</div>';
+              }).join('')
+            : '<div class="ci-empty">还没有好友。在搜索里点一个人，进主页点「加好友」。</div>') +
+          '<p class="hint" style="font-size:12px;margin-top:8px;line-height:1.7">' +
+            '你和好友同一天都签到：情谊 +1、友情连胜 +1；漏签可以用「忘签到保护」保住连胜。</p>' +
+        '</div>' +
+        (sent.length
+          ? '<div class="ci-sec">' +
+              '<h3>我发出的申请</h3>' +
+              sent.map(function (f) {
+                return '<div class="ci-fr"><span class="nm">' + esc(f.name) + '</span>' +
+                  '<span class="st">等对方同意</span></div>';
+              }).join('') +
+            '</div>'
+          : '') +
+      '</div>';
+
+    body.querySelectorAll('[data-fans]').forEach(function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute('data-fans');
+        var ok = b.getAttribute('data-ok') === '1';
+        b.disabled = true;
+        api('api_friend_ans', {
+          p_token: S.token, p_id: (/^\d+$/.test(id) ? Number(id) : id), p_ok: ok
+        }).then(function () {
+          toast(ok ? '已同意，你们是好友了' : '已拒绝', 'ok');
+          renderFriendsPage();
+        }, function (e) {
+          b.disabled = false;
+          toast(e.message || '操作失败', 'err', 3200);
+        });
+      };
+    });
+  }
+
+  function addFriend(uid, btn) {
+    if (!uid || (S.me && S.me.id === uid)) return;
+    if (btn) btn.disabled = true;
+    api('api_friend_req', { p_token: S.token, p_uid: uid }).then(function (r) {
+      toast((r && r.msg) || '已发送好友申请，等对方同意', 'ok', 3000);
+      if (btn) btn.outerHTML = '<span class="badge gray" style="height:22px;font-size:11.5px">已申请，等对方同意</span>';
+    }, function (e) {
+      if (btn) btn.disabled = false;
+      toast(e.message || '申请失败', 'err', 3200);
+    });
+  }
+
   /* ================= VIP 兑换券 ================= */
   var couponDraft = { view: 'form', item: null, img: '' };
   var couponPlans = [];
@@ -8151,6 +8819,21 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
+  function couponRowHtml(c) {
+    return '<div class="news-item" style="display:flex;align-items:center;gap:12px">' +
+      '<div style="flex:1;min-width:0">' +
+        '<b style="font-size:14px;color:var(--ink)">' + esc(c.name) + '</b>' +
+        ' <span class="badge gray" style="height:18px;font-size:11px">' + esc(c.code) + '</span>' +
+        '<div class="hint" style="margin-top:4px">' +
+          esc(c.plan_name) + 'VIP · ' + c.days + ' 天 · ' + esc(c.created_at) +
+          (c.used ? ' · <span style="color:var(--red)">已被 ' + esc(c.used_by || '某人') + ' 用掉</span>' : ' · 未使用') +
+        '</div>' +
+      '</div>' +
+      (c.used ? '' : '<button type="button" class="link" data-couponimg="' + esc(c.id) + '">看图片</button>') +
+      '<button type="button" class="link danger" data-coupondel="' + esc(c.id) + '">删除</button>' +
+    '</div>';
+  }
+
   function renderCouponAdmin() {
     var box = $('couponList');
     var list = S.coupons || [];
@@ -8158,20 +8841,15 @@ window.__supaReady = new Promise(function (resolve) {
       box.innerHTML = '<div class="empty"><strong>还没有兑换券</strong>点右上角「＋ 添加」建一张</div>';
       return;
     }
-    box.innerHTML = list.map(function (c) {
-      return '<div class="news-item" style="display:flex;align-items:center;gap:12px">' +
-        '<div style="flex:1;min-width:0">' +
-          '<b style="font-size:14px;color:var(--ink)">' + esc(c.name) + '</b>' +
-          ' <span class="badge gray" style="height:18px;font-size:11px">' + esc(c.code) + '</span>' +
-          '<div class="hint" style="margin-top:4px">' +
-            esc(c.plan_name) + 'VIP · ' + c.days + ' 天 · ' + esc(c.created_at) +
-            (c.used ? ' · <span style="color:var(--red)">已被 ' + esc(c.used_by || '某人') + ' 用掉</span>' : ' · 未使用') +
-          '</div>' +
-        '</div>' +
-        (c.used ? '' : '<button type="button" class="link" data-couponimg="' + esc(c.id) + '">看图片</button>') +
-        '<button type="button" class="link danger" data-coupondel="' + esc(c.id) + '">删除</button>' +
-      '</div>';
-    }).join('');
+    var unused = list.filter(function (c) { return !c.used; });
+    var used = list.filter(function (c) { return c.used; });
+    box.innerHTML =
+      '<div class="news-sec-title">未兑换 <span class="n">' + unused.length + ' 张</span></div>' +
+      (unused.length ? unused.map(couponRowHtml).join('')
+        : '<div class="hint" style="padding:6px 0 2px">还没有未兑换的券</div>') +
+      '<div class="news-sec-title is-used">已兑换 <span class="n">' + used.length + ' 张</span></div>' +
+      (used.length ? used.map(couponRowHtml).join('')
+        : '<div class="hint" style="padding:6px 0 2px">还没有人兑换过</div>');
   }
 
   function couponById(id) {
@@ -8206,11 +8884,14 @@ window.__supaReady = new Promise(function (resolve) {
           '<div class="hint" style="margin-bottom:10px">图片已生成，长按或点「保存图片」就能存到相册</div>' +
           '<img src="' + couponDraft.img + '" style="width:100%;max-width:420px;border-radius:12px;border:1px solid var(--line)">' +
           '<div style="margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
-            '<a class="btn primary" download="' + esc(couponDraft.item ? couponDraft.item.code : 'coupon') + '.png" href="' + couponDraft.img + '">保存图片</a>' +
+            '<button class="btn primary" type="button" id="couponSaveImg">保存图片</button>' +
             '<button class="btn ghost" type="button" id="couponBackList">返回列表</button>' +
           '</div>' +
         '</div>';
       $('couponBackList').onclick = function () { leaveCouponPage(); };
+      $('couponSaveImg').onclick = function () {
+        saveImageFile(couponDraft.img, (couponDraft.item ? couponDraft.item.code : 'coupon') + '.png');
+      };
       return;
     }
 
@@ -8322,6 +9003,22 @@ window.__supaReady = new Promise(function (resolve) {
         toast('生成图片失败：' + e, 'err', 3000);
       }
     });
+  }
+
+  /* 保存图片：App 里交给原生存进相册（WebView 的 <a download> 不管用），网页版直接下载 */
+  function saveImageFile(dataUrl, filename) {
+    var name = String(filename || 'xkyctp.png');
+    if (window.XkyctpShell && window.XkyctpShell.saveImage) {
+      try { window.XkyctpShell.saveImage(dataUrl, name); return; } catch (e) {}
+    }
+    try {
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 100);
+    } catch (e2) { toast('保存失败，长按图片试试', 'err', 2800); }
   }
 
   function leaveCouponPage() {
@@ -10366,17 +11063,34 @@ window.__supaReady = new Promise(function (resolve) {
       $('mailTargets').hidden = false;
     });
     $('btnCouponNew').addEventListener('click', openCouponCreate);
+
+    /* 管理端签到 */
+    if ($('btnCiAdminReload')) $('btnCiAdminReload').addEventListener('click', loadCheckinAdmin);
+    if ($('btnCiRwAdd')) $('btnCiRwAdd').addEventListener('click', function () {
+      CI_ADMIN.rewards = (CI_ADMIN.rewards || []).concat([{ days: (CI_ADMIN.rewards || []).length ? 7 : 7, text: '' }]);
+      renderCiRewardEditor();
+    });
+    if ($('btnCiRwSave')) $('btnCiRwSave').addEventListener('click', function () { saveCiRewards(this); });
+    if ($('ciRwBox')) $('ciRwBox').addEventListener('click', function (e) {
+      var del = e.target.closest('[data-rwdel]');
+      if (!del) return;
+      var i = parseInt(del.getAttribute('data-rwdel'), 10);
+      CI_ADMIN.rewards.splice(i, 1);
+      renderCiRewardEditor();
+    });
     $('couponList').addEventListener('click', function (e) {
       var img = e.target.closest('[data-couponimg]');
       if (img) {
         var c = couponById(img.getAttribute('data-couponimg'));
         if (!c) return;
         makeCouponImage({ name: c.name, code: c.code, plan_name: c.plan_name, days: c.days }, function (url) {
-          modal('兑换券图片',
+          var mo = modal('兑换券图片',
             '<div style="text-align:center"><img src="' + url + '" style="width:100%;max-width:380px;border-radius:12px">' +
-            '<div class="hint" style="margin-top:10px">长按图片可以保存</div></div>',
-            '<a class="btn primary" download="' + esc(c.code) + '.png" href="' + url + '">保存图片</a>' +
+            '<div class="hint" style="margin-top:10px">长按图片也可以保存</div></div>',
+            '<button class="btn primary" type="button" id="cpImgSave">保存图片</button>' +
             '<button class="btn ghost" type="button" data-close>关闭</button>', 460);
+          var sb = mo.querySelector('#cpImgSave');
+          if (sb) sb.onclick = function () { saveImageFile(url, c.code + '.png'); };
         });
         return;
       }
@@ -10702,6 +11416,10 @@ window.__supaReady = new Promise(function (resolve) {
 
     /* 全局兜底：不管在列表、弹窗还是哪，只要带 data-uid 的人名都能点开主页 */
     document.addEventListener('click', function (e) {
+      /* 先处理「加好友 / 对方申请了，点这里同意」 */
+      var fadd = e.target.closest('[data-fadd]');
+      if (fadd) { e.preventDefault(); addFriend(fadd.getAttribute('data-fadd'), fadd); return; }
+
       var who = e.target.closest('[data-uid]');
       if (!who) return;
       // 管理端的按钮（身份切换、权限标签、加减分）也带 data-uid，别误触发主页
