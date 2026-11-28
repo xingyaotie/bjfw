@@ -726,6 +726,18 @@ body.s-down #downBar{display:block}
 .fb-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
 .fb-head .who{font-size:13.5px;font-weight:600;color:var(--ink)}
 .fb-head .time{margin-left:auto;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.fb-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:-5px;margin-right:6px}
+.me-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
+.me-avatar{cursor:pointer;overflow:hidden}
+.fb-imgs{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.fb-imgs img{width:86px;height:86px;object-fit:cover;border-radius:9px;border:1px solid var(--line);cursor:pointer}
+.compose-imgs{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.compose-imgs .ci-thumb{position:relative;width:76px;height:76px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+.compose-imgs .ci-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.compose-imgs .ci-thumb button{position:absolute;top:0;right:0;width:20px;height:20px;border:none;
+  border-radius:0 0 0 8px;background:rgba(0,0,0,.55);color:#fff;font-size:13px;line-height:1;cursor:pointer}
+.pf-avatar{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:none;border:1px solid var(--line);margin-right:12px}
+.av-view{max-width:100%;max-height:70vh;border-radius:12px;display:block;margin:0 auto}
 .fb-body{font-size:13.5px;line-height:1.75;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
 .fb-replies{margin-top:10px;border-top:1px dashed #EEF0F3;padding-top:10px;display:flex;flex-direction:column;gap:8px}
 .fb-reply{background:#FAFBFC;border:1px solid #F1F2F5;border-radius:8px;padding:8px 10px;font-size:13px;color:var(--ink2)}
@@ -1156,6 +1168,57 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
   .login-top{padding:20px}
   .login-top .school{font-size:21px}
 }
+
+/* ===== 1.3.0 扩展：头像框 / 统计格 / 每日任务 / 私聊 / 看板 ===== */
+.av-ring{width:64px;height:64px;border-radius:50%;flex:none;overflow:hidden;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:600;
+  color:var(--ink);background:var(--bg);border:3px solid #D8DBE1}
+.av-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.av-ring.av-ring-gold{border-color:#E0A82E;box-shadow:0 0 0 3px rgba(224,168,46,.18)}
+.av-ring.av-ring-red{border-color:#C8102E;box-shadow:0 0 0 3px rgba(200,16,46,.16)}
+
+.ci-fr[data-chat-row] .nm{max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ci-fr[data-chat-row] .st{flex:1;min-width:0;text-align:right;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+
+.pf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 16px}
+.pf-stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 4px;text-align:center}
+.pf-stat b{display:block;font-size:14.5px;color:var(--ink);line-height:1.3}
+.pf-stat span{font-size:11px;color:var(--muted)}
+
+.dt-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.dt-row:last-child{border-bottom:none}
+.dt-row .dt-t{flex:1;min-width:0;font-size:13.5px;color:var(--ink)}
+.dt-row .dt-p{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+.chat-wrap{max-width:600px;margin:0 auto;display:flex;flex-direction:column}
+.chat-head{display:flex;align-items:baseline;gap:8px;padding:8px 4px 10px;
+  border-bottom:1px solid var(--line);flex-wrap:wrap}
+.chat-head .ch-nm{font-size:15px;font-weight:700;color:var(--ink)}
+.chat-head .ch-st{font-size:11.5px;color:var(--muted)}
+.chat-head .ch-left{margin-left:auto;font-size:11.5px;color:var(--muted)}
+.chat-list{flex:1;min-height:160px;max-height:52vh;overflow-y:auto;padding:12px 2px;-webkit-overflow-scrolling:touch}
+.chat-row{display:flex;margin-bottom:10px}
+.chat-row.me{justify-content:flex-end}
+.chat-b{max-width:78%;padding:9px 12px;border-radius:14px;font-size:14px;line-height:1.6;
+  word-break:break-word;white-space:pre-wrap}
+.chat-b.me{background:var(--red);color:#fff;border-bottom-right-radius:4px}
+.chat-b.other{background:var(--card);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:4px}
+.chat-b .q{font-size:11.5px;opacity:.78;border-left:3px solid currentColor;padding-left:6px;margin-bottom:5px}
+.chat-b .chat-t{font-size:10.5px;opacity:.68;margin-top:4px}
+.chat-quote{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:10px;padding:6px 2px}
+.chat-quote:empty{display:none}
+.chat-in{display:flex;gap:8px;align-items:flex-end;padding:8px 0 4px;border-top:1px solid var(--line)}
+.chat-in .textarea{flex:1;min-height:38px;max-height:110px;font-size:14px;padding:9px 11px;resize:none}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.dash-c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}
+.dash-c b{display:block;font-size:22px;color:var(--red);line-height:1.2}
+.dash-c span{display:block;font-size:12px;color:var(--muted);margin-top:5px}
+
+@media(max-width:640px){
+  .pf-stats{grid-template-columns:repeat(2,1fr)}
+}
 </style>
 </head>
 <body>
@@ -1163,8 +1226,8 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
 <!-- ========== 登录 ========== -->
 <div id="loginView">
   <div class="login-top">
-    <span class="school">徐悲鸿中学</span>
-    <span class="cls">2026级</span>
+    <span class="school">xkyctp</span>
+    <span class="cls">班级平台</span>
   </div>
   <div class="login-main">
     <div class="login-stack">
@@ -1246,6 +1309,9 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       <button class="tab" data-tab="vendor" type="button">加盟商</button>
       <button class="tab" data-tab="member" type="button">会员</button>
       <button class="tab" data-tab="coupon" type="button">兑换券</button>
+      <button class="tab" data-tab="orders" type="button">订单</button>
+      <button class="tab" data-tab="reports" type="button">举报</button>
+      <button class="tab" data-tab="dash" type="button">看板</button>
       <button class="tab" data-tab="checkin" type="button">签到</button>
       <button class="tab" data-tab="ad" type="button">广告推销</button>
       <button class="tab" data-tab="rank" type="button">排行榜</button>
@@ -1715,12 +1781,55 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
       </div></div>
     </section>
 
+    <!-- 会员订单（人工确认收款 → 自动开 VIP） -->
+    <section id="tab-orders" hidden>
+      <div class="panel-head">
+        <div><h2>会员订单</h2>
+          <div class="hint">学生下单后在这里确认收款；确认后自动开通 VIP，拒绝则订单作废</div></div>
+        <button class="btn ghost sm" id="btnOrdersReload" type="button" style="height:34px">刷新</button>
+      </div>
+      <div class="seg" id="orderFilter">
+        <button type="button" data-of="all">全部</button>
+        <button type="button" data-of="pending" class="on">待确认</button>
+        <button type="button" data-of="paid">已完成</button>
+      </div>
+      <div class="card"><div class="news" id="orderList">
+        <div class="loading"><span class="spinner"></span>加载中…</div>
+      </div></div>
+    </section>
+
+    <!-- 举报处理 -->
+    <section id="tab-reports" hidden>
+      <div class="panel-head">
+        <div><h2>举报处理</h2>
+          <div class="hint">学生举报的帖子和跟评都在这里，删除内容会连带清掉它</div></div>
+        <button class="btn ghost sm" id="btnReportsReload" type="button" style="height:34px">刷新</button>
+      </div>
+      <div class="card"><div class="news" id="reportList">
+        <div class="loading"><span class="spinner"></span>加载中…</div>
+      </div></div>
+    </section>
+
+    <!-- 数据看板 -->
+    <section id="tab-dash" hidden>
+      <div class="panel-head">
+        <div><h2>数据看板</h2><div class="hint">一眼看清今天的情况</div></div>
+        <button class="btn ghost sm" id="btnDashReload" type="button" style="height:34px">刷新</button>
+      </div>
+      <div id="dashBox"><div class="loading"><span class="spinner"></span>加载中…</div></div>
+    </section>
+
     <!-- 签到 -->
     <section id="tab-checkin" hidden>
       <div class="panel-head">
         <div><h2>签到</h2>
           <div class="hint">看每个人今天签没签、连续多少天；连续签到奖励写在这里，学生端签到页能看到</div></div>
-        <button class="btn ghost sm" id="btnCiAdminReload" type="button" style="height:34px">刷新</button>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input class="input" id="ciAllGem" type="number" min="1" max="100000" value="10"
+            style="width:92px;height:34px;text-align:center;flex:none" title="每人加多少宝石">
+          <button class="btn primary sm" id="btnCiAllGem" type="button" style="height:34px;white-space:nowrap">全员加宝石</button>
+          <button class="btn ghost sm" id="btnCiAdminReload" type="button" style="height:34px">刷新</button>
+        </div>
       </div>
 
       <div class="card" style="padding:16px;margin-bottom:16px">
@@ -2503,7 +2612,8 @@ window.__supaReady = new Promise(function (resolve) {
     if (!tb) return;
     tb.innerHTML = '<span class="tab-pill"></span>' + appTabs().map(function (k) {
       return '<button type="button" data-atab="' + k + '">' +
-        '<span class="ti">' + TAB_DEF[k].icon + '</span>' +
+        '<span class="ti"' + (k === 'me' ? ' style="position:relative"' : '') + '>' + TAB_DEF[k].icon +
+          (k === 'me' ? '<span class="dot-badge" id="meTabDot" hidden></span>' : '') + '</span>' +
         '<span class="tl">' + TAB_DEF[k].label + '</span></button>';
     }).join('');
   }
@@ -2756,7 +2866,10 @@ window.__supaReady = new Promise(function (resolve) {
     box.innerHTML =
       '<div class="me-wrap">' +
         '<div class="me-hero">' +
-          '<div class="me-avatar">' + esc(String(name).slice(0, 1)) + '</div>' +
+          '<div class="me-avatar" title="点头像换头像">' +
+            '<img id="meAvatar" src="' + esc(avatarUrlOf(me)) + '" alt=""' +
+              ' onerror="this.onerror=null;this.src=&quot;' + AVATAR_DEFAULT + '&quot;">' +
+          '</div>' +
           '<div style="min-width:0">' +
             '<div class="nm">' + esc(name) + '</div>' +
             '<div class="me-tags">' + tags + '</div>' +
@@ -2768,6 +2881,9 @@ window.__supaReady = new Promise(function (resolve) {
           appMeRow(MI_ICON.checkin, '签到', '日历、连胜、商城', 'checkin') +
           appMeRow(MI_ICON.friend, '好友', '好友、情谊与友情连胜', 'friends') +
           appMeRow(MI_ICON.mail, '信箱', unread ? '有 ' + unread + ' 封新通知' : '', 'mail') +
+          appMeRow(MI_ICON.member, '我的订单', '买过的会员都在这里', 'orders') +
+          appMeRow(MI_ICON.mail, '消息中心',
+            extraState.msgUnread ? '有 ' + extraState.msgUnread + ' 条新消息' : '赞、回复、好友和私聊', 'msgs') +
           ((me.role === 'admin' || me.role === 'staff') ? '' : appMeRow(MI_ICON.member, '扫码兑换', '扫 VIP 兑换券', 'redeem')) +
           (isAdmin ? appMeRow(MI_ICON.aid, '急救箱', '强制退出、维护工具', 'aid') : '') +
           appMeRow(MI_ICON.tools, '背景音乐', '打开后单曲循环', 'tools') +
@@ -2776,6 +2892,9 @@ window.__supaReady = new Promise(function (resolve) {
         '</div>' +
         '<div class="me-foot">徐悲鸿中学 · 班级服务平台</div>' +
       '</div>';
+
+    var avEl = $('meAvatar');
+    if (avEl) avEl.onclick = openAvatarPicker;
 
     box.querySelector('.me-rows').addEventListener('click', function (e) {
       var b = e.target.closest('[data-meact]');
@@ -2786,6 +2905,8 @@ window.__supaReady = new Promise(function (resolve) {
       if (act === 'checkin') return openCheckinPage();
       if (act === 'friends') return openFriendsPage();
       if (act === 'mail')    return openMailbox();
+      if (act === 'orders')  return openMyOrders();
+      if (act === 'msgs')    return openMsgCenter();
       if (act === 'redeem')  return openRedeemPage();
       if (act === 'aid')     return openFirstAid();
       if (act === 'tools')   return openTools();
@@ -2964,7 +3085,7 @@ window.__supaReady = new Promise(function (resolve) {
 
   function fatal(msg) {
     $('loginView').innerHTML =
-      '<div class="login-top"><span class="school">徐悲鸿中学</span><span class="cls">2026级</span></div>' +
+      '<div class="login-top"><span class="school">xkyctp</span><span class="cls">班级平台</span></div>' +
       '<div class="login-main"><div class="login-card">' +
         '<div class="fatal"><strong>站点暂时打不开</strong><p>' + esc(msg) + '</p></div>' +
         '<button class="btn primary block" type="button" onclick="location.reload()">重新加载</button>' +
@@ -3160,10 +3281,23 @@ window.__supaReady = new Promise(function (resolve) {
       '<button class="btn ghost" type="button" data-close>知道了</button>', 400);
   }
 
+  var heartbeatTimer = null;
+  function heartbeatStart() {
+    if (heartbeatTimer) return;
+    var beat = function () {
+      if (!S.token || document.hidden) return;
+      api('api_heartbeat', { p_token: S.token }).catch(function () {});
+      refreshMsgUnread();
+    };
+    beat();
+    heartbeatTimer = setInterval(beat, 3 * 60 * 1000);
+  }
+
   function enter(profile) {
     S.me = profile;
     S.ad2Shown = false;
     bannedLoad();
+    heartbeatStart();
 
     /* 登录成功就把键盘收掉，不然它会一直挂在屏幕上 */
     try {
@@ -3512,6 +3646,12 @@ window.__supaReady = new Promise(function (resolve) {
       if (moreState.view === 'fb' || moreState.view === 'promo' || moreState.view === 'ver') return renderMore();
     }
     if (currentMod === 'couponNew') { leaveCouponPage(); return; }
+    if (currentMod === 'chat') {
+      currentMod = 'friends';
+      $('modTitle').textContent = '好友';
+      renderFriendsPage();
+      return;
+    }
     if (currentMod === 'couponDetail') { leaveCouponDetail(); return; }
     if (currentMod === 'redeem') {
       stopRedeemScan();
@@ -3557,6 +3697,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (currentMod === 'checkin') return renderCheckinPage();
     if (currentMod === 'friends') return renderFriendsPage();
     if (currentMod === 'compose') return renderComposePage();
+    if (currentMod === 'chat') return renderChatPage();
   }
 
   /* ================= 搜索页 ================= */
@@ -3749,15 +3890,31 @@ window.__supaReady = new Promise(function (resolve) {
     if (rankState.view === 'detail' && rankState.id) return renderRankDetail(rankState.id);
     rankState.view = 'list';
     var body = $('modBody');
-    body.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    body.innerHTML =
+      '<div class="seg" id="rankKind" style="margin:0 0 12px">' +
+        '<button type="button" data-rkind="normal" class="' + (rankBoardKind === 'normal' ? 'on' : '') + '">普通榜</button>' +
+        '<button type="button" data-rkind="gems" class="' + (rankBoardKind === 'gems' ? 'on' : '') + '">宝石榜</button>' +
+        '<button type="button" data-rkind="checkin" class="' + (rankBoardKind === 'checkin' ? 'on' : '') + '">签到榜</button>' +
+      '</div>' +
+      '<div id="rankBody"><div class="loading"><span class="spinner"></span>加载中…</div></div>';
+    $('rankKind').addEventListener('click', function (e) {
+      var kb = e.target.closest('[data-rkind]');
+      if (!kb) return;
+      var k = kb.getAttribute('data-rkind');
+      if (k === rankBoardKind) return;
+      rankBoardKind = k;
+      renderRankPage();
+    });
+    if (rankBoardKind !== 'normal') { paintExtraRank(rankBoardKind); return; }
+    var rankBox = $('rankBody');
     api('api_rank_boards', { p_token: S.token }).then(function (r) {
       if (currentMod !== 'rank') return;
       var items = r.items || [];
       if (!items.length) {
-        body.innerHTML = '<div class="empty"><strong>还没有排行榜</strong>管理员建好后会显示在这里</div>';
+        rankBox.innerHTML = '<div class="empty"><strong>还没有排行榜</strong>管理员建好后会显示在这里</div>';
         return;
       }
-      body.innerHTML = '<div style="max-width:640px;margin:0 auto">' +
+      rankBox.innerHTML = '<div style="max-width:640px;margin:0 auto">' +
         items.map(function (b) {
           var unit = b.unit || '分';
           var mine = b.my_score > 0 ? ('\u00b7 \u6211 ' + b.my_score + unit) : '';
@@ -3770,7 +3927,7 @@ window.__supaReady = new Promise(function (resolve) {
         }).join('') + '</div>';
     }, function (e) {
       if (currentMod !== 'rank') return;
-      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+      rankBox.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
     });
   }
 
@@ -4346,6 +4503,16 @@ window.__supaReady = new Promise(function (resolve) {
   function forumPostCard(p, isAdmin) {
     postReaders[p.id] = p.readers || [];
     postLikers[p.id] = p.likers || [];
+    var pImgs = p.images;
+    if (typeof pImgs === 'string') {
+      try { pImgs = JSON.parse(pImgs); } catch (e) { pImgs = []; }
+    }
+    if (!pImgs || typeof pImgs.slice !== 'function') pImgs = [];
+    var imgsHtml = pImgs.length
+      ? '<div class="fb-imgs">' + pImgs.slice(0, 3).map(function (u) {
+          return '<img src="' + esc(u) + '" alt="" loading="lazy" data-imgview="' + esc(u) + '">';
+        }).join('') + '</div>'
+      : '';
     var quote = p.quote_text
       ? '<div class="quote-box"><b>' + esc(p.quote_author || '') + '</b>：' +
           esc(String(p.quote_text).slice(0, 10)) +
@@ -4355,6 +4522,7 @@ window.__supaReady = new Promise(function (resolve) {
     return '<div class="news-item" data-post="' + esc(p.id) + '">' +
       '<div class="fb-head">' +
         (p.cat_name ? '<span class="badge gold" style="height:18px;font-size:11px">' + esc(p.cat_name) + '</span>' : '') +
+        '<img class="fb-avatar" src="' + esc(avatarUrlOf({ avatar_url: p.author_avatar })) + '" alt="" onerror="this.onerror=null;this.src=&quot;' + AVATAR_DEFAULT + '&quot;">' +
         '<span class="who" data-uid="' + esc(p.user_id || '') + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' + esc(p.author) + '</span>' +
         (p.author_role === 'vip' ? '<span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '') +
         statusTag(p.author_banned, p.author_banned_forever, p.author_muted, p.author_muted_forever) +
@@ -4363,6 +4531,7 @@ window.__supaReady = new Promise(function (resolve) {
       '</div>' +
       quote +
       '<div class="fb-body">' + esc(p.body) + '</div>' +
+      imgsHtml +
       '<div style="margin-top:8px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">' +
         '<button type="button" class="link" data-expand="' + esc(p.id) + '">' +
           (p.reply_count ? p.reply_count + ' 条跟评' : '跟评') + '</button>' +
@@ -4372,6 +4541,8 @@ window.__supaReady = new Promise(function (resolve) {
         (likeNames
           ? '<button type="button" class="link like-names" data-likers="' + esc(p.id) + '">' + esc(likeNames) + '</button>'
           : '') +
+        (p.is_mine ? '' :
+          '<button type="button" class="link" data-report="' + esc(p.id) + '">举报</button>') +
         (isAdmin ? '<button type="button" class="link danger" data-postdel="' + esc(p.id) + '">删除帖子</button>' : '') +
         '<span class="hint" data-readers="' + esc(p.id) + '" style="font-size:12px">' + readersText(p.readers, p.id) + '</span>' +
       '</div>' +
@@ -4908,7 +5079,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (!b || !currentMod) return;
 
       /* 一出现「加载中」，就先用上次的快照顶上 */
-      if (!snapBusy && b.querySelector('.loading')) {
+      if (!snapBusy && b.firstElementChild && b.firstElementChild.classList.contains('loading')) {
         var key0 = routeKey();
         var rec = Snap.get(key0);
         if (rec && rec.html) {
@@ -4926,7 +5097,7 @@ window.__supaReady = new Promise(function (resolve) {
         var el = $('modBody');
         if (!el || !currentMod) return;
         var key = routeKey();
-        if (el.querySelector('.loading')) return;
+        if (el.firstElementChild && el.firstElementChild.classList.contains('loading')) return;
         if (el.querySelector('.cache-tip:not(.is-done)')) return;   /* 还在更新，先不存 */
 
         /* 铺过快照的页面：更新完把胶囊换成「更新完成」（等高，位置不动，也不消失） */
@@ -4959,8 +5130,140 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* 发帖页（整页，不再弹窗）：＋ 里可以 @ 人、引用帖子 */
-  var composeState = { body: '', cat: '', quote: null, mentions: [], picking: false, left: 3 };
+  var composeState = { body: '', cat: '', quote: null, mentions: [], picking: false, left: 3, imgs: [] };
   var composeCats = [];
+
+  /* ================= 图片：发帖 / 头像共用 ================= */
+  var AVATAR_DEFAULT = './avatar_default.png';
+  var uploadSeq = 0;
+
+  /* 上传到 Supabase Storage 的 media 桶：路径唯一，扩展名按 file.type 推
+     cb(err, publicUrl)；prefix 是目录，baseName 可指定文件名（不带扩展名） */
+  function uploadToStorage(file, prefix, cb, baseName) {
+    cb = cb || function () {};
+    if (!file) return cb(new Error('没有选中文件'));
+    if (!db || !db.storage) return cb(new Error('平台还没配置图片存储（Storage），请找管理员'));
+    var ext = 'jpg';
+    var t = String(file.type || '').toLowerCase();
+    if (t.indexOf('png') >= 0) ext = 'png';
+    else if (t.indexOf('webp') >= 0) ext = 'webp';
+    else if (t.indexOf('gif') >= 0) ext = 'gif';
+    var name = baseName || (Date.now() + '_' + (uploadSeq++));
+    var dir = String(prefix || '').replace(/\/+$/, '');
+    var p = (dir ? dir + '/' : '') + name + '.' + ext;
+    var bucket = db.storage.from('media');
+    var task;
+    try { task = bucket.upload(p, file); } catch (e) { return cb(e); }
+    Promise.resolve(task).then(function (r) {
+      if (r && r.error) return cb(r.error);
+      var pub = null;
+      try { pub = bucket.getPublicUrl(p); } catch (e2) { pub = null; }
+      var url = pub && pub.data && pub.data.publicUrl;
+      if (!url) return cb(new Error('上传成功但拿不到图片地址，请找管理员'));
+      cb(null, url);
+    }, function (e) { cb(e); });
+  }
+
+  /* 上传失败时给一句人话；Storage 没建 / 没权限时提示找管理员 */
+  function storageErrText(e) {
+    var msg = '';
+    if (e) msg = e.message || e.error_description || e.error || '';
+    msg = String(msg || '未知错误');
+    if (/bucket|not found|not exist|storage|policy|permission|权限|row-level|jwt|apikey/i.test(msg)) {
+      return msg + '（请找管理员检查 Storage 的 media 存储桶）';
+    }
+    return msg;
+  }
+
+  /* 头像地址：空就用默认图 */
+  function avatarUrlOf(u) {
+    return (u && u.avatar_url) ? u.avatar_url : AVATAR_DEFAULT;
+  }
+  /* 头像两个月只能改一次：下次可改日期 yyyy-mm-dd */
+  function avatarNextText(setAt) {
+    if (!setAt) return '';
+    var d = new Date(setAt);
+    if (isNaN(d)) return '';
+    d.setMonth(d.getMonth() + 2);
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  }
+
+  /* 点帖子里的图片放大看 */
+  function openImageViewer(url) {
+    if (!url) return;
+    modal('查看图片',
+      '<img class="av-view" src="' + esc(url) + '" alt="">',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 720);
+  }
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var iv = t.closest('[data-imgview]');
+    if (iv) openImageViewer(iv.getAttribute('data-imgview'));
+  });
+
+  /* 发帖图片每天配额：VIP 2 张，普通 1 张（本地按天记，服务端也会拦） */
+  var IMG_USED_KEY = 'xbh_forum_img_used';
+  function forumImgQuota() {
+    var me = S.me || {};
+    return (me.role === 'vip' || me.is_vip || me.member_plan_name) ? 2 : 1;
+  }
+  function forumImgDayKey() {
+    var me = S.me || {};
+    var d = new Date();
+    return IMG_USED_KEY + '_' + (me.id || '') + '_' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate());
+  }
+  function forumImgUsed() {
+    var n = 0;
+    try { n = parseInt(localStorage.getItem(forumImgDayKey()) || '0', 10) || 0; } catch (e) { n = 0; }
+    var me = S.me || {};
+    var srv = parseInt(me.img_today != null ? me.img_today
+      : (me.forum_img_today != null ? me.forum_img_today : 0), 10) || 0;
+    return Math.max(n, srv);
+  }
+  function forumImgLeft() {
+    return Math.max(0, forumImgQuota() - forumImgUsed());
+  }
+  function forumImgUse(n) {
+    var used = forumImgUsed() + (parseInt(n, 10) || 0);
+    try { localStorage.setItem(forumImgDayKey(), String(used)); } catch (e) {}
+  }
+
+  /* 头像：选文件 -> 传 Storage -> api_set_avatar */
+  function openAvatarPicker() {
+    var inp = $('avatarFileInput');
+    if (!inp) {
+      inp = document.createElement('input');
+      inp.type = 'file';
+      inp.accept = 'image/*';
+      inp.id = 'avatarFileInput';
+      inp.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';
+      document.body.appendChild(inp);
+      inp.addEventListener('change', function () {
+        var f = inp.files && inp.files[0];
+        inp.value = '';
+        if (f) uploadAvatarFile(f);
+      });
+    }
+    inp.click();
+  }
+  function uploadAvatarFile(file) {
+    var uid = (S.me && S.me.id) || '';
+    if (!uid) return toast('登录过期了，重新进一下', 'err');
+    if (!/^image\//i.test(String(file.type || ''))) return toast('只能选图片', 'err');
+    toast('头像上传中…', 'ok', 1600);
+    uploadToStorage(file, 'avatar', function (err, url) {
+      if (err) return toast('头像上传失败：' + storageErrText(err), 'err', 4200);
+      api('api_set_avatar', { p_token: S.token, p_url: url }).then(function (r) {
+        S.me.avatar_url = (r && r.avatar_url) || url;
+        S.me.avatar_set_at = (r && r.avatar_set_at) || new Date().toISOString();
+        saveSession(S.token, S.me);
+        toast('头像已更新', 'ok');
+        if (currentMod === 'profile') renderProfile();
+        if (!$('mePanel').hidden) renderAppMe();
+      }, function (e) { toast(e.message || '头像修改失败', 'err', 4200); });
+    }, uid + '_' + Date.now());
+  }
 
   function openForumCompose(left) {
     composeState = {
@@ -4969,7 +5272,8 @@ window.__supaReady = new Promise(function (resolve) {
       quote: null,
       mentions: [],
       picking: false,
-      left: left
+      left: left,
+      imgs: []
     };
     composeCats = forumCats || [];
     currentMod = 'compose';
@@ -5018,6 +5322,14 @@ window.__supaReady = new Promise(function (resolve) {
                 esc(m.name) + ' \u2715</button>';
             }).join('') + '</div>'
           : '') +
+        '<div class="field"><span>图片（VIP 每天 2 张，普通 1 张，一条最多 3 张）</span>' +
+          '<div class="compose-imgs" id="composeImgs"></div>' +
+          '<input type="file" id="composeFile" accept="image/*" multiple style="display:none">' +
+          '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
+            '<button type="button" class="btn ghost sm" id="composeImgBtn" style="height:34px">＋ 图片</button>' +
+            '<span class="hint" id="composeImgTip" style="font-size:12px">今天还能发图 ' + forumImgLeft() + ' 张</span>' +
+          '</div>' +
+        '</div>' +
         '<div class="compose-bar">' +
           '<button type="button" class="compose-plus" id="composePlus" aria-label="添加">\uff0b</button>' +
           '<button type="button" class="btn primary" id="composeSend">发布</button>' +
@@ -5054,6 +5366,60 @@ window.__supaReady = new Promise(function (resolve) {
 
     $('composePlus').onclick = openComposeAddMenu;
     $('composeSend').onclick = sendCompose;
+    bindComposeImgs();
+  }
+
+  /* 发帖页图片：预览缩略图 / 删除 / 配额提示 */
+  function bindComposeImgs() {
+    var inp = $('composeFile');
+    var btn = $('composeImgBtn');
+    var box = $('composeImgs');
+    if (!inp || !btn || !box) return;
+
+    function paint() {
+      var list = composeState.imgs || [];
+      box.innerHTML = list.map(function (it, i) {
+        return '<span class="ci-thumb"><img src="' + esc(it.url) + '" alt="">' +
+          '<button type="button" data-imgthumb-del="' + i + '" aria-label="移除">\u00d7</button></span>';
+      }).join('');
+      var tip = $('composeImgTip');
+      if (tip) tip.textContent = '今天还能发图 ' + forumImgLeft() + ' 张';
+    }
+
+    btn.onclick = function () {
+      if (forumImgLeft() <= 0) return toast('今天发图机会用完了', 'err', 3000);
+      if ((composeState.imgs || []).length >= 3) return toast('一条帖子最多 3 张图', 'err', 2800);
+      inp.click();
+    };
+
+    inp.onchange = function () {
+      var files = Array.prototype.slice.call(inp.files || []);
+      inp.value = '';
+      if (!files.length) return;
+      var room = Math.min(3 - (composeState.imgs || []).length, forumImgLeft());
+      if (room <= 0) return toast('今天发图机会用完了', 'err', 3000);
+      if (files.length > room) toast('今天最多还能选 ' + room + ' 张', 'err', 3000);
+      files.slice(0, room).forEach(function (f) {
+        if (!/^image\//i.test(String(f.type || ''))) return toast('只能选图片', 'err', 2400);
+        composeState.imgs = composeState.imgs || [];
+        composeState.imgs.push({ file: f, url: URL.createObjectURL(f) });
+      });
+      paint();
+    };
+
+    box.onclick = function (e) {
+      var b = e.target.closest('[data-imgthumb-del]');
+      if (!b) return;
+      var i = parseInt(b.getAttribute('data-imgthumb-del'), 10);
+      var list = composeState.imgs || [];
+      if (isNaN(i) || !list[i]) return;
+      try { URL.revokeObjectURL(list[i].url); } catch (err) {}
+      list.splice(i, 1);
+      composeState.imgs = list;
+      paint();
+    };
+
+    paint();
   }
 
   /* ＋ 号：@ 某人 / 引用帖子 */
@@ -5163,23 +5529,57 @@ window.__supaReady = new Promise(function (resolve) {
     if (bannedGuard(v)) return;
     composeState.body = v;
 
-    busy(btn, true, '发布中\u2026');
-    api('api_forum_post', {
-      p_token: S.token,
-      p_body: v,
-      p_cat_id: composeState.cat || null,
-      p_quote_id: composeState.quote ? composeState.quote.id : null,
-      p_mentions: composeState.mentions.map(function (m) { return m.id; })
-    }).then(function (r) {
-      busy(btn, false);
-      var gemTip = (r && r.reward) ? ('，宝石 +' + r.reward) : '';
-      toast(r && r.mentioned ? ('已发布，提醒了 ' + r.mentioned + ' 人' + gemTip) : ('已发布' + gemTip), 'ok');
-      currentMod = 'forum';
-      $('modTitle').textContent = '论坛';
-      renderForum();
-    }, function (e) {
-      busy(btn, false);
-      toast(e.message, 'err', 3800);
+    var imgs = composeState.imgs || [];
+    if (imgs.length > 3) imgs = imgs.slice(0, 3);
+    if (imgs.length > forumImgLeft()) return toast('今天发图机会用完了', 'err', 3200);
+    var uid = (S.me && S.me.id) || '';
+
+    busy(btn, true, imgs.length ? '上传图片\u2026' : '发布中\u2026');
+
+    function doPost(urls) {
+      var params = {
+        p_token: S.token,
+        p_body: v,
+        p_cat_id: composeState.cat || null,
+        p_quote_id: composeState.quote ? composeState.quote.id : null,
+        p_mentions: composeState.mentions.map(function (m) { return m.id; })
+      };
+      if (urls && urls.length) params.p_images = urls;
+      api('api_forum_post', params).then(function (r) {
+        busy(btn, false);
+        if (urls && urls.length) forumImgUse(urls.length);
+        composeState.imgs = [];
+        var gemTip = (r && r.reward) ? ('，宝石 +' + r.reward) : '';
+        toast(r && r.mentioned ? ('已发布，提醒了 ' + r.mentioned + ' 人' + gemTip) : ('已发布' + gemTip), 'ok');
+        currentMod = 'forum';
+        $('modTitle').textContent = '论坛';
+        renderForum();
+      }, function (e) {
+        busy(btn, false);
+        toast(e.message, 'err', 3800);
+      });
+    }
+
+    if (!imgs.length) return doPost([]);
+
+    var ts = Date.now();
+    var urls = new Array(imgs.length);
+    var done = 0, failed = false;
+    imgs.forEach(function (it, i) {
+      uploadToStorage(it.file, 'forum/' + uid, function (err, url) {
+        if (failed) return;
+        if (err) {
+          failed = true;
+          busy(btn, false);
+          toast('图片上传失败：' + storageErrText(err), 'err', 4200);
+          return;
+        }
+        urls[i] = url;
+        done++;
+        if (done === imgs.length) {
+          doPost(urls.filter(function (x) { return !!x; }));
+        }
+      }, ts + '_' + i);
     });
   }
 
@@ -5245,7 +5645,11 @@ window.__supaReady = new Promise(function (resolve) {
               return '<div class="fb-reply"><b data-uid="' + esc(x.user_id || '') + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' + esc(x.author) +
                 (x.author_role === 'vip' ? ' · VIP' : '') + '</b>' +
                 statusTag(x.author_banned, x.author_banned_forever, x.author_muted, x.author_muted_forever) + ' ' + esc(x.body) +
-                '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + esc(x.created_at) + '</div></div>';
+                '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + esc(x.created_at) +
+                  (x.user_id && S.me && x.user_id === S.me.id ? '' :
+                    ' <button type="button" class="link" data-report-reply="' + esc(x.id) + '"' +
+                    ' style="font-size:11px">举报</button>') +
+                '</div></div>';
             }).join('')
           : '<div class="hint">还没有人跟评</div>') +
         '<div style="margin-top:10px">' +
@@ -6095,12 +6499,12 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
-  /* 学生投稿热点（每周 3 次，发布后直接显示） */
+  /* 学生投稿热点（每周 10 次，发布后直接显示） */
 
   function openNewsApply() {
     var m = modal('投稿班级热点',
       '<p class="hint" style="margin-bottom:12px;line-height:1.7">' +
-        '每周最多 3 次，发布后会直接出现在「班级热点」里。</p>' +
+        '每周最多 10 次，发布后会直接出现在「班级热点」里。</p>' +
       '<label class="field"><span>标题<em>*</em></span>' +
         '<input class="input" id="naTitle" maxlength="40" placeholder="例如：本周五运动会"></label>' +
       '<label class="field"><span>小字（可选，列表里显示这一行）</span>' +
@@ -6114,7 +6518,7 @@ window.__supaReady = new Promise(function (resolve) {
     api('api_news_my_applies', { p_token: S.token }).then(function (r) {
       var items = r.items || [];
       m.querySelector('#naMine').innerHTML =
-        '<div class="hint" style="margin-top:6px">本周已投稿 ' + (r.used || 0) + ' / 3</div>' +
+        '<div class="hint" style="margin-top:6px">本周已投稿 ' + (r.used || 0) + ' / 10</div>' +
         (items.length
           ? '<div class="pf-label" style="margin:10px 0 6px">我的投稿</div>' + items.slice(0, 6).map(function (x) {
               var tag = x.status === 'approved' ? '已发布' : x.status === 'rejected' ? '已删除' : '已发布';
@@ -6138,9 +6542,9 @@ window.__supaReady = new Promise(function (resolve) {
         p_token: S.token, p_title: t,
         p_sub: m.querySelector('#naSub').value.trim(),
         p_content: m.querySelector('#naBody').value.trim()
-      }).then(function () {
+      }).then(function (r) {
         busy(btn, false); closeModal();
-        toast('已发布，已出现在「班级热点」里', 'ok', 3000);
+        toast('已发布，已出现在「班级热点」里' + ((r && r.reward) ? ('，宝石 +' + r.reward) : ''), 'ok', 3000);
         if (currentMod === 'news') renderNewsInModule($('modBody'));
       }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
     };
@@ -6149,7 +6553,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 用户端 ---------- */
   /* ---------- 管理端：标签 ---------- */
   function switchTab(name) {
-    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'hwlib', 'coupon', 'checkin', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'more', 'me'].forEach(function (k) {
+    ['users', 'identity', 'hw', 'news', 'cube', 'debug', 'hwlib', 'coupon', 'checkin', 'mail', 'feedback', 'forum', 'medal', 'vendor', 'member', 'ad', 'rank', 'notice', 'status', 'orders', 'reports', 'dash', 'more', 'me'].forEach(function (k) {
       $('tab-' + k).hidden = (k !== name);
     });
     Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
@@ -6169,6 +6573,9 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
     if (name === 'coupon') loadCouponAdmin();
+    if (name === 'orders') loadOrderAdmin();
+    if (name === 'reports') loadReportAdmin();
+    if (name === 'dash') loadDashAdmin();
     if (name === 'checkin') loadCheckinAdmin();
     if (name === 'ad') { loadAdAdmin(); loadAdFreeList(); }
     if (name === 'rank') loadRankAdmin();
@@ -6562,6 +6969,7 @@ window.__supaReady = new Promise(function (resolve) {
     var vip = u.is_vip ? ' <span class="badge gold" style="height:18px;font-size:11px">VIP</span>' : '';
 
     return '<div class="pf-row">' +
+        '<img class="pf-avatar" src="' + esc(avatarUrlOf(u)) + '" alt="" onerror="this.onerror=null;this.src=&quot;' + AVATAR_DEFAULT + '&quot;">' +
         '<div class="pf-main">' +
           '<div class="pf-val" style="font-size:16px;font-weight:700">' + esc(u.name) + vip +
             ' ' + statusTag(u.banned, u.banned_forever, u.muted, u.muted_forever) + '</div>' +
@@ -6737,6 +7145,16 @@ window.__supaReady = new Promise(function (resolve) {
               '<div class="pf-val" style="font-size:16px;font-weight:700">' + esc(u.name) + '</div>' +
             '</div></div>' +
 
+            '<div class="pf-row">' +
+              '<img class="pf-avatar" src="' + esc(avatarUrlOf(u)) + '" alt="" onerror="this.onerror=null;this.src=&quot;' + AVATAR_DEFAULT + '&quot;">' +
+              '<div class="pf-main">' +
+                '<div class="pf-label">头像</div>' +
+                '<div class="pf-val" style="font-size:13.5px">' + (u.avatar_url ? '已设置' : '还没设置，先用默认头像') + '</div>' +
+                (u.avatar_set_at ? '<div class="pf-hint">下次可改：' + esc(avatarNextText(u.avatar_set_at)) + '</div>' : '') +
+              '</div>' +
+              '<button class="btn ghost sm" id="pfAvatarSet" type="button" style="height:34px;flex:none">更换</button>' +
+            '</div>' +
+
             '<div class="pf-row"><div class="pf-main">' +
               '<div class="pf-label">性别</div>' +
               '<div class="chips" id="pfGender">' +
@@ -6841,6 +7259,9 @@ window.__supaReady = new Promise(function (resolve) {
           toast(n ? ('已清除 ' + n + ' 项缓存') : '本来就是空的', 'ok');
         }, 200);
       };
+
+      var avSet = body.querySelector('#pfAvatarSet');
+      if (avSet) avSet.onclick = openAvatarPicker;
 
       body.querySelector('#pfSaveBio').onclick = function () {
         var btn = this;
@@ -7243,13 +7664,17 @@ window.__supaReady = new Promise(function (resolve) {
       var r = arr[0], show = arr[1], mine = arr[2] || {};
       var rel = friendRelOf(uid, mine);
       body.innerHTML = '<div style="max-width:600px;margin:0 auto">' +
+        profileHeadHtml(r.user, 0) +
         profileCardHtml(r.user, r.medals, false) +
+        '<div id="pfStats"></div>' +
         userFriendsHtml(uid, show, rel) +
         '</div>';
 
       body.querySelectorAll('[data-fadd]').forEach(function (b) {
         b.onclick = function () { addFriend(b.getAttribute('data-fadd'), b); };
       });
+
+      loadProfileStats(uid, r.user);
     }, function (e) {
       if (currentMod !== 'userpage') return;
       body.innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
@@ -7681,6 +8106,7 @@ window.__supaReady = new Promise(function (resolve) {
   /* ---------- 站内信 ---------- */
   /* 有新信就弹一次提醒，只显示标题；点「去看看」打开信箱 */
   function loadMailBadge() {
+    refreshMsgUnread();                /* 顺手拉一次未读，给底栏「我的」点红点 */
     if (S.me && S.me.role === 'admin') return;
 
     api('api_list_mails', { p_token: S.token, p_unread_only: true }).then(function (r) {
@@ -8493,6 +8919,10 @@ window.__supaReady = new Promise(function (resolve) {
           '</div>' +
         '</div>' +
         cal +
+        '<div class="ci-sec" id="dailyBox">' +
+          '<h3>每日任务</h3>' +
+          '<div class="loading"><span class="spinner"></span>加载中…</div>' +
+        '</div>' +
         '<div class="ci-sec">' +
           '<h3>连续签到奖励</h3>' +
           (rewards.length
@@ -8524,6 +8954,8 @@ window.__supaReady = new Promise(function (resolve) {
         paintCheckinPage(d);
       };
     });
+
+    loadDailyTasks();
   }
 
   function ciCalendarHtml(dayMap, today) {
@@ -8592,7 +9024,7 @@ window.__supaReady = new Promise(function (resolve) {
             '<div class="nm"><div>忘签到保护</div>' +
               '<div class="sub">漏签那天自动消耗 1 个，连胜不断 · 已拥有 ' + owned + ' 个</div></div>' +
             '<button type="button" class="btn primary sm" id="shopBuy" ' +
-              ((d.gems || 0) < 300 ? 'disabled' : '') + '>300 宝石购买</button>' +
+              ((d.gems || 0) < 200 ? 'disabled' : '') + '>200 宝石购买</button>' +
           '</div>' +
           '<div class="ci-shop-item">' +
             '<span class="ic">🎒</span>' +
@@ -8821,11 +9253,17 @@ window.__supaReady = new Promise(function (resolve) {
           '<h3>我的好友（' + fr.length + '）</h3>' +
           (fr.length
             ? fr.map(function (f) {
-                return '<div class="ci-fr">' +
+                return '<div class="ci-fr" data-chat-row="1">' +
                   '<span class="nm" data-uid="' + esc(f.uid) + '" style="cursor:pointer;text-decoration:underline;text-decoration-style:dotted">' +
                     esc(f.name) + '</span>' +
-                  '<span class="st">情谊 ' + (f.intimacy || 0) + ' · 连胜 ' + (f.streak || 0) + ' 天' +
+                  '<span class="st">' +
+                    (f.online ? '在线'
+                      : (f.last_seen ? '上次上线 ' + fmt(f.last_seen) : '还没上线过')) +
+                    ' · 情谊 ' + (f.intimacy || 0) + ' · 连胜 ' + (f.streak || 0) + ' 天' +
                     (f.checked_today ? ' · 今日已签' : '') + '</span>' +
+                  '<button type="button" class="btn ghost sm" data-chat="' + esc(f.uid) + '"' +
+                    ' data-chat-name="' + esc(f.name) + '"' +
+                    ' style="height:28px;margin-left:auto;flex:none">聊天</button>' +
                 '</div>';
               }).join('')
             : '<div class="ci-empty">还没有好友。在搜索里点一个人，进主页点「加好友」。</div>') +
@@ -8859,6 +9297,12 @@ window.__supaReady = new Promise(function (resolve) {
         });
       };
     });
+
+    body.querySelectorAll('[data-chat]').forEach(function (b) {
+      b.onclick = function () {
+        openChatPage(b.getAttribute('data-chat'), b.getAttribute('data-chat-name'));
+      };
+    });
   }
 
   function addFriend(uid, btn) {
@@ -8874,7 +9318,7 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   /* ================= VIP 兑换券 ================= */
-  var couponDraft = { view: 'form', item: null, img: '' };
+  var couponDraft = { view: 'form', item: null, img: '', kind: 'vip' };
   var couponPlans = [];
   var redeemState = { view: 'scan', info: null, stream: null, timer: null };
 
@@ -8900,7 +9344,9 @@ window.__supaReady = new Promise(function (resolve) {
         ' <span class="badge ' + (c.used ? 'gray' : 'st-done') + '" style="height:18px;font-size:11px">' +
           (c.used ? '已兑换' : '未兑换') + '</span>' +
         '<div class="hint" style="margin-top:4px">' +
-          esc(c.code) + ' · ' + esc(c.plan_name) + 'VIP · ' + c.days + ' 天' +
+          esc(c.code) + ' · ' + (c.kind === 'gems'
+            ? ('💎 ' + (c.gems || 0) + ' 宝石')
+            : (esc(c.plan_name) + 'VIP · ' + c.days + ' 天')) +
           (c.used ? ' · 被 ' + esc(c.used_by || '某人') + ' 用掉' : '') +
         '</div>' +
       '</div>' +
@@ -8955,7 +9401,9 @@ window.__supaReady = new Promise(function (resolve) {
         '<div class="ci-sec" style="margin-top:14px">' +
           '<div class="ci-rw"><span class="rw-d">名称</span><span>' + esc(c.name) + '</span></div>' +
           '<div class="ci-rw"><span class="rw-d">编号</span><span>' + esc(c.code) + '</span></div>' +
-          '<div class="ci-rw"><span class="rw-d">方案</span><span>' + esc(c.plan_name) + 'VIP · ' + c.days + ' 天</span></div>' +
+          (c.kind === 'gems'
+            ? '<div class="ci-rw"><span class="rw-d">类型</span><span>💎 ' + (c.gems || 0) + ' 宝石</span></div>'
+            : '<div class="ci-rw"><span class="rw-d">方案</span><span>' + esc(c.plan_name) + 'VIP · ' + c.days + ' 天</span></div>') +
           '<div class="ci-rw"><span class="rw-d">状态</span><span>' +
             (c.used ? '已兑换（' + esc(c.used_by || '某人') + '）' : '未兑换') + '</span></div>' +
           '<div class="ci-rw"><span class="rw-d">创建</span><span>' + esc(c.created_at) + '</span></div>' +
@@ -8969,7 +9417,7 @@ window.__supaReady = new Promise(function (resolve) {
 
     $('cpDetailBack').onclick = leaveCouponDetail;
     $('cpDetailDel').onclick = function () { deleteCoupon(c.id); };
-    makeCouponImage({ name: c.name, code: c.code, plan_name: c.plan_name, days: c.days }, function (url) {
+    makeCouponImage({ name: c.name, code: c.code, plan_name: c.plan_name, days: c.days, kind: c.kind, gems: c.gems }, function (url) {
       var box = $('cpDetailImg');
       if (!box) return;
       box.innerHTML = '<img src="' + url + '" style="width:100%;max-width:420px;border-radius:12px;border:1px solid var(--line)">';
@@ -9041,22 +9489,34 @@ window.__supaReady = new Promise(function (resolve) {
       return;
     }
 
+    var kind = couponDraft.kind || 'vip';
+
     body.innerHTML =
       '<div style="max-width:560px;margin:0 auto">' +
         '<label class="field"><span>兑换券名称<em>*</em></span>' +
           '<input class="input" id="cpName" maxlength="40" placeholder="例如：元旦福利券"></label>' +
         '<label class="field"><span>兑换券编号<em>*</em></span>' +
           '<input class="input" id="cpCode" maxlength="40" placeholder="例如：NEW2026（4-40 位字母/数字/-/_）" style="text-transform:uppercase"></label>' +
-        '<label class="field"><span>兑换的会员方案<em>*</em></span>' +
-          '<select class="input" id="cpPlan">' +
-            (couponPlans.length
-              ? couponPlans.map(function (p) {
-                  return '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>';
-                }).join('')
-              : '<option value="">（先在会员里建一个方案）</option>') +
-          '</select></label>' +
-        '<label class="field"><span>天数<em>*</em></span>' +
-          '<input class="input" id="cpDays" type="number" min="1" max="3650" value="30"></label>' +
+        '<div class="field"><span>券类型</span>' +
+          '<div class="chips" id="cpKind">' +
+            '<button type="button" class="chip-btn ' + (kind === 'vip' ? 'on' : '') + '" data-ckind="vip">VIP券</button>' +
+            '<button type="button" class="chip-btn ' + (kind === 'gems' ? 'on' : '') + '" data-ckind="gems">宝石券</button>' +
+          '</div>' +
+        '</div>' +
+        '<div id="cpVipBox"' + (kind === 'gems' ? ' hidden' : '') + '>' +
+          '<label class="field"><span>兑换的会员方案<em>*</em></span>' +
+            '<select class="input" id="cpPlan">' +
+              (couponPlans.length
+                ? couponPlans.map(function (p) {
+                    return '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>';
+                  }).join('')
+                : '<option value="">（先在会员里建一个方案）</option>') +
+            '</select></label>' +
+          '<label class="field"><span>天数<em>*</em></span>' +
+            '<input class="input" id="cpDays" type="number" min="1" max="3650" value="30"></label>' +
+        '</div>' +
+        '<label class="field" id="cpGemBox"' + (kind === 'gems' ? '' : ' hidden') + '><span>宝石数量<em>*</em></span>' +
+          '<input class="input" id="cpGems" type="number" min="1" max="100000" value="50"></label>' +
         '<div style="text-align:right;margin-top:6px">' +
           '<button class="btn ghost" type="button" id="couponCancel" style="margin-right:8px">取消</button>' +
           '<button class="btn primary" type="button" id="couponCreate">创建</button>' +
@@ -9064,27 +9524,53 @@ window.__supaReady = new Promise(function (resolve) {
       '</div>';
 
     $('couponCancel').onclick = leaveCouponPage;
+
+    var kindBox = $('cpKind');
+    if (kindBox) kindBox.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-ckind]');
+      if (!b) return;
+      kind = b.getAttribute('data-ckind');
+      couponDraft.kind = kind;
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      var vb = $('cpVipBox'), gb = $('cpGemBox');
+      if (vb) vb.hidden = (kind === 'gems');
+      if (gb) gb.hidden = (kind !== 'gems');
+    });
+
     $('couponCreate').onclick = function () {
       var btn = this;
       var nm = $('cpName').value.trim();
       var cd = $('cpCode').value.trim().toUpperCase();
-      var pid = $('cpPlan').value;
-      var days = parseInt($('cpDays').value, 10) || 0;
+      var isGems = (kind === 'gems');
+      var pid = isGems ? null : $('cpPlan').value;
+      var days = isGems ? 0 : (parseInt($('cpDays').value, 10) || 0);
+      var gems = isGems ? (parseInt($('cpGems').value, 10) || 0) : 0;
       if (!nm) return toast('请填兑换券名称', 'err');
       if (!/^[A-Z0-9_-]{4,40}$/.test(cd)) return toast('编号只能是 4-40 位字母、数字、- 或 _', 'err');
-      if (!pid) return toast('先在会员里建一个方案', 'err');
-      if (!days) return toast('请填天数', 'err');
+      if (isGems) {
+        if (!gems || gems < 1) return toast('请填宝石数量', 'err');
+      } else {
+        if (!pid) return toast('先在会员里建一个方案', 'err');
+        if (!days) return toast('请填天数', 'err');
+      }
 
       busy(btn, true, '创建中…');
       api('api_admin_coupon_save', {
-        p_token: S.token, p_name: nm, p_code: cd, p_plan_id: pid, p_days: days
+        p_token: S.token, p_name: nm, p_code: cd,
+        p_kind: isGems ? 'gems' : 'vip',
+        p_gems: gems,
+        p_plan_id: pid, p_days: days
       }).then(function (r) {
         var planName = '';
         couponPlans.forEach(function (p) { if (p.id === pid) planName = p.name; });
-        var item = { id: r && r.id, name: nm, code: cd, plan_name: planName, days: days };
+        var item = {
+          id: r && r.id, name: nm, code: cd,
+          kind: isGems ? 'gems' : 'vip',
+          plan_name: planName, days: days, gems: gems
+        };
         makeCouponImage(item, function (dataUrl) {
           busy(btn, false);
-          couponDraft = { view: 'result', item: item, img: dataUrl };
+          couponDraft = { view: 'result', item: item, img: dataUrl, kind: kind };
           renderCouponCreate();
           loadCouponAdmin();
           toast('已创建', 'ok');
@@ -9122,7 +9608,9 @@ window.__supaReady = new Promise(function (resolve) {
 
         g.fillStyle = '#1F2328';
         g.font = 'bold 34px sans-serif';
-        g.fillText(item.plan_name + 'VIP  ' + item.days + '天', W / 2, 244);
+        g.fillText(item.kind === 'gems'
+          ? ((item.gems || 0) + ' 宝石')
+          : (item.plan_name + 'VIP  ' + item.days + '天'), W / 2, 244);
 
         var n = qr.getModuleCount();
         var cell = Math.floor(400 / n);
@@ -9201,8 +9689,11 @@ window.__supaReady = new Promise(function (resolve) {
         '<div style="max-width:520px;margin:0 auto;text-align:center;padding-top:30px">' +
           '<div style="font-size:44px">🎉</div>' +
           '<h2 style="font-size:20px;color:var(--ink);margin:10px 0">兑换成功</h2>' +
-          '<div class="hint">' + esc(st.info.plan_name) + 'VIP · ' + st.info.days + ' 天</div>' +
-          '<div class="hint" style="margin-top:6px">到期时间：' + esc(st.info.vip_until || '') + '</div>' +
+          (st.info.kind === 'gems'
+            ? '<div class="hint">宝石 +' + (st.info.gems_added || 0) +
+                (st.info.gems != null ? ('，现有 ' + st.info.gems) : '') + '</div>'
+            : '<div class="hint">' + esc(st.info.plan_name) + 'VIP · ' + st.info.days + ' 天</div>' +
+              '<div class="hint" style="margin-top:6px">到期时间：' + esc(st.info.vip_until || '') + '</div>') +
           '<div style="margin-top:20px"><button class="btn primary" type="button" id="redeemAgain">再兑一张</button></div>' +
         '</div>';
       $('redeemAgain').onclick = function () { stopRedeemScan(); redeemState = { view: 'scan', info: null, stream: null, timer: null }; renderRedeemPage(); };
@@ -9216,7 +9707,9 @@ window.__supaReady = new Promise(function (resolve) {
             '<div class="pf-label">兑换券</div>' +
             '<div class="pf-val" style="font-size:17px;font-weight:700">' + esc(st.info.name) + '</div>' +
             '<div class="hint" style="margin-top:6px">编号：' + esc(st.info.code) + '</div>' +
-            '<div class="hint" style="margin-top:2px">' + esc(st.info.plan_name) + 'VIP · ' + st.info.days + ' 天</div>' +
+            '<div class="hint" style="margin-top:2px">' + (st.info.kind === 'gems'
+              ? ('💎 宝石券 · +' + (st.info.gems || 0) + ' 宝石')
+              : (esc(st.info.plan_name) + 'VIP · ' + st.info.days + ' 天')) + '</div>' +
           '</div>' +
           '<div style="text-align:center;margin-top:18px">' +
             '<button class="btn primary" id="redeemGo" type="button" style="min-width:180px">确认兑换</button>' +
@@ -9294,7 +9787,9 @@ window.__supaReady = new Promise(function (resolve) {
       box.innerHTML = items.map(function (c) {
         return '<div class="perm-row" style="padding:8px 0">' +
           '<div class="who" style="width:auto;flex:1;min-width:0">' + esc(c.name) +
-            '<small>' + esc(c.code) + ' · ' + esc(c.plan_name) + 'VIP ' + c.days + ' 天</small></div>' +
+            '<small>' + esc(c.code) + ' · ' + (c.kind === 'gems'
+              ? ('💎 ' + (c.gems || 0) + ' 宝石')
+              : (esc(c.plan_name) + 'VIP ' + c.days + ' 天')) + '</small></div>' +
           '<span class="hint" style="font-size:11.5px">' + esc(c.used_at) + '</span>' +
         '</div>';
       }).join('');
@@ -9861,6 +10356,12 @@ window.__supaReady = new Promise(function (resolve) {
         '</div>' +
         (isVip ? colorPickerHtml() : '') +
         '<div id="memberCards"><div class="loading"><span class="spinner"></span>加载中…</div></div>' +
+        '<div style="text-align:center;margin:18px 0 6px">' +
+          '<button class="btn primary" type="button" id="memBuyBtn" onclick="window.__memberOrderBtn(this)">' +
+            '购买会员（人工确认）</button>' +
+          '<div class="hint" style="font-size:12px;margin-top:8px;line-height:1.7">' +
+            '选方案下单 → 管理员确认收款 → 自动开通 VIP</div>' +
+        '</div>' +
       '</div>';
 
     api('api_member_page', { p_token: S.token }).then(function (r) {
@@ -11217,6 +11718,19 @@ window.__supaReady = new Promise(function (resolve) {
       renderCiRewardEditor();
     });
     if ($('btnCiRwSave')) $('btnCiRwSave').addEventListener('click', function () { saveCiRewards(this); });
+    if ($('btnCiAllGem')) $('btnCiAllGem').addEventListener('click', function () {
+      var btn = this;
+      var inp = $('ciAllGem');
+      var n = parseInt(inp && inp.value, 10);
+      if (isNaN(n) || n < 1) return toast('宝石数量要填正整数', 'err');
+      busy(btn, true, '发放中…');
+      api('api_admin_gems_all', { p_token: S.token, p_delta: n }).then(function (r) {
+        busy(btn, false);
+        var cnt = (r && (r.count || r.n || r.total || r.users)) || 0;
+        toast('已给 ' + cnt + ' 人各加 ' + n + ' 宝石', 'ok', 3600);
+        loadCheckinAdmin();
+      }, function (e) { busy(btn, false); toast(e.message, 'err', 3600); });
+    });
     if ($('btnWordsSave')) $('btnWordsSave').addEventListener('click', function () {
       var btnW = this;
       var val = String($('wordsBox').value || '').trim();
@@ -11788,6 +12302,709 @@ window.__supaReady = new Promise(function (resolve) {
       if (e.key !== 'Escape') return;
       if (modalEl) return closeModal();
       if ($('modView').hidden === false) closeModule();
+    });
+  }
+
+  /* ============================================================
+   * 1.3.0 扩展：订单 / 消息中心 / 宝石榜签到榜 / 每日任务 /
+   *            举报 / 管理看板 / 主页统计与头像框 / 好友私聊
+   * ============================================================ */
+  var extraState = { msgUnread: 0 };
+  var chatState = { uid: '', name: '', left: 0, quote: null, msgs: [], peer: null, draft: '' };
+  var rankBoardKind = 'normal';      /* normal | gems | checkin */
+  var orderFilter = 'pending';       /* pending | paid | all */
+
+  /* ---------- 半自动付费开 VIP ---------- */
+  function openMemberOrder() {
+    var plans = S.memberPlans || [];
+    function open() {
+      var opts = (S.memberPlans || []).map(function (p) {
+        return '<option value="' + esc(p.id) + '">' + esc(p.name) + '</option>';
+      }).join('');
+
+      var m = modal('购买会员（人工确认）',
+        '<p class="hint" style="margin-bottom:12px;line-height:1.7">' +
+          '选好方案下单，把钱转给管理员并在备注里说一声；管理员确认收款后会自动给你开通 VIP。</p>' +
+        '<label class="field"><span>方案<em>*</em></span>' +
+          '<select class="input" id="moPlan">' + (opts || '<option value="">还没有方案</option>') + '</select></label>' +
+        '<label class="field"><span>天数<em>*</em></span>' +
+          '<input class="input" id="moDays" type="number" min="1" max="3650" value="30"></label>' +
+        '<label class="field"><span>备注（可选）</span>' +
+          '<input class="input" id="moNote" maxlength="60" placeholder="例如：微信转账，昵称小徐"></label>',
+        '<button class="btn ghost" type="button" data-close>取消</button>' +
+        '<button class="btn primary" id="moOk" type="button">提交订单</button>', 440);
+
+      m.querySelector('#moOk').onclick = function () {
+        var btn = this;
+        var pid = m.querySelector('#moPlan').value;
+        var days = parseInt(m.querySelector('#moDays').value, 10);
+        var note = m.querySelector('#moNote').value.trim();
+        if (!pid) return toast('先选一个方案', 'err');
+        if (!days || days < 1 || days > 3650) return toast('天数填 1 ~ 3650', 'err');
+        busy(btn, true, '提交中…');
+        api('api_order_create', {
+          p_token: S.token, p_plan_id: pid, p_days: days, p_note: note
+        }).then(function () {
+          busy(btn, false);
+          closeModal();
+          toast('已下单，管理员确认收款后自动开通 VIP', 'ok', 3600);
+          openMyOrders();
+        }, function (e) {
+          busy(btn, false);
+          toast(e.message || '下单失败', 'err', 3600);
+        });
+      };
+    }
+    if (plans.length) return open();
+    api('api_member_page', { p_token: S.token }).then(function (r) {
+      S.memberPlans = r.plans || [];
+      if (!(S.memberPlans || []).length) return toast('管理员还没有建会员方案', 'err');
+      open();
+    }, function (e) { toast(e.message || '加载方案失败', 'err', 3200); });
+  }
+  window.__memberOrderBtn = function () { openMemberOrder(); };
+
+  function orderStatusText(s) {
+    if (s === 'paid') return '已开通';
+    if (s === 'cancelled') return '已取消';
+    return '待确认';
+  }
+  function orderStatusBadge(s) {
+    var cls = s === 'paid' ? 'st-done' : (s === 'cancelled' ? 'gray' : 'st-doing');
+    return '<span class="badge ' + cls + '" style="height:18px;font-size:11px">' +
+      orderStatusText(s) + '</span>';
+  }
+
+  function openMyOrders() {
+    var m = modal('我的订单', '<div class="loading"><span class="spinner"></span>加载中…</div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 560);
+    var body = m.querySelector('.modal-body');
+
+    api('api_my_orders', { p_token: S.token }).then(function (r) {
+      if (!document.body.contains(body)) return;
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>还没有订单</strong>' +
+          '在会员页点「购买会员（人工确认）」下一个</div>';
+        return;
+      }
+      body.innerHTML = items.map(function (x) {
+        return '<div class="news-item">' +
+          '<div class="hd"><b>' + esc(x.plan_name || '会员方案') + ' · ' + (x.days || 0) + ' 天</b>' +
+            orderStatusBadge(x.status) +
+            '<span class="time">' + esc(x.at || x.created_at || '') + '</span></div>' +
+          '<p style="font-size:13px">价格：' +
+            (x.price == null || x.price === '' ? '—' : esc(String(x.price))) +
+            (x.note ? '　备注：' + esc(x.note) : '') + '</p>' +
+        '</div>';
+      }).join('');
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* 管理端：订单 */
+  function loadOrderAdmin() {
+    var box = $('orderList');
+    if (!box) return;
+
+    var seg = $('orderFilter');
+    if (seg && !seg.__bound) {
+      seg.__bound = 1;
+      seg.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-of]');
+        if (!b) return;
+        orderFilter = b.getAttribute('data-of');
+        Array.prototype.forEach.call(seg.children, function (x) { x.classList.toggle('on', x === b); });
+        loadOrderAdmin();
+      });
+    }
+    var rb = $('btnOrdersReload');
+    if (rb && !rb.__bound) { rb.__bound = 1; rb.onclick = function () { loadOrderAdmin(); }; }
+
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_orders', { p_token: S.token, p_status: orderFilter }).then(function (r) {
+      if (!box.isConnected) return;
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="empty"><strong>这里没有订单</strong>' +
+          (orderFilter === 'pending' ? '等学生下单后会出现在这里' : '换个筛选看看') + '</div>';
+        return;
+      }
+      box.innerHTML = items.map(function (x) {
+        var ops = x.status === 'pending'
+          ? '<button class="link" type="button" data-oact="ok">确认收款</button>' +
+            '<button class="link danger" type="button" data-oact="no">拒绝</button>'
+          : orderStatusBadge(x.status);
+        return '<div class="news-item" data-oid="' + esc(x.id) + '">' +
+          '<div class="hd"><b>' + esc(x.name || x.user_name || '同学') + '</b>' +
+            '<span class="badge gold" style="height:18px;font-size:11px">' +
+              esc(x.plan_name || '会员') + '</span>' +
+            '<span class="time">' + esc(x.at || x.created_at || '') + '</span></div>' +
+          '<p style="font-size:13px">' + (x.days || 0) + ' 天 · 价格 ' +
+            (x.price == null || x.price === '' ? '—' : esc(String(x.price))) +
+            (x.note ? ' · 备注：' + esc(x.note) : '') + '</p>' +
+          '<div style="display:flex;gap:14px;margin-top:10px">' + ops + '</div>' +
+        '</div>';
+      }).join('');
+
+      Array.prototype.forEach.call(box.querySelectorAll('[data-oact]'), function (b) {
+        b.onclick = function () {
+          var host = b.closest('[data-oid]');
+          if (!host) return;
+          var ok = b.getAttribute('data-oact') === 'ok';
+          var id = host.getAttribute('data-oid');
+          b.disabled = true;
+          api('api_admin_order_decide', { p_token: S.token, p_id: id, p_ok: ok }).then(function () {
+            toast(ok ? '已开通 VIP' : '已拒绝', 'ok');
+            loadOrderAdmin();
+          }, function (e) {
+            b.disabled = false;
+            toast(e.message || '操作失败', 'err', 3200);
+          });
+        };
+      });
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ---------- 消息中心 ---------- */
+  function refreshMsgUnread() {
+    if (!S.token) return;
+    api('api_msg_center', { p_token: S.token }).then(function (r) {
+      extraState.msgUnread = r.unread || 0;
+      updateMeBadge();
+    }, function () {});
+  }
+
+  function updateMeBadge() {
+    var dot = $('meTabDot');
+    if (!dot) return;
+    var n = extraState.msgUnread || 0;
+    dot.hidden = !n;
+    dot.textContent = n > 0 ? (n > 9 ? '9+' : String(n)) : '';
+  }
+
+  function openMsgCenter() {
+    var m = modal('消息中心', '<div class="loading"><span class="spinner"></span>加载中…</div>',
+      '<button class="btn ghost" type="button" data-close>关闭</button>', 560);
+    var body = m.querySelector('.modal-body');
+
+    api('api_msg_center', { p_token: S.token }).then(function (r) {
+      if (!document.body.contains(body)) return;
+      extraState.msgUnread = 0;
+      updateMeBadge();
+      api('api_msg_read', { p_token: S.token }).catch(function () {});
+      if ($('mePanel') && !$('mePanel').hidden) renderAppMe();
+
+      var items = r.items || [];
+      if (!items.length) {
+        body.innerHTML = '<div class="empty"><strong>暂时没有新消息</strong>' +
+          '有人赞你、回复你、加你好友或给你发私聊时会出现在这里</div>';
+        return;
+      }
+      body.innerHTML = items.map(function (x, i) {
+        var tag = x.type === 'like' ? '赞'
+          : x.type === 'reply' ? '回复'
+          : x.type === 'friend' ? '好友' : '私聊';
+        return '<button type="button" class="me-row" data-msg="' + i + '">' +
+          '<span class="mi" style="font-size:13px;font-weight:600">' + tag + '</span>' +
+          '<span style="flex:1;min-width:0;text-align:left">' +
+            esc(x.name || '有人') + ' ' + esc(x.text || '') +
+            '<span class="ms" style="display:block">' + esc(x.at || '') + '</span>' +
+          '</span><span class="arrow">›</span></button>';
+      }).join('');
+
+      body.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-msg]');
+        if (!b) return;
+        var x = items[parseInt(b.getAttribute('data-msg'), 10)];
+        if (!x) return;
+        if (x.type === 'chat') { closeModal(); openChatPage(x.uid, x.name); return; }
+        if (x.post_id) { jumpToForumPost(x.post_id); return; }
+        if (x.uid) { closeModal(); openUserCard(x.uid); }
+      });
+    }, function (e) {
+      body.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* 跳到论坛某条帖子：列表是异步画的，轮询等它出现 */
+  function jumpToForumPost(pid) {
+    if (!pid) return;
+    closeModal();
+    if (TAB_UI) appTab('forum');
+    else openModule('forum', '论坛');
+    var tries = 0;
+    (function look() {
+      var el = document.querySelector('[data-post="' + pid + '"]');
+      if (el) {
+        try { el.scrollIntoView({ block: 'center' }); }
+        catch (e) { try { el.scrollIntoView(); } catch (e2) {} }
+        el.style.outline = '2px solid var(--red)';
+        setTimeout(function () { el.style.outline = ''; }, 2400);
+        return;
+      }
+      if (++tries > 24) return;
+      setTimeout(look, 250);
+    })();
+  }
+
+  /* ---------- 排行榜：宝石榜 / 签到榜 ---------- */
+  function paintExtraRank(kind) {
+    var box = $('rankBody');
+    if (!box) return;
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+
+    api('api_extra_ranks', { p_token: S.token }).then(function (r) {
+      if (currentMod !== 'rank' || rankBoardKind !== kind) return;
+      var b2 = $('rankBody');
+      if (!b2) return;
+      var list = (kind === 'gems' ? (r.gems || []) : (r.checkin || [])).slice(0, 20);
+      if (!list.length) {
+        b2.innerHTML = '<div class="empty"><strong>还没有人上榜</strong>多发帖、多签到就能上来</div>';
+        return;
+      }
+      b2.innerHTML = '<div style="max-width:600px;margin:0 auto">' + list.map(function (x, i) {
+        var val = kind === 'gems' ? (x.gems || 0) : (x.streak || 0);
+        return '<div class="rank-row">' +
+          '<span class="rk">' + (i + 1) + '</span>' +
+          '<span class="nm"><span class="lnk" data-uid="' + esc(x.uid) + '">' +
+            esc(x.name) + '</span></span>' +
+          '<span class="sc">' + val + ' <small>' + (kind === 'gems' ? '宝石' : '天') + '</small>' +
+            (kind === 'checkin' ? ' <small>最长 ' + (x.best || 0) + ' 天</small>' : '') +
+          '</span>' +
+        '</div>';
+      }).join('') + '</div>';
+    }, function (e) {
+      if (currentMod !== 'rank') return;
+      var b2 = $('rankBody');
+      if (b2) b2.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ---------- 每日任务 ---------- */
+  function loadDailyTasks() {
+    if (!S.token) return;
+    api('api_daily_info', { p_token: S.token }).then(function (r) {
+      var box = $('dailyBox');
+      if (!box) return;
+      var tasks = r.tasks || [];
+      box.innerHTML = '<h3>每日任务</h3>' + (tasks.length
+        ? tasks.map(function (t) {
+            var target = t.target || 1;
+            var prog = Math.min(target, t.progress || 0);
+            var tail;
+            if (t.claimed) {
+              tail = '<span class="badge gray" style="height:20px;font-size:11px">已领取</span>';
+            } else if (t.done) {
+              tail = '<button type="button" class="btn primary sm" data-claim="' + esc(t.key) +
+                '" style="height:30px">领取</button>';
+            } else {
+              tail = '<span class="hint" style="font-size:12px">' + prog + '/' + target + '</span>';
+            }
+            return '<div class="dt-row">' +
+              '<div class="dt-t">' + esc(t.title) +
+                '<div class="dt-p">进度 ' + prog + '/' + target +
+                  ' · 奖励 +' + (t.reward || 0) + ' 宝石</div></div>' + tail +
+            '</div>';
+          }).join('')
+        : '<div class="ci-empty">今天没有任务</div>');
+
+      box.querySelectorAll('[data-claim]').forEach(function (b) {
+        b.onclick = function () {
+          var key = b.getAttribute('data-claim');
+          busy(b, true, '领取中…');
+          api('api_daily_claim', { p_token: S.token, p_key: key }).then(function (r2) {
+            busy(b, false);
+            toast('已领取' + (r2 && r2.reward ? '，宝石 +' + r2.reward : ''), 'ok');
+            renderCheckinPage();
+          }, function (e) {
+            busy(b, false);
+            toast(e.message || '领取失败', 'err', 3200);
+          });
+        };
+      });
+    }, function () {
+      var box = $('dailyBox');
+      if (box) box.innerHTML = '<h3>每日任务</h3><div class="ci-empty">加载失败，稍后再看</div>';
+    });
+  }
+
+  /* ---------- 举报 ---------- */
+  function openReportDialog(kind, id) {
+    var m = modal('举报',
+      '<label class="field"><span>举报原因<em>*</em></span>' +
+        '<textarea class="textarea" id="rpReason" rows="3" maxlength="120"' +
+          ' placeholder="例如：骂人、广告、和班级无关"></textarea></label>' +
+      '<p class="hint" style="font-size:12px;line-height:1.7">' +
+        '管理员会在「举报」里看到这条记录；恶意举报可能被处理。</p>',
+      '<button class="btn ghost" type="button" data-close>取消</button>' +
+      '<button class="btn primary" id="rpSend" type="button">提交举报</button>', 440);
+
+    m.querySelector('#rpSend').onclick = function () {
+      var btn = this;
+      var v = m.querySelector('#rpReason').value.trim();
+      if (!v) return toast('写一下举报原因', 'err');
+      busy(btn, true, '提交中…');
+      api('api_report_add', {
+        p_token: S.token, p_kind: kind, p_target_id: id, p_reason: v
+      }).then(function () {
+        busy(btn, false);
+        closeModal();
+        toast('已提交，管理员会尽快处理', 'ok', 3000);
+      }, function (e) {
+        busy(btn, false);
+        toast(e.message || '提交失败', 'err', 3200);
+      });
+    };
+  }
+
+  /* 帖子 / 跟评上的「举报」统一走这里，只装一次 */
+  document.addEventListener('click', function (e) {
+    var rp = e.target.closest('[data-report]');
+    if (rp) {
+      e.preventDefault();
+      e.stopPropagation();
+      openReportDialog('post', rp.getAttribute('data-report'));
+      return;
+    }
+    var rr = e.target.closest('[data-report-reply]');
+    if (rr) {
+      e.preventDefault();
+      e.stopPropagation();
+      openReportDialog('reply', rr.getAttribute('data-report-reply'));
+    }
+  });
+
+  /* 管理端：举报列表 */
+  function loadReportAdmin() {
+    var box = $('reportList');
+    if (!box) return;
+    var rb = $('btnReportsReload');
+    if (rb && !rb.__bound) { rb.__bound = 1; rb.onclick = function () { loadReportAdmin(); }; }
+
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_reports', { p_token: S.token }).then(function (r) {
+      if (!box.isConnected) return;
+      var items = r.items || [];
+      if (!items.length) {
+        box.innerHTML = '<div class="empty"><strong>没有待处理的举报</strong>挺干净的</div>';
+        return;
+      }
+      box.innerHTML = items.map(function (x) {
+        var kind = x.kind === 'reply' ? 'reply' : 'post';
+        var kindTxt = kind === 'reply' ? '跟评' : '帖子';
+        return '<div class="news-item" data-rid="' + esc(x.id) + '" data-rtype="' + kind + '">' +
+          '<div class="hd"><span class="badge red" style="height:18px;font-size:11px">' + kindTxt + '</span>' +
+            '<h4 style="flex:1;min-width:0">' +
+              esc(x.summary || x.target_text || x.content || '（内容已删除）') + '</h4>' +
+            '<span class="time">' + esc(x.at || x.created_at || '') + '</span></div>' +
+          '<p style="font-size:12.5px;color:var(--muted)">举报人：' + esc(x.reporter || x.reporter_name || '同学') +
+            ' · 原因：' + esc(x.reason || '') + '</p>' +
+          '<div style="display:flex;gap:14px;margin-top:10px">' +
+            '<button class="link danger" type="button" data-ract="delete">删除内容</button>' +
+            '<button class="link" type="button" data-ract="dismiss">忽略</button>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      Array.prototype.forEach.call(box.querySelectorAll('[data-ract]'), function (b) {
+        b.onclick = function () {
+          var host = b.closest('[data-rid]');
+          if (!host) return;
+          var act = b.getAttribute('data-ract');
+          var action = act === 'dismiss' ? 'dismiss'
+            : (host.getAttribute('data-rtype') === 'reply' ? 'delete_reply' : 'delete_post');
+          b.disabled = true;
+          api('api_admin_report_handle', {
+            p_token: S.token, p_id: host.getAttribute('data-rid'), p_action: action
+          }).then(function () {
+            toast(act === 'dismiss' ? '已忽略' : '已删除内容', 'ok');
+            loadReportAdmin();
+          }, function (e) {
+            b.disabled = false;
+            toast(e.message || '操作失败', 'err', 3200);
+          });
+        };
+      });
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ---------- 管理端：数据看板 ---------- */
+  function loadDashAdmin() {
+    var box = $('dashBox');
+    if (!box) return;
+    var rb = $('btnDashReload');
+    if (rb && !rb.__bound) { rb.__bound = 1; rb.onclick = function () { loadDashAdmin(); }; }
+
+    box.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    api('api_admin_dashboard', { p_token: S.token }).then(function (r) {
+      if (!box.isConnected) return;
+      var cells = [
+        ['总用户', r.users, '人'],
+        ['今日活跃', r.active_today, '人'],
+        ['今日签到', r.checkin_today, '人'],
+        ['宝石总量', r.gems_total, ''],
+        ['今日帖子', r.posts_today, '条'],
+        ['今日跟评', r.replies_today, '条'],
+        ['近 7 天新用户', r.new_users_7d, '人'],
+        ['待处理举报', r.reports_pending, '条'],
+        ['待确认订单', r.orders_pending, '单']
+      ];
+      box.innerHTML = '<div class="dash-grid">' + cells.map(function (c) {
+        var v = (c[1] == null || c[1] === '') ? 0 : c[1];
+        return '<div class="dash-c"><b>' + esc(String(v)) + '</b>' +
+          '<span>' + esc(c[0]) + (c[2] ? '（' + c[2] + '）' : '') + '</span></div>';
+      }).join('') + '</div>' +
+      '<p class="hint" style="margin-top:12px;font-size:12px">数字来自 api_admin_dashboard，点右上角「刷新」重新拉一次。</p>';
+    }, function (e) {
+      box.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  /* ---------- 个人主页：统计 + 头像框 ---------- */
+  function avRingHtml(u, streak) {
+    var cls = 'av-ring';
+    if (u && u.is_vip) cls += ' av-ring-gold';
+    else if ((streak || 0) >= 7) cls += ' av-ring-red';
+    var inner = (u && u.avatar_url)
+      ? '<img src="' + esc(u.avatar_url) + '" alt="">'
+      : esc(String((u && u.name) || '?').slice(0, 1));
+    return '<div class="' + cls + '">' + inner + '</div>';
+  }
+
+  function profileHeadHtml(u, streak) {
+    return '<div id="pfHead" style="display:flex;justify-content:center;margin:4px 0 14px">' +
+      avRingHtml(u, streak) + '</div>';
+  }
+
+  function loadProfileStats(uid, user) {
+    api('api_profile_stats', { p_token: S.token, p_uid: uid }).then(function (r) {
+      if (currentMod !== 'userpage') return;
+      var box = $('pfStats');
+      if (!box) return;
+      var cells = [
+        ['帖子', r.posts || 0],
+        ['跟评', r.replies || 0],
+        ['收到的赞', r.likes_received || 0],
+        ['好友', r.friends || 0],
+        ['连续签到', (r.checkin_streak || 0) + ' 天'],
+        ['最长连胜', (r.checkin_best || 0) + ' 天'],
+        ['宝石', r.gems || 0],
+        ['加入', r.joined_at ? String(r.joined_at).slice(0, 10) : '—']
+      ];
+      box.innerHTML = '<div class="pf-stats">' + cells.map(function (c) {
+        return '<div class="pf-stat"><b>' + esc(String(c[1])) + '</b>' +
+          '<span>' + esc(c[0]) + '</span></div>';
+      }).join('') + '</div>';
+
+      var head = $('pfHead');
+      if (head) head.innerHTML = avRingHtml(user, r.checkin_streak);
+    }, function () {
+      var box = $('pfStats');
+      if (box) box.innerHTML = '<div class="hint" style="text-align:center;font-size:12px">' +
+        '统计暂时加载不出来</div>';
+    });
+  }
+
+  /* ---------- 好友私聊（每天 10 条） ---------- */
+  function openChatPage(uid, name) {
+    if (!uid) return;
+    if (S.me && S.me.id === uid) return toast('不能和自己聊天', 'err');
+
+    chatState = { uid: uid, name: name || '', left: 0, quote: null, msgs: [], peer: null, draft: '' };
+    currentMod = 'chat';
+    $('modTitle').textContent = name ? ('和 ' + name + ' 聊天') : '私聊';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    $('modBody').innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+    slideIn($('modView'), 'right');
+    syncAppChrome();
+    api('api_chat_read', { p_token: S.token, p_uid: uid }).catch(function () {});
+    renderChatPage();
+  }
+
+  function renderChatPage() { loadChat(); }
+
+  function loadChat() {
+    var uid = chatState.uid;
+    api('api_chat_msgs', { p_token: S.token, p_uid: uid }).then(function (r) {
+      if (currentMod !== 'chat' || chatState.uid !== uid) return;
+      chatState.left = (r.left == null) ? 0 : r.left;
+      chatState.peer = r.peer || {};
+      chatState.msgs = r.items || [];
+      paintChat();
+    }, function (e) {
+      if (currentMod !== 'chat') return;
+      $('modBody').innerHTML = '<div class="empty"><strong>打不开</strong>' + esc(e.message) + '</div>';
+    });
+  }
+
+  function paintChat() {
+    var body = $('modBody');
+    if (!body) return;
+    var p = chatState.peer || {};
+    var nm = p.name || chatState.name || '对方';
+    var online = p.online ? '在线' : ('上次上线 ' + fmt(p.last_seen));
+    var left = chatState.left || 0;
+    var q = chatState.quote;
+
+    var bubbles = chatState.msgs.length
+      ? chatState.msgs.map(function (x) {
+          return '<div class="chat-row' + (x.from_me ? ' me' : '') + '">' +
+            '<div class="chat-b ' + (x.from_me ? 'me' : 'other') + '">' +
+              (x.quote_text ? '<div class="q">' + esc(String(x.quote_text).slice(0, 80)) + '</div>' : '') +
+              esc(x.body) +
+              '<div class="chat-t">' + esc(x.created_at || '') + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('')
+      : '<div class="ci-empty">还没有聊过，打个招呼吧</div>';
+
+    body.innerHTML =
+      '<div class="chat-wrap">' +
+        '<div class="chat-head">' +
+          '<span class="ch-nm lnk" data-uid="' + esc(chatState.uid) + '">' + esc(nm) + '</span>' +
+          '<span class="ch-st">' + esc(online) + '</span>' +
+          '<span class="ch-left">今天还能发 ' + left + ' 条</span>' +
+        '</div>' +
+        '<div class="chat-list" id="chatList">' + bubbles + '</div>' +
+        '<div class="chat-quote" id="chatQuote">' +
+          (q ? '<span>引用：' + esc(String(q.text || '').slice(0, 40)) + '</span>' +
+               '<button type="button" class="link" id="chatQuoteX">取消</button>' : '') +
+        '</div>' +
+        '<div class="chat-in">' +
+          '<button type="button" class="btn ghost sm" id="chatQuoteBtn"' +
+            ' style="height:36px;flex:none">引用</button>' +
+          '<textarea class="textarea" id="chatInput" rows="1" maxlength="500"' +
+            ' placeholder="说点什么…"' + (left <= 0 ? ' disabled' : '') + '>' +
+            esc(chatState.draft || '') + '</textarea>' +
+          '<button type="button" class="btn primary sm" id="chatSend"' +
+            ' style="height:36px;flex:none"' + (left <= 0 ? ' disabled' : '') + '>' +
+            (left <= 0 ? '已达上限' : '发送') + '</button>' +
+        '</div>' +
+      '</div>';
+
+    var list = $('chatList');
+    if (list) list.scrollTop = list.scrollHeight;
+
+    var ta = $('chatInput');
+    if (ta) ta.addEventListener('input', function () { chatState.draft = ta.value; });
+
+    var qx = $('chatQuoteX');
+    if (qx) qx.onclick = function () { chatState.quote = null; paintChat(); };
+
+    var qb = $('chatQuoteBtn');
+    if (qb) qb.onclick = openChatQuote;
+
+    var send = $('chatSend');
+    if (send) send.onclick = sendChat;
+  }
+
+  function sendChat() {
+    if ((chatState.left || 0) <= 0) {
+      return toast('今天已经发满 10 条了，明天再来', 'ok', 3200);
+    }
+    var ta = $('chatInput');
+    var btn = $('chatSend');
+    if (!ta) return;
+    var v = String(ta.value || '');
+    if (!v.trim()) return toast('写点内容吧', 'err');
+
+    var q = chatState.quote;
+    busy(btn, true, '发送中…');
+    api('api_chat_send', {
+      p_token: S.token,
+      p_uid: chatState.uid,
+      p_body: v,
+      p_quote_kind: q ? q.kind : null,
+      p_quote_text: q ? String(q.text || '').slice(0, 80) : null
+    }).then(function () {
+      busy(btn, false);
+      chatState.quote = null;
+      chatState.draft = '';
+      loadChat();
+    }, function (e) {
+      busy(btn, false);
+      toast(e.message || '发送失败', 'err', 3200);
+    });
+  }
+
+  /* 引用：从论坛帖子 / 班级热点里挑一条 */
+  function openChatQuote() {
+    var ta = $('chatInput');
+    if (ta) chatState.draft = ta.value;
+
+    var m = modal('引用一条',
+      '<div class="seg" id="qSeg">' +
+        '<button type="button" data-qk="post" class="on">论坛帖子</button>' +
+        '<button type="button" data-qk="news">班级热点</button>' +
+      '</div>' +
+      '<div id="qList"><div class="loading"><span class="spinner"></span>加载中…</div></div>',
+      '<button class="btn ghost" type="button" data-close>取消</button>', 520);
+    var list = m.querySelector('#qList');
+
+    function paint(kind) {
+      list.__kind = kind;
+      list.innerHTML = '<div class="loading"><span class="spinner"></span>加载中…</div>';
+      var job = kind === 'news'
+        ? api('api_list_announcements', { p_token: S.token })
+        : api('api_forum_list', { p_token: S.token });
+
+      job.then(function (r) {
+        if (!document.body.contains(list) || list.__kind !== kind) return;
+        var items = (r.items || []).slice(0, 20);
+        if (!items.length) {
+          list.innerHTML = '<div class="empty"><strong>没有可引用的内容</strong></div>';
+          return;
+        }
+        list.innerHTML = items.map(function (x, i) {
+          var txt = kind === 'news' ? (x.title || '') : (x.body || '');
+          var sub = kind === 'news' ? (x.sub || '') : (x.author || '');
+          return '<button type="button" class="fc-row" data-qpick="' + i + '">' +
+            '<span class="fc-r-name" style="flex:1;text-align:left">' +
+              esc(String(txt).slice(0, 40)) + '</span>' +
+            '<span class="fc-r-sub" style="flex:none">' + esc(String(sub).slice(0, 16)) + '</span>' +
+          '</button>';
+        }).join('');
+
+        Array.prototype.forEach.call(list.querySelectorAll('[data-qpick]'), function (b) {
+          b.onclick = function () {
+            var x = items[parseInt(b.getAttribute('data-qpick'), 10)];
+            if (!x) return;
+            chatState.quote = {
+              kind: kind === 'news' ? 'news' : 'post',
+              text: kind === 'news'
+                ? (x.title || '')
+                : ((x.author ? (x.author + '：') : '') + (x.body || ''))
+            };
+            closeModal();
+            if (currentMod !== 'chat') return;
+            paintChat();
+            toast('已引用，发送时会带上', 'ok');
+          };
+        });
+      }, function (e) {
+        if (!document.body.contains(list)) return;
+        list.innerHTML = '<div class="empty"><strong>加载失败</strong>' + esc(e.message) + '</div>';
+      });
+    }
+
+    paint('post');
+    m.querySelector('#qSeg').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-qk]');
+      if (!b) return;
+      var kind = b.getAttribute('data-qk');
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      paint(kind);
     });
   }
 
