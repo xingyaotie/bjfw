@@ -624,6 +624,12 @@ body.theme-heicheng .ci-d.on{background:#0E2418;color:#5FD79A;border-color:#1E4A
 .ci-shop-item .nm{flex:1;min-width:0;font-size:14px;color:var(--ink)}
 .ci-shop-item .sub{font-size:12px;color:var(--muted);margin-top:2px}
 .ci-empty{font-size:13px;color:var(--muted);padding:6px 0}
+.ci-sign{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.ci-sign .t1{font-size:15px;font-weight:700;color:var(--ink)}
+.ci-sign .t2{font-size:12.5px;color:var(--muted);margin-top:3px}
+.ci-sign .grow{flex:1;min-width:0}
+.ci-sign .btn{height:44px;min-width:104px;font-size:15px;flex:none}
 
 /* 兑换券管理：未兑换 / 已兑换 两段 */
 .news-sec-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;
@@ -1597,6 +1603,18 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
         </div>
         <div id="catBox" hidden style="margin-top:12px"></div>
       </div>
+
+      <div class="card" style="padding:16px;margin-top:18px">
+        <div class="panel-head" style="margin:0">
+          <div>
+            <h3 style="font-size:15px">④ 屏蔽词</h3>
+            <div class="hint">一行一个词；学生在论坛发帖 / 跟评、热点投稿时命中就提示「包含违禁词语」</div>
+          </div>
+          <button class="btn primary sm" id="btnWordsSave" type="button" style="height:32px;padding:0 14px">保存</button>
+        </div>
+        <textarea class="textarea" id="wordsBox" rows="6" style="margin-top:10px"
+          placeholder="例如：&#10;广告&#10;加微信"></textarea>
+      </div>
     </section>
 
     <!-- 勋章设置 -->
@@ -1686,6 +1704,11 @@ body.theme-wujin .cube-opt .ico{background:rgba(255,255,255,.07);color:#F2EDE3}
         <div><h2>VIP 兑换券</h2>
           <div class="hint">建好后会生成一张带二维码的图片，发给同学扫一下就能兑换</div></div>
         <button class="btn primary sm" id="btnCouponNew" type="button" style="height:34px;padding:0 14px">＋ 添加</button>
+      </div>
+      <div class="seg" id="couponFilter">
+        <button type="button" data-cf="all" class="on">全部</button>
+        <button type="button" data-cf="unused">未兑换</button>
+        <button type="button" data-cf="used">已兑换</button>
       </div>
       <div class="card"><div class="news" id="couponList">
         <div class="loading"><span class="spinner"></span>加载中…</div>
@@ -3140,6 +3163,7 @@ window.__supaReady = new Promise(function (resolve) {
   function enter(profile) {
     S.me = profile;
     S.ad2Shown = false;
+    bannedLoad();
 
     /* 登录成功就把键盘收掉，不然它会一直挂在屏幕上 */
     try {
@@ -3488,6 +3512,7 @@ window.__supaReady = new Promise(function (resolve) {
       if (moreState.view === 'fb' || moreState.view === 'promo' || moreState.view === 'ver') return renderMore();
     }
     if (currentMod === 'couponNew') { leaveCouponPage(); return; }
+    if (currentMod === 'couponDetail') { leaveCouponDetail(); return; }
     if (currentMod === 'redeem') {
       stopRedeemScan();
       currentMod = '';
@@ -5110,11 +5135,32 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
+  /* 屏蔽词：管理端设置，发帖 / 跟评 / 热点都先查一遍 */
+  var BANNED_WORDS = [];
+  function bannedLoad() {
+    api('api_banned_words', {}).then(function (r) {
+      BANNED_WORDS = ((r && r.words) || []).filter(function (w) { return !!w; });
+    }, function () {});
+  }
+  function bannedHit(text) {
+    var t = String(text || '');
+    for (var i = 0; i < BANNED_WORDS.length; i++) {
+      var w = BANNED_WORDS[i];
+      if (w && t.indexOf(w) >= 0) return w;
+    }
+    return '';
+  }
+  function bannedGuard(text) {
+    if (bannedHit(text)) { toast('包含违禁词语', 'err', 3200); return true; }
+    return false;
+  }
+
   function sendCompose() {
     var btn = $('composeSend');
     var ta = $('composeBody');
     var v = ta ? ta.value : composeState.body;
     if (!v || !v.trim()) return toast('写点内容吧', 'err');
+    if (bannedGuard(v)) return;
     composeState.body = v;
 
     busy(btn, true, '发布中\u2026');
@@ -5126,7 +5172,8 @@ window.__supaReady = new Promise(function (resolve) {
       p_mentions: composeState.mentions.map(function (m) { return m.id; })
     }).then(function (r) {
       busy(btn, false);
-      toast(r && r.mentioned ? ('已发布，提醒了 ' + r.mentioned + ' 人') : '已发布', 'ok');
+      var gemTip = (r && r.reward) ? ('，宝石 +' + r.reward) : '';
+      toast(r && r.mentioned ? ('已发布，提醒了 ' + r.mentioned + ' 人' + gemTip) : ('已发布' + gemTip), 'ok');
       currentMod = 'forum';
       $('modTitle').textContent = '论坛';
       renderForum();
@@ -5214,10 +5261,11 @@ window.__supaReady = new Promise(function (resolve) {
         var inp = box.querySelector('[data-reply-input]');
         var v = inp.value;
         if (!v.trim()) return toast('写点内容吧', 'err');
+        if (bannedGuard(v)) return;
         busy(send, true, '发送中…');
-        api('api_forum_reply', { p_token: S.token, p_post_id: pid, p_body: v }).then(function () {
+        api('api_forum_reply', { p_token: S.token, p_post_id: pid, p_body: v }).then(function (r) {
           busy(send, false);
-          toast('已跟评', 'ok');
+          toast('已跟评' + ((r && r.reward) ? ('，宝石 +' + r.reward) : ''), 'ok');
           cacheDel('rep_' + pid);
           renderForum();
         }, function (e) { busy(send, false); toast(e.message, 'err', 3800); });
@@ -5248,6 +5296,16 @@ window.__supaReady = new Promise(function (resolve) {
         loadForumAdmin();
       }, function (e) { toast(e.message, 'err', 3600); });
     });
+  }
+
+  function loadBannedWordsAdmin() {
+    var box = $('wordsBox');
+    if (!box) return;
+    api('api_banned_words', {}).then(function (r) {
+      var words = (r && r.words) || [];
+      box.value = words.join('\n');
+      BANNED_WORDS = words.slice();
+    }, function () {});
   }
 
   /* ---------- 管理端：论坛类别 ---------- */
@@ -6037,13 +6095,12 @@ window.__supaReady = new Promise(function (resolve) {
     });
   }
 
-  /* 学生投稿热点（每周 3 次，需审核） */
-  var NEWS_REVIEW_TIP = '审核时间：工作日 20:10–21:30，节假日 10:00–22:00';
+  /* 学生投稿热点（每周 3 次，发布后直接显示） */
 
   function openNewsApply() {
     var m = modal('投稿班级热点',
-      '<p class="hint" style="margin-bottom:12px;line-height:1.7">' + NEWS_REVIEW_TIP +
-        '<br>每周最多 3 次，管理员通过后会出现在「班级热点」里。</p>' +
+      '<p class="hint" style="margin-bottom:12px;line-height:1.7">' +
+        '每周最多 3 次，发布后会直接出现在「班级热点」里。</p>' +
       '<label class="field"><span>标题<em>*</em></span>' +
         '<input class="input" id="naTitle" maxlength="40" placeholder="例如：本周五运动会"></label>' +
       '<label class="field"><span>小字（可选，列表里显示这一行）</span>' +
@@ -6052,7 +6109,7 @@ window.__supaReady = new Promise(function (resolve) {
         '<textarea class="textarea" id="naBody" rows="5" maxlength="2000" placeholder="想说的内容"></textarea></label>' +
       '<div id="naMine"></div>',
       '<button class="btn ghost" type="button" data-close>取消</button>' +
-      '<button class="btn primary" id="naSend" type="button">提交审核</button>', 520);
+      '<button class="btn primary" id="naSend" type="button">发布</button>', 520);
 
     api('api_news_my_applies', { p_token: S.token }).then(function (r) {
       var items = r.items || [];
@@ -6060,8 +6117,8 @@ window.__supaReady = new Promise(function (resolve) {
         '<div class="hint" style="margin-top:6px">本周已投稿 ' + (r.used || 0) + ' / 3</div>' +
         (items.length
           ? '<div class="pf-label" style="margin:10px 0 6px">我的投稿</div>' + items.slice(0, 6).map(function (x) {
-              var tag = x.status === 'approved' ? '已通过' : x.status === 'rejected' ? '已被拒绝' : '待审核';
-              var color = x.status === 'approved' ? 'st-done' : x.status === 'rejected' ? 'st-new' : 'st-doing';
+              var tag = x.status === 'approved' ? '已发布' : x.status === 'rejected' ? '已删除' : '已发布';
+              var color = x.status === 'rejected' ? 'st-new' : 'st-done';
               return '<div class="perm-row" style="padding:6px 0">' +
                 '<div class="who" style="width:auto;flex:1">' + esc(x.title) +
                   '<small>' + esc(x.at) + '</small></div>' +
@@ -6075,14 +6132,16 @@ window.__supaReady = new Promise(function (resolve) {
       var btn = this;
       var t = m.querySelector('#naTitle').value.trim();
       if (!t) return toast('填一下标题', 'err');
-      busy(btn, true, '提交中…');
+      if (bannedGuard(t + ' ' + m.querySelector('#naSub').value + ' ' + m.querySelector('#naBody').value)) return;
+      busy(btn, true, '发布中…');
       api('api_news_apply', {
         p_token: S.token, p_title: t,
         p_sub: m.querySelector('#naSub').value.trim(),
         p_content: m.querySelector('#naBody').value.trim()
       }).then(function () {
         busy(btn, false); closeModal();
-        toast('已提交，等管理员审核（' + NEWS_REVIEW_TIP.replace('审核时间：', '') + '）', 'ok', 5000);
+        toast('已发布，已出现在「班级热点」里', 'ok', 3000);
+        if (currentMod === 'news') renderNewsInModule($('modBody'));
       }, function (e) { busy(btn, false); toast(e.message, 'err', 3800); });
     };
   }
@@ -6105,7 +6164,7 @@ window.__supaReady = new Promise(function (resolve) {
     if (name === 'hwlib') { S.hwOpen = S.hwOpen || {}; loadHwLibAdmin(); }
     if (name === 'mail') loadMailTab();
     if (name === 'feedback') loadFeedbackAdmin();
-    if (name === 'forum') { loadForumAdmin(); loadMutePanel(); loadForumCatsAdmin(); }
+    if (name === 'forum') { loadForumAdmin(); loadMutePanel(); loadForumCatsAdmin(); loadBannedWordsAdmin(); }
     if (name === 'medal') loadMedalAdmin();
     if (name === 'vendor') loadVendorAdmin();
     if (name === 'member') loadMemberAdmin();
@@ -8415,17 +8474,22 @@ window.__supaReady = new Promise(function (resolve) {
 
     body.innerHTML =
       '<div class="ci-wrap">' +
+        '<div class="ci-sign">' +
+          '<div class="grow">' +
+            '<div class="t1">今天 ' + esc(today) + '</div>' +
+            '<div class="t2">' + (checkedToday ? '已签到 ✓ 明天记得再来' : '还没签到，点右边按钮') + '</div>' +
+          '</div>' +
+          '<button type="button" class="btn primary" id="ciDo"' +
+            (checkedToday ? ' disabled' : '') + '>' + (checkedToday ? '已签到' : '签到') + '</button>' +
+        '</div>' +
         '<div class="ci-top">' +
           '<div class="ci-hero">' +
             '<div class="big">' + streak + '<small>天</small></div>' +
             '<div class="sm">连续签到 · 最长 ' + best + ' 天</div>' +
-            '<div class="sm">今天 ' + esc(today) + ' ' + (checkedToday ? '· 已签到 ✓' : '· 还没签到') + '</div>' +
             '<div class="sm">宝石 ' + gems + ' · 忘签到保护 ' + equipped + '/' + owned + '（已装备/拥有）</div>' +
           '</div>' +
           '<div class="ci-side">' +
             '<button type="button" class="btn ghost sm" id="ciShop">🛒 商城</button>' +
-            '<button type="button" class="btn primary sm" id="ciDo"' +
-              (checkedToday ? ' disabled' : '') + '>' + (checkedToday ? '已签到' : '签到') + '</button>' +
           '</div>' +
         '</div>' +
         cal +
@@ -8649,16 +8713,23 @@ window.__supaReady = new Promise(function (resolve) {
       '<div class="panel-head" style="margin:0 0 10px"><div>' +
         '<h3 style="font-size:15px">今天签到 ' + done + ' / ' + users.length + ' 人</h3></div></div>' +
       users.map(function (u) {
-        return '<div class="news-item" style="display:flex;align-items:center;gap:10px">' +
+        return '<div class="news-item" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">' +
           '<span class="badge ' + (u.checked_today ? 'st-done' : 'gray') + '" style="height:18px;font-size:11px">' +
             (u.checked_today ? '已签' : '未签') + '</span>' +
-          '<span style="flex:1;min-width:0;font-size:13.5px;color:var(--ink)">' + esc(u.name) +
+          '<span style="flex:1;min-width:120px;font-size:13.5px;color:var(--ink)">' + esc(u.name) +
             (u.dept ? ' <span class="hint">' + esc(u.dept) + '</span>' : '') + '</span>' +
           '<span class="hint" style="font-size:12px;text-align:right">' +
             '连续 ' + (u.streak || 0) + ' · 最长 ' + (u.best || 0) + '<br>' +
             '保护 ' + (u.protect_equipped || 0) + '/' + (u.protect_owned || 0) +
             (u.last ? ' · 上次 ' + esc(u.last) : '') +
           '</span>' +
+          '<div style="display:flex;align-items:center;gap:6px;flex:none">' +
+            '<span class="hint" style="font-size:12px">💎</span>' +
+            '<input class="input" data-gemin="' + esc(u.id) + '" type="number" min="0" step="1" value="' +
+              (u.gems || 0) + '" style="width:76px;height:30px;padding:0 6px">' +
+            '<button type="button" class="btn ghost sm" data-gemset="' + esc(u.id) + '" style="height:30px">设为</button>' +
+            '<button type="button" class="btn ghost sm" data-gemadd="' + esc(u.id) + '" data-d="10" style="height:30px">+10</button>' +
+          '</div>' +
         '</div>';
       }).join('');
   }
@@ -8807,6 +8878,9 @@ window.__supaReady = new Promise(function (resolve) {
   var couponPlans = [];
   var redeemState = { view: 'scan', info: null, stream: null, timer: null };
 
+  var couponFilter = 'all';
+  var couponDetail = null;
+
   function loadCouponAdmin() {
     var box = $('couponList');
     if (!box) return;
@@ -8820,36 +8894,108 @@ window.__supaReady = new Promise(function (resolve) {
   }
 
   function couponRowHtml(c) {
-    return '<div class="news-item" style="display:flex;align-items:center;gap:12px">' +
+    return '<div class="news-item" data-couponopen="' + esc(c.id) + '" style="display:flex;align-items:center;gap:12px;cursor:pointer">' +
       '<div style="flex:1;min-width:0">' +
         '<b style="font-size:14px;color:var(--ink)">' + esc(c.name) + '</b>' +
-        ' <span class="badge gray" style="height:18px;font-size:11px">' + esc(c.code) + '</span>' +
+        ' <span class="badge ' + (c.used ? 'gray' : 'st-done') + '" style="height:18px;font-size:11px">' +
+          (c.used ? '已兑换' : '未兑换') + '</span>' +
         '<div class="hint" style="margin-top:4px">' +
-          esc(c.plan_name) + 'VIP · ' + c.days + ' 天 · ' + esc(c.created_at) +
-          (c.used ? ' · <span style="color:var(--red)">已被 ' + esc(c.used_by || '某人') + ' 用掉</span>' : ' · 未使用') +
+          esc(c.code) + ' · ' + esc(c.plan_name) + 'VIP · ' + c.days + ' 天' +
+          (c.used ? ' · 被 ' + esc(c.used_by || '某人') + ' 用掉' : '') +
         '</div>' +
       '</div>' +
-      (c.used ? '' : '<button type="button" class="link" data-couponimg="' + esc(c.id) + '">看图片</button>') +
-      '<button type="button" class="link danger" data-coupondel="' + esc(c.id) + '">删除</button>' +
+      '<span class="arrow">›</span>' +
     '</div>';
   }
 
   function renderCouponAdmin() {
     var box = $('couponList');
-    var list = S.coupons || [];
-    if (!list.length) {
+    var all = S.coupons || [];
+    if (!all.length) {
       box.innerHTML = '<div class="empty"><strong>还没有兑换券</strong>点右上角「＋ 添加」建一张</div>';
       return;
     }
-    var unused = list.filter(function (c) { return !c.used; });
-    var used = list.filter(function (c) { return c.used; });
-    box.innerHTML =
-      '<div class="news-sec-title">未兑换 <span class="n">' + unused.length + ' 张</span></div>' +
-      (unused.length ? unused.map(couponRowHtml).join('')
-        : '<div class="hint" style="padding:6px 0 2px">还没有未兑换的券</div>') +
-      '<div class="news-sec-title is-used">已兑换 <span class="n">' + used.length + ' 张</span></div>' +
-      (used.length ? used.map(couponRowHtml).join('')
-        : '<div class="hint" style="padding:6px 0 2px">还没有人兑换过</div>');
+    var list = all.filter(function (c) {
+      if (couponFilter === 'unused') return !c.used;
+      if (couponFilter === 'used') return c.used;
+      return true;
+    });
+    if (!list.length) {
+      box.innerHTML = '<div class="empty"><strong>这里没有券</strong>换个筛选看看</div>';
+      return;
+    }
+    box.innerHTML = list.map(couponRowHtml).join('');
+  }
+
+  function openCouponDetail(id) {
+    var c = couponById(id);
+    if (!c) return;
+    couponDetail = c;
+    currentMod = 'couponDetail';
+    $('modTitle').textContent = '兑换券详情';
+    $('mePanel').hidden = true;
+    $('userPanel').hidden = true;
+    $('adminPanel').hidden = true;
+    $('modView').hidden = false;
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('app-mod');
+    slideIn($('modView'), 'right');
+    renderCouponDetailPage();
+  }
+
+  function renderCouponDetailPage() {
+    var c = couponDetail;
+    var body = $('modBody');
+    if (!c) { leaveCouponDetail(); return; }
+    body.innerHTML =
+      '<div style="max-width:560px;margin:0 auto">' +
+        '<div class="hint" style="margin-bottom:10px">' +
+          (c.used ? '这张券已经被兑换，图片仅作记录' : '发给同学扫一扫就能兑换') + '</div>' +
+        '<div id="cpDetailImg"><div class="loading"><span class="spinner"></span>生成图片…</div></div>' +
+        '<div class="ci-sec" style="margin-top:14px">' +
+          '<div class="ci-rw"><span class="rw-d">名称</span><span>' + esc(c.name) + '</span></div>' +
+          '<div class="ci-rw"><span class="rw-d">编号</span><span>' + esc(c.code) + '</span></div>' +
+          '<div class="ci-rw"><span class="rw-d">方案</span><span>' + esc(c.plan_name) + 'VIP · ' + c.days + ' 天</span></div>' +
+          '<div class="ci-rw"><span class="rw-d">状态</span><span>' +
+            (c.used ? '已兑换（' + esc(c.used_by || '某人') + '）' : '未兑换') + '</span></div>' +
+          '<div class="ci-rw"><span class="rw-d">创建</span><span>' + esc(c.created_at) + '</span></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap">' +
+          '<button class="btn primary" type="button" id="cpDetailSave">保存图片</button>' +
+          '<button class="btn danger" type="button" id="cpDetailDel">删除</button>' +
+          '<button class="btn ghost" type="button" id="cpDetailBack">返回列表</button>' +
+        '</div>' +
+      '</div>';
+
+    $('cpDetailBack').onclick = leaveCouponDetail;
+    $('cpDetailDel').onclick = function () { deleteCoupon(c.id); };
+    makeCouponImage({ name: c.name, code: c.code, plan_name: c.plan_name, days: c.days }, function (url) {
+      var box = $('cpDetailImg');
+      if (!box) return;
+      box.innerHTML = '<img src="' + url + '" style="width:100%;max-width:420px;border-radius:12px;border:1px solid var(--line)">';
+      var save = $('cpDetailSave');
+      if (save) save.onclick = function () { saveImageFile(url, c.code + '.png'); };
+    });
+  }
+
+  function deleteCoupon(id) {
+    confirmBox('删除兑换券', '删除后这张券就不能再兑换了。', '', '删除').then(function (yes) {
+      if (!yes) return;
+      api('api_admin_coupon_delete', { p_token: S.token, p_id: id }).then(function () {
+        toast('已删除', 'ok');
+        leaveCouponDetail();
+        loadCouponAdmin();
+      }, function (e) { toast(e.message, 'err', 3600); });
+    });
+  }
+
+  function leaveCouponDetail() {
+    currentMod = '';
+    $('modView').hidden = true;
+    $('adminPanel').hidden = false;
+    document.body.style.overflow = '';
+    document.body.classList.remove('app-mod');
+    switchTab('coupon');
   }
 
   function couponById(id) {
@@ -11071,6 +11217,40 @@ window.__supaReady = new Promise(function (resolve) {
       renderCiRewardEditor();
     });
     if ($('btnCiRwSave')) $('btnCiRwSave').addEventListener('click', function () { saveCiRewards(this); });
+    if ($('btnWordsSave')) $('btnWordsSave').addEventListener('click', function () {
+      var btnW = this;
+      var val = String($('wordsBox').value || '').trim();
+      saveSetting('banned_words', val, btnW).then(function () {
+        bannedLoad();
+        toast('屏蔽词已保存', 'ok');
+      }, function (e) { toast(e.message, 'err', 3600); });
+    });
+    if ($('ciAdminBox')) $('ciAdminBox').addEventListener('click', function (e) {
+      var ga = e.target.closest('[data-gemadd]');
+      if (ga) {
+        ga.disabled = true;
+        api('api_admin_gems_add', {
+          p_token: S.token, p_user_id: ga.getAttribute('data-gemadd'),
+          p_delta: parseInt(ga.getAttribute('data-d'), 10) || 10
+        }).then(function (r) {
+          toast('已赠送，现有 ' + (r && r.gems) + ' 宝石', 'ok');
+          loadCheckinAdmin();
+        }, function (err) { ga.disabled = false; toast(err.message, 'err', 3600); });
+        return;
+      }
+      var gs = e.target.closest('[data-gemset]');
+      if (gs) {
+        var uid = gs.getAttribute('data-gemset');
+        var inp = $('ciAdminBox').querySelector('[data-gemin="' + uid + '"]');
+        var v = parseInt(inp && inp.value, 10);
+        if (isNaN(v) || v < 0) return toast('宝石数量要填 0 或正整数', 'err');
+        gs.disabled = true;
+        api('api_admin_gems_set', { p_token: S.token, p_user_id: uid, p_gems: v }).then(function (r) {
+          toast('已设为 ' + (r && r.gems) + ' 宝石', 'ok');
+          loadCheckinAdmin();
+        }, function (err) { gs.disabled = false; toast(err.message, 'err', 3600); });
+      }
+    });
     if ($('ciRwBox')) $('ciRwBox').addEventListener('click', function (e) {
       var del = e.target.closest('[data-rwdel]');
       if (!del) return;
@@ -11079,30 +11259,15 @@ window.__supaReady = new Promise(function (resolve) {
       renderCiRewardEditor();
     });
     $('couponList').addEventListener('click', function (e) {
-      var img = e.target.closest('[data-couponimg]');
-      if (img) {
-        var c = couponById(img.getAttribute('data-couponimg'));
-        if (!c) return;
-        makeCouponImage({ name: c.name, code: c.code, plan_name: c.plan_name, days: c.days }, function (url) {
-          var mo = modal('兑换券图片',
-            '<div style="text-align:center"><img src="' + url + '" style="width:100%;max-width:380px;border-radius:12px">' +
-            '<div class="hint" style="margin-top:10px">长按图片也可以保存</div></div>',
-            '<button class="btn primary" type="button" id="cpImgSave">保存图片</button>' +
-            '<button class="btn ghost" type="button" data-close>关闭</button>', 460);
-          var sb = mo.querySelector('#cpImgSave');
-          if (sb) sb.onclick = function () { saveImageFile(url, c.code + '.png'); };
-        });
-        return;
-      }
-      var del = e.target.closest('[data-coupondel]');
-      if (del) {
-        confirmBox('删除兑换券', '删除后这张券就不能再兑换了。', '', '删除').then(function (yes) {
-          if (!yes) return;
-          api('api_admin_coupon_delete', { p_token: S.token, p_id: del.getAttribute('data-coupondel') }).then(function () {
-            toast('已删除', 'ok'); loadCouponAdmin();
-          }, function (err) { toast(err.message, 'err'); });
-        });
-      }
+      var row = e.target.closest('[data-couponopen]');
+      if (row) { openCouponDetail(row.getAttribute('data-couponopen')); return; }
+    });
+    if ($('couponFilter')) $('couponFilter').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-cf]');
+      if (!b) return;
+      couponFilter = b.getAttribute('data-cf');
+      Array.prototype.forEach.call(this.children, function (x) { x.classList.toggle('on', x === b); });
+      renderCouponAdmin();
     });
 
     $('btnSendMail').addEventListener('click', sendMail);
